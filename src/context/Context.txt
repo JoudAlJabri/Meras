@@ -1,0 +1,30 @@
+What is the Context Folder and AuthContext?
+Think of it this way. Imagine your app is a building with many rooms (pages). Now imagine the "currently logged in user" is a VIP guest pass. Every room needs to know:
+
+Is someone holding this pass?
+What's their name?
+Are they an Explorer, Guide, or Admin?
+
+The naive approach (wrong way):
+LandingPage → passes user to Navbar
+Navbar → passes user to Dashboard
+Dashboard → passes user to Sidebar
+Sidebar → passes user to ProfileIcon
+You'd be passing the same user data through 4 components just to show a name. This is called "prop drilling" and it's a nightmare.
+
+Context solves this:
+jsx// ANY component in the entire app can just do this:
+const { currentUser } = useAuth()
+// And instantly knows who is logged in
+// No passing props through 10 components
+```
+
+Think of AuthContext like a **global variable** that any page or component can read from directly. It stores:
+```
+- Who is logged in (currentUser)
+- Their role (explorer / guide / admin)
+- login() function → call this when they submit login form
+- logout() function → call this when they click logout
+```
+
+So when Sara logs in on LoginPage, you call `login(sara)` and now **every single page** in the app automatically knows Sara is logged in without you passing her data anywhere.
