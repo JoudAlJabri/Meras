@@ -1,6 +1,7 @@
 :root {
   --meras-green: #3DB87A;
   --meras-green-dark: #2A8C5C;
+  --meras-yellow: #EEBF10;
   --meras-orange: #E8622A;
   --meras-bg: #F0F2F0;
   --meras-text: #1A0A00;
@@ -38,4 +39,10 @@ body {
 
 .border-primary {
   border-color: var(--meras-green) !important;
+}
+
+.btn-yellow {
+  border: 2px solid var(--meras-yellow) !important;
+  color: var(--meras-text) !important;
+  background-color: transparent !important;
 }

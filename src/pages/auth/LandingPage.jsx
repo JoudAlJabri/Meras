@@ -9,7 +9,7 @@ function LandingPage() {
       <nav className="navbar navbar-expand-lg" style={{ backgroundColor: 'white', borderBottom: '1px solid var(--meras-border)' }}>
         <div className="container">
           {/* Logo */}
-          <span className="navbar-brand fw-bold fs-4" style={{ color: 'var(--meras-green)' }}>
+          <span className="navbar-brand fw-semibold fs-4" style={{ color: 'var(--meras-green)' }}>
             Meras
           </span>
 
@@ -46,27 +46,26 @@ function LandingPage() {
               <span className="badge px-3 py-2 mb-3 fw-semibold" style={{ backgroundColor: '#e8f5ef', color: 'var(--meras-green)', fontSize: '14px' }}>
                 🎓 For High School Students
               </span>
-              <h1 className="fw-bold mb-4" style={{ fontSize: '3rem', lineHeight: '1.2', color: 'var(--meras-text)' }}>
+              <h1 className="fw-semibold mb-4" style={{ fontSize: '3rem', lineHeight: '1.2', color: 'var(--meras-text)' }}>
                 Experience Your{' '}
                 <span style={{ color: 'var(--meras-green)' }}>Major</span>{' '}
                 Before You Choose It
               </h1>
               <p className="mb-4 fs-5" style={{ color: 'var(--meras-gray)', lineHeight: '1.7' }}>
-                Try real university tasks, get feedback from actual students,
+                Try real university tasks, get feedback from actual collage students,
                 and make a confident decision about your future — before committing four years of your life.
               </p>
-              <div className="d-flex gap-3 flex-wrap">
+              <div className="d-flex flex-row gap-3">
                 <Link
                   to="/signup/explorer"
-                  className="btn btn-lg px-5 text-white fw-semibold"
+                  className="btn px-4 text-black fw-semibold"
                   style={{ backgroundColor: 'var(--meras-green)', border: 'none' }}
                 >
                   Start Exploring Free
                 </Link>
                 <Link
                   to="/signup/guide"
-                  className="btn btn-lg px-5 fw-semibold"
-                  style={{ border: '2px solid var(--meras-green)', color: 'var(--meras-green)', backgroundColor: 'transparent' }}
+                  className="btn px-4 fw-semibold btn-yellow"
                 >
                   Become a Guide
                 </Link>

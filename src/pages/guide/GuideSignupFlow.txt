@@ -1,0 +1,39 @@
+/signup/guide
+     │
+     ▼
+Fill form:
+- First Name, Last Name
+- University Email (.edu.sa required)
+- Password, Confirm Password
+- University (dropdown)
+- Major (dropdown)
+- Upload University ID or Transcript
+     │
+     ▼
+Submit → system checks email ends in .edu.sa
+     │
+     ├── NO  → show error "Please use your university email"
+     │
+     └── YES → account created with status "Pending"
+                    │
+                    ▼
+             /verify-email page
+             "Check your university inbox"
+                    │
+                    ▼
+             They click link in email
+                    │
+                    ▼
+             /waiting-room page
+             "Your account is under review
+              by our team. We'll notify you
+              within 24-48 hours."
+                    │
+                    ▼
+             Admin sees them in
+             Pending Verifications dashboard
+                    │
+                    ├── Reject → email sent to guide
+                    │
+                    └── Approve → Guide can now login
+                                  and gets Verified ✓ badge
