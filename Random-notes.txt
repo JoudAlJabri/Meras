@@ -112,3 +112,42 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+
+------------------------------
+
+<div className="col-lg-6">
+              <div className="card border-0 shadow-lg p-4" style={{ borderRadius: '20px' }}>
+                <div className="d-flex align-items-center gap-3 mb-4">
+                  <div className="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
+                    style={{ width: '45px', height: '40px', backgroundColor: 'var(--meras-green)', fontSize: '18px' }}>
+                    R
+                  </div>
+                  <div>
+                    <div className="fw-semibold" style={{ color: 'var(--meras-text)' }}>Rana Abdullah</div>
+                    <div style={{ color: 'var(--meras-gray)', fontSize: '13px' }}>Software Engineering · KFUPM ✓</div>
+                  </div>
+                </div>
+                <h5 className="fw-bold mb-2" style={{ color: 'var(--meras-text)' }}>
+                  Build a Simple Calculator
+                </h5>
+                <p style={{ color: 'var(--meras-gray)', fontSize: '14px' }}>
+                  Write a program that handles basic arithmetic operations. No experience needed!
+                </p>
+                <div className="d-flex gap-2 mb-4 flex-wrap">
+                  <span className="badge px-3 py-2" style={{ backgroundColor: '#e8f5ef', color: 'var(--meras-green)' }}>
+                    Computer Science
+                  </span>
+                  <span className="badge px-3 py-2" style={{ backgroundColor: '#fff3ee', color: 'var(--meras-orange)' }}>
+                    30 mins
+                  </span>
+                  <span className="badge px-3 py-2" style={{ backgroundColor: '#f3f4f6', color: 'var(--meras-gray)' }}>
+                    Beginner
+                  </span>
+                </div>
+                <button className="btn w-100 text-white fw-semibold"
+                  style={{ backgroundColor: 'var(--meras-green)', borderRadius: '10px', padding: '12px' }}>
+                  Start Challenge →
+                </button>
+              </div>
+            </div> 
