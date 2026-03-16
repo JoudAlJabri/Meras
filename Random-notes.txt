@@ -146,3 +146,176 @@ One line instead of a separate CSS file. That's the whole point.
 
 
 ---------------------------------------------------------------------------------------
+------
+import { Link } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
+
+function GuideWaitingRoom() {
+  const {currentUser} = useAuth()
+
+  return (
+    <div
+     style={{
+        minHeight: '100vh',
+        backgroundColor: 'var(--meras-bg)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}
+    >
+    
+    <div
+     style={{
+        width: '100%' , maxWidth: '520px', padding: '2rem'
+      }}
+    >
+
+      <div
+       className = 'text-center'
+       style={{
+        background: 'white',
+        borderRadius: '20px',
+        boxShadow:'0 4px 24px rgba(0,0,0,0.08)'
+       }}
+      >
+        <div
+        className="d-flex align-items-center justify-content-center mx-auto mb-4"
+            style={{
+              width: '80px',
+              height: '80px',
+              borderRadius: '50%',
+              backgroundColor: '#fff3ee'
+            }}>
+
+              <span style={{fontSize: '36px'}}>⏳</span>
+        </div>
+
+        <Link to="/" style={{ textDecoration: 'none' }}>
+            <span className="fw-bold fs-5" style={{ color: 'var(--meras-green)' }}>
+              Meras
+            </span>
+          </Link>
+       
+        <h3 className="fw-bold mt-3 mb-2" style={{ color: 'var(--meras-text)' }}>
+            Your application is under review
+          </h3>
+
+          <p style={{ color: 'var(--meras-gray)', lineHeight: '1.6' }}>
+            Hi{' '}
+            <span className="fw-semibold" style={{ color: 'var(--meras-text)' }}>
+              {currentUser?.name?.split(' ')[0] || 'there'}
+            </span>
+            ! Our team is reviewing your university documents.
+            This usually takes <strong>24 to 48 hours</strong>.
+          </p>
+
+          <div className="p-3 mb-4"
+            style={{
+              backgroundColor: '#fff3ee',
+              borderRadius: '12px',
+              border: '1px solid #f8d4c2'
+            }}>
+<div className="d-flex align-items-center justify-content-between mb-2">
+<span style={{ fontSize: '13px' , color: 'var(--meras-gray)'}}>
+  Application Status
+</span>
+<span className="badge px-3 py-1"
+                style={{
+                  backgroundColor: '#E8622A',
+                  color: 'white',
+                  borderRadius: '20px',
+                  fontSize: '12px'
+                }}>
+Pending Review
+</span>
+</div>
+<div className="d-flex align-items-center justify-content-between">
+<span style={{ fontSize: '13px', color: 'var(--meras-gray)' }}>
+                Submitted By
+              </span>
+              <span style={{ fontSize: '13px', fontWeight: '600', color: 'var(--meras-text)' }}>
+                {currentUser?.email || 'your email'}
+              </span>
+</div>
+          </div>
+
+          <div  className="text-start p-3 mb-4"
+            style={{
+              backgroundColor: '#e8f5ef',
+              borderRadius: '12px',
+              border: '1px solid #b7dfcc'
+            }}
+            >
+              <p className="fw-semibold mb-3"
+              style={{ color: 'var(--meras-text)', fontSize: '14px' }}>
+                What happens next?
+              </p>
+              {[
+                {
+                  icon: '🔍',
+                  title: 'Document Review',
+                  desc: 'Our team verifies your university ID or transcript'
+                },
+                {
+                icon: '📬',
+                title: 'Email Notification',
+                desc: 'You\'ll receive an email once a decision is made'
+              },
+              {
+                icon: '✅',
+                title: 'Start Mentoring',
+                desc: 'Once approved, you can create challenges and earn!'
+              }
+
+              ].map((item, index) => (
+              <div key={index} className="d-flex align-items-start gap-3 mb-3">
+                <span style={{ fontSize: '20px' }}>{item.icon}</span>
+                <div>
+                  <p
+                    className="fw-semibold mb-0"
+                    style={{ color: 'var(--meras-text)', fontSize: '13px' }}
+                  >
+                    {item.title}
+                  </p>
+                  <p
+                    className="mb-0"
+                    style={{ color: 'var(--meras-gray)', fontSize: '12px' }}
+                  >
+                    {item.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <a
+            href={`mailto:${currentUser?.email}`}
+            className="btn w-100 text-white fw-semibold py-2 mb-3"
+            style={{
+              backgroundColor: 'var(--meras-green)',
+              border: 'none',
+              borderRadius: '10px',
+              fontSize: '15px',
+              textDecoration: 'none'
+            }}
+          >
+            📬 Check my email
+          </a>
+          <Link
+            to="/"
+            style={{
+              color: 'var(--meras-green)',
+              fontWeight: '600',
+              textDecoration: 'none',
+              fontSize: '14px'
+            }}
+          >
+            ← Back to home
+          </Link>
+      </div>
+
+    </div>
+    </div>
+  )
+}
+
+export default GuideWaitingRoom

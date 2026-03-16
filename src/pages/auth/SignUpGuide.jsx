@@ -1,8 +1,46 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from "../../context/AuthContext"
+import { mockUsers } from '../../data/mockData'
 
 function SignUpGuide() {
+    const UNIVERSITIES = [
+  'King Fahd University of Petroleum and Minerals (KFUPM)',
+  'King Abdulaziz University (KAU)',
+  'King Saud University (KSU)',
+  'King Abdullah University of Science and Technology (KAUST)',
+  'Princess Nourah bint Abdulrahman University (PNU)',
+  'Imam Abdulrahman Bin Faisal University (IAU)',
+  'Taibah University',
+  'Taif University',
+  'Qassim University',
+  'Umm Al-Qura University',
+  'Other'
+]
+
+const MAJORS = [
+  'Software Engineering',
+  'Computer Science',
+  'Information Technology',
+  'Data Science',
+  'Cybersecurity',
+  'Electrical Engineering',
+  'Mechanical Engineering',
+  'Civil Engineering',
+  'Architecture',
+  'Business Administration',
+  'Finance',
+  'Accounting',
+  'Marketing',
+  'Medicine',
+  'Pharmacy',
+  'Nursing',
+  'Law',
+  'Education',
+  'Psychology',
+  'Graphic Design',
+  'Other'
+]
     const navigate = useNavigate()
     const {login} = useAuth()
 
@@ -560,7 +598,7 @@ return (
               <p className="text-center mt-4" style={{ fontSize: '14px', color: 'var(--meras-gray)' }}>
                 Already have an account?{' '}
                 <Link
-                  to="/login"
+                  to="/LoginPage"
                   style={{ color: 'var(--meras-green)', fontWeight: '600', textDecoration: 'none' }}
                 >
                   Log in
@@ -579,23 +617,7 @@ return (
               position: 'relative'
             }}
           >
-            <div style={{
-              position: 'absolute',
-              width: '300px', height: '300px',
-              borderRadius: '50%',
-              backgroundColor: 'var(--meras-green)',
-              opacity: 0.08,
-              top: '-50px', right: '-50px'
-            }} />
-            <div style={{
-              position: 'absolute',
-              width: '200px', height: '200px',
-              borderRadius: '50%',
-              backgroundColor: 'var(--meras-green)',
-              opacity: 0.08,
-              bottom: '50px', left: '20px'
-            }} />
-
+            
             <div className="text-center p-5" style={{ position: 'relative', zIndex: 1 }}>
               <div
                 className="d-flex align-items-center justify-content-center mx-auto mb-4"
@@ -609,9 +631,7 @@ return (
               >
                 <div className="text-center">
                   <div style={{ fontSize: '48px' }}>🖼️</div>
-                  <p style={{ color: 'var(--meras-green)', fontSize: '14px', marginTop: '8px' }}>
-                    Your illustration here
-                  </p>
+                 
                 </div>
               </div>
 
