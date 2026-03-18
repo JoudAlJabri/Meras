@@ -1,4 +1,13 @@
+
+import { Link } from "react-router-dom";
+import AdminLayout from '../../layouts/AdminLayout'
+
 function AdminDashboard() {
-  return <div className="p-4"><h1>Admin Dashboard - Coming Soon</h1></div>
+  return (
+    <AdminLayout>
+      <h1>Admin Dashboard</h1>
+    </AdminLayout>
+  )
 }
+
 export default AdminDashboard
