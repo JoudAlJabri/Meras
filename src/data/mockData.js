@@ -126,3 +126,25 @@ const MAJORS = [
   'Graphic Design',
   'Other'
 ]
+export const mockPendingApplications = [
+  {
+    id: 2,
+    name: 'Reem Abdullah',
+    email: 'reem@kfupm.edu.sa',
+    university: 'KFUPM',
+    major: 'Software Engineering',
+    submittedDate: '2026-03-15',
+    documentPreview: 'Guide verification document preview goes here.',
+    status: 'Pending',
+  },
+  {
+    id: 4,
+    name: 'Noura Salem',
+    email: 'noura@example.com',
+    university: 'KFUPM',
+    major: 'Chemical Engineering',
+    submittedDate: '2026-03-17',
+    documentPreview: 'Transcript / ID / proof of enrollment preview.',
+    status: 'Pending',
+  },
+]
