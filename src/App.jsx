@@ -1,7 +1,7 @@
 
 import { useState } from 'react'
 import './App.css'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom' // using react's React Router library
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import LandingPage from './pages/auth/LandingPage'
@@ -16,13 +16,6 @@ import ExplorerDashboard from './pages/explorer/ExplorerDashboard'
 import GuideDashboard from './pages/guide/GuideDashboard'
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard'
-import PendingVerifications from './pages/admin/PendingVerifications'
-import UserDirectory from './pages/admin/UserDirectory'
-import ContentModeration from './pages/admin/ContentModeration'
-import Announcements from './pages/admin/Announcements'
-import TaxonomyManagement from './pages/admin/TaxonomyManagement'
-import EarningsDashboard from './pages/admin/EarningsDashboard'
-import OfficeHoursCalendar from './pages/admin/OfficeHoursCalendar'
 
 function App() {
   return (
@@ -42,6 +35,11 @@ function App() {
           <Route path="/explorer/dashboard" element={
             <ProtectedRoute allowedRoles={['explorer']}>
               <ExplorerDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/explorer/challengeCatalog" element={
+            <ProtectedRoute allowedRoles={['explorer']}>
+              <ChallengeCatalog />
             </ProtectedRoute>
           } />
           {/* add more explorer routes here */}
