@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { mockChallenges } from '../../../data/mockData'
 import ChallengeCard from '../../../components/ChallengeCard'
 
@@ -6,6 +7,7 @@ const CARDS_PER_PAGE = 8
 const majors = ['All', ...new Set(mockChallenges.map(c => c.major))]
 
 function ChallengeCatalog() {
+  const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [selectedMajor, setSelectedMajor] = useState('All')
 
@@ -83,15 +85,18 @@ function ChallengeCatalog() {
 
       <div className="container-fluid px-5 pb-5">
         <div className="row g-4">
-          {visible.map((challenge, index) => (
-            <div key={index} className="col-lg-3 col-md-6">
+          {visible.map((challenge) => {
+            const realIndex = mockChallenges.indexOf(challenge)
+            return (
+            <div key={realIndex} className="col-lg-3 col-md-6">
               <ChallengeCard
                 challengeName={challenge.title}
                 description={challenge.description}
                 major={challenge.major}
+                onMoreDetails={() => navigate(`/explorer/challenges/${realIndex}`)}
               />
             </div>
-          ))}
+          )})}
         </div>
       </div>
 

@@ -26,6 +26,34 @@ export const mockUsers = [
   }
 ]
 
+export const mockMentors = [
+  {
+    id: 2,
+    name: 'Rana Abdullah',
+    major: 'Software Engineering',
+    university: 'KFUPM',
+    rating: 4.8,
+    totalSessions: 23,
+    bio: 'Senior SWE student. Love helping high schoolers discover coding!',
+    isVerified: true,
+    hourlyRate: 50
+  },
+  {
+    id: 4,
+    name: 'Khalid Hassan',
+    major: 'Architecture',
+    university: 'KAU',
+    rating: 4.5,
+    totalSessions: 15,
+    bio: 'Architecture student with a passion for design.',
+    isVerified: true,
+    hourlyRate: 45
+  }
+
+
+]
+
+
 export const mockChallenges = [
   {
     title: 'Build a Simple Calculator',
@@ -909,32 +937,6 @@ export const mockChallenges = [
   }
 ];
 
-export const mockMentors = [
-  {
-    id: 2,
-    name: 'Rana Abdullah',
-    major: 'Software Engineering',
-    university: 'KFUPM',
-    rating: 4.8,
-    totalSessions: 23,
-    bio: 'Senior SWE student. Love helping high schoolers discover coding!',
-    isVerified: true,
-    hourlyRate: 50
-  },
-  {
-    id: 4,
-    name: 'Khalid Hassan',
-    major: 'Architecture',
-    university: 'KAU',
-    rating: 4.5,
-    totalSessions: 15,
-    bio: 'Architecture student with a passion for design.',
-    isVerified: true,
-    hourlyRate: 45
-  }
-
-
-]
 
 const UNIVERSITIES = [
   'King Fahd University of Petroleum and Minerals (KFUPM)',

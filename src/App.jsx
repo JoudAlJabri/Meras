@@ -11,6 +11,7 @@ import SignUpGuide from './pages/auth/SignUpGuide'
 import EmailVerification from './pages/auth/EmailVerification'
 import GuideWaitingRoom from './pages/auth/GuideWaitingRoom'
 import ChallengeCatalog from './pages/explorer/Challenge/ChallengeCatalog'
+import ChallengeDetail from './pages/explorer/Challenge/ChallengeDetail'
 // Explorer Pages
 import ExplorerDashboard from './pages/explorer/ExplorerDashboard'
 // Guide Pages
@@ -49,6 +50,11 @@ function App() {
           <Route path="/explorer/challengeCatalog" element={
             <ProtectedRoute allowedRoles={['explorer']}>
               <ChallengeCatalog />
+            </ProtectedRoute>
+          } />
+          <Route path="/explorer/challenges/:index" element={
+            <ProtectedRoute allowedRoles={['explorer']}>
+              <ChallengeDetail />
             </ProtectedRoute>
           } />
           {/* add more explorer routes here */}
