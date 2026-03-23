@@ -10,12 +10,21 @@ import SignUpExplorer from './pages/auth/SignUpExplorer'
 import SignUpGuide from './pages/auth/SignUpGuide'
 import EmailVerification from './pages/auth/EmailVerification'
 import GuideWaitingRoom from './pages/auth/GuideWaitingRoom'
+import ChallengeCatalog from './pages/explorer/Challenge/ChallengeCatalog'
 // Explorer Pages
 import ExplorerDashboard from './pages/explorer/ExplorerDashboard'
 // Guide Pages
 import GuideDashboard from './pages/guide/GuideDashboard'
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard'
+import PendingVerifications from './pages/admin/PendingVerifications'
+import UserDirectory from './pages/admin/UserDirectory'
+import Announcements from './pages/admin/Announcements'
+import ContentModeration from './pages/admin/ContentModeration'
+import OfficeHoursCalendar from './pages/admin/OfficeHoursCalendar'
+import EarningsDashboard from './pages/admin/EarningsDashboard'
+import TaxonomyManagement from './pages/admin/TaxonomyManagement'
+
 
 function App() {
   return (
@@ -53,7 +62,7 @@ function App() {
           {/* add more guide routes here */}
 
           {/* ── ADMIN ROUTES ── */}
-          <Route path="/admin/dashboard" element={
+          <Route path="/admin" element={
             <ProtectedRoute allowedRoles={['admin']}>
               <AdminDashboard />
             </ProtectedRoute>
