@@ -5,6 +5,8 @@ export const mockUsers = [
     email: 'sara@gmail.com',
     password: '123456',
     role: 'explorer',
+    joinDate: '2026-03-10',
+    status: 'Active',
     recommendedMajors: ['Computer Science', 'Software Engineering', 'Data Science']
   },
   {
@@ -15,14 +17,18 @@ export const mockUsers = [
     role: 'guide',
     major: 'Software Engineering',
     university: 'KFUPM',
-    isVerified: true
+    isVerified: true,
+    joinDate: '2026-03-12',     
+    status: 'Active'   
   },
   {
     id: 3,
-    name: 'Admin',
+    name: 'Dana Alsawad',
     email: 'admin@meras.com',
     password: 'admin123',
-    role: 'admin'
+    role: 'admin' ,
+   joinDate: '2026-03-01',     
+    status: 'Active'  
   }
 ]
 
@@ -125,4 +131,26 @@ const MAJORS = [
   'Psychology',
   'Graphic Design',
   'Other'
+]
+export const mockPendingApplications = [
+  {
+    id: 2,
+    name: 'Reem Abdullah',
+    email: 'reem@kfupm.edu.sa',
+    university: 'KFUPM',
+    major: 'Software Engineering',
+    submittedDate: '2026-03-15',
+    documentPreview: 'Guide verification document preview goes here.',
+    status: 'Pending',
+  },
+  {
+    id: 4,
+    name: 'Noura Salem',
+    email: 'noura@example.com',
+    university: 'KFUPM',
+    major: 'Chemical Engineering',
+    submittedDate: '2026-03-17',
+    documentPreview: 'Transcript / ID / proof of enrollment preview.',
+    status: 'Pending',
+  },
 ]

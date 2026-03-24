@@ -16,6 +16,13 @@ import ExplorerDashboard from './pages/explorer/ExplorerDashboard'
 import GuideDashboard from './pages/guide/GuideDashboard'
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard'
+import PendingVerifications from './pages/admin/PendingVerifications'
+import UserDirectory from './pages/admin/UserDirectory'
+import ContentModeration from './pages/admin/ContentModeration'
+import Announcements from './pages/admin/Announcements'
+import TaxonomyManagement from './pages/admin/TaxonomyManagement'
+import EarningsDashboard from './pages/admin/EarningsDashboard'
+import OfficeHoursCalendar from './pages/admin/OfficeHoursCalendar'
 
 function App() {
   return (
@@ -53,8 +60,48 @@ function App() {
               <AdminDashboard />
             </ProtectedRoute>
           } />
-          {/* add more admin routes here */}
+          <Route path="/admin/pending-verifications" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <PendingVerifications />
+            </ProtectedRoute>
+          } />
 
+          <Route path="/admin/users" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <UserDirectory />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/admin/content-moderation" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <ContentModeration />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/admin/announcements" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <Announcements />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/admin/taxonomy" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <TaxonomyManagement />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/admin/earnings" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <EarningsDashboard />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/admin/office-hours" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <OfficeHoursCalendar />
+            </ProtectedRoute>
+          } />
+           {/* add more admin routes here */}
           {/* ── FALLBACK ── */}
           <Route path="*" element={<Navigate to="/" replace />} />
 

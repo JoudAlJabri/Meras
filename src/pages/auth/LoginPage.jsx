@@ -95,9 +95,41 @@ function LoginPage() {
               <p style={{ color: 'var(--meras-gray)' }}>
                 Welcome back! Please enter your details.
               </p>
-
               {/* Role Selector */}
-              
+                <div className="mb-4">
+                  <label
+                    className="form-label fw-semibold"
+                    style={{ color: 'var(--meras-text)', fontSize: '14px' }}
+                  >
+                    Sign in as
+                  </label>
+
+                  <div className="d-flex gap-2">
+                    {['explorer', 'guide', 'admin'].map((role) => (
+                      <button
+                        key={role}
+                        type="button"
+                        onClick={() => setFromData({ ...formData, role })}
+                        className="btn"
+                        style={{
+                          borderRadius: '999px',
+                          padding: '8px 16px',
+                          border: formData.role === role
+                            ? '1.5px solid var(--meras-green)'
+                            : '1.5px solid var(--meras-border)',
+                          backgroundColor: formData.role === role
+                            ? 'var(--meras-green)'
+                            : 'white',
+                          color: formData.role === role ? 'white' : 'var(--meras-text)',
+                          fontSize: '14px',
+                          fontWeight: '500'
+                        }}
+                      >
+                        {role.charAt(0).toUpperCase() + role.slice(1)}
+                      </button>
+                    ))}
+                  </div>
+              </div>
 
               {/* Error message */}
               {error && (
