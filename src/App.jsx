@@ -16,6 +16,7 @@ import ExplorerDashboard from './pages/explorer/ExplorerDashboard'
 import GuideDashboard from './pages/guide/GuideDashboard'
 import MentorDirectory from './pages/guide/MentorDirectory'
 import MentorProfile from './pages/guide/MentorProfile'
+import BookingPage from './pages/guide/BookingPage'
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard'
 import PendingVerifications from './pages/admin/PendingVerifications'
@@ -105,7 +106,7 @@ function App() {
           } />
            {/* add more admin routes here */}
           {/* ── FALLBACK ── */}
-
+          
           <Route path="*" element={<Navigate to="/" replace />} />
 
         </Routes>
