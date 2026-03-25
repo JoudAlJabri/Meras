@@ -1,0 +1,58 @@
+/* 🌿 COLORS */
+:root {
+  --primary: #3DB87A;
+  --accent: #2A8C5C;
+  --orange: #E8622A;
+  --bg: #F0F2F0;
+  --card: #FFFFFF;
+  --text-main: #1A0A00;
+  --text-secondary: #6B7280;
+  --border: #E5E7EB;
+}
+
+/* 🌿 BASE */
+body {
+  background-color: var(--bg);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* 🌿 CARD */
+.card {
+  background: var(--card);
+  border: 2px solid var(--text-main);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* 🌿 BUTTON */
+.btn {
+  background-color: var(--primary);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: var(--accent);
+}
+
+/* 🌿 TAG */
+.tag {
+  background-color: var(--accent);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 8px;
+  margin-right: 5px;
+}
+
+/* 🌿 TEXT */
+.title {
+  color: var(--text-main);
+}
+
+.subtext {
+  color: var(--text-secondary);
+}

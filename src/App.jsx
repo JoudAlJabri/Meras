@@ -15,6 +15,7 @@ import ExplorerDashboard from './pages/explorer/ExplorerDashboard'
 // Guide Pages
 import GuideDashboard from './pages/guide/GuideDashboard'
 import MentorDirectory from './pages/guide/MentorDirectory'
+import MentorProfile from './pages/guide/MentorProfile'
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard'
 import PendingVerifications from './pages/admin/PendingVerifications'
@@ -104,6 +105,9 @@ function App() {
           } />
            {/* add more admin routes here */}
           {/* ── FALLBACK ── */}
+
+          {/* 🟡 TEMP TEST ROUTE (JANA) — MentorProfile */}
+<Route path="/test-profile" element={<MentorProfile />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
 
