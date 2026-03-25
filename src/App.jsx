@@ -106,9 +106,6 @@ function App() {
            {/* add more admin routes here */}
           {/* ── FALLBACK ── */}
 
-          {/* 🟡 TEMP TEST ROUTE (JANA) — MentorProfile */}
-<Route path="/test-profile" element={<MentorProfile />} />
-
           <Route path="*" element={<Navigate to="/" replace />} />
 
         </Routes>
