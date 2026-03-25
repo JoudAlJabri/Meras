@@ -270,7 +270,7 @@ function ChallengeDetail() {
                 {/* Start button in hero */}
                 <button
                   className="btn ms-auto fw-semibold px-4 py-2"
-                  onClick={() => navigate('/explorer/workspace')}
+                  onClick={() => navigate(`/explorer/workspace/${index}`)}
                   style={{
                     backgroundColor: 'white',
                     color: heroColor,
@@ -539,7 +539,7 @@ function ChallengeDetail() {
                   {/* Start button */}
                   <button
                     className="btn w-100 fw-semibold py-2 mb-2 text-white"
-                    onClick={() => navigate('/explorer/workspace')}
+                    onClick={() => navigate(`/explorer/workspace/${index}`)}
                     style={{
                       backgroundColor: heroColor,
                       border: 'none',
@@ -640,7 +640,7 @@ function ChallengeDetail() {
               </button>
               <button
                 className="btn fw-semibold px-5 text-white"
-                onClick={() => navigate('/explorer/workspace')}
+                onClick={() => navigate(`/explorer/workspace/${index}`)}
                 style={{
                   backgroundColor: heroColor,
                   border: 'none',

@@ -10,10 +10,12 @@ import SignUpExplorer from './pages/auth/SignUpExplorer'
 import SignUpGuide from './pages/auth/SignUpGuide'
 import EmailVerification from './pages/auth/EmailVerification'
 import GuideWaitingRoom from './pages/auth/GuideWaitingRoom'
-import ChallengeCatalog from './pages/explorer/Challenge/ChallengeCatalog'
-import ChallengeDetail from './pages/explorer/Challenge/ChallengeDetail'
+
 // Explorer Pages
 import ExplorerDashboard from './pages/explorer/ExplorerDashboard'
+import TaskWorkspace from './pages/explorer/Challenge/TaskWorkspace'
+import ChallengeCatalog from './pages/explorer/Challenge/ChallengeCatalog'
+import ChallengeDetail from './pages/explorer/Challenge/ChallengeDetail'
 // Guide Pages
 import GuideDashboard from './pages/guide/GuideDashboard'
 // Admin Pages
@@ -25,6 +27,7 @@ import ContentModeration from './pages/admin/ContentModeration'
 import OfficeHoursCalendar from './pages/admin/OfficeHoursCalendar'
 import EarningsDashboard from './pages/admin/EarningsDashboard'
 import TaxonomyManagement from './pages/admin/TaxonomyManagement'
+import SubmissionConfirmation from './pages/explorer/Challenge/SubmissionConfirmation'
 
 
 function App() {
@@ -57,6 +60,18 @@ function App() {
               <ChallengeDetail />
             </ProtectedRoute>
           } />
+          <Route path="/explorer/workspace/:index" element={
+            <ProtectedRoute allowedRoles={['explorer']}>
+              <TaskWorkspace />
+            </ProtectedRoute>
+          } />
+          <Route path="/explorer/submission-confirmation/:index" element={
+            <ProtectedRoute allowedRoles={['explorer']}>
+              <SubmissionConfirmation />
+            </ProtectedRoute>
+          } />
+
+          
           {/* add more explorer routes here */}
 
           {/* ── GUIDE ROUTES ── */}
