@@ -1,5 +1,5 @@
 import { mockMentors, mockChallenges } from "../../data/mockData";
-import "./guide.css";
+import "./Guide.css";
 
 function MentorProfile() {
 
@@ -12,10 +12,10 @@ function MentorProfile() {
   );
 
   return (
-    <div className="guide-container">
+    <div className="page-container">
 
       {/* 🔹 PROFILE HEADER */}
-      <div className="card profile-header">
+      <div className="card section flex">
         <div className="avatar">👤</div>
 
         <h2 className="title">
@@ -26,22 +26,22 @@ function MentorProfile() {
           {mentor.university} • {mentor.major}
         </p>
 
-        <p>
+        <p className="subtext">
           ⭐ {mentor.rating} | {mentor.totalSessions} sessions
         </p>
       </div>
 
       {/* 🔹 BIO */}
-      <div className="card">
+      <div className="card section">
         <h3 className="title">About</h3>
         <p className="subtext">{mentor.bio}</p>
       </div>
 
       {/* 🔹 SKILLS */}
-      <div className="card">
+      <div className="card section">
         <h3 className="title">Skills</h3>
 
-        <div>
+        <div className="flex gap-2 mt-2">
           <span className="tag">#React</span>
           <span className="tag">#Python</span>
           <span className="tag">#DataScience</span>
@@ -49,11 +49,11 @@ function MentorProfile() {
       </div>
 
       {/* 🔹 CHALLENGES */}
-      <div className="card">
+      <div className="card section">
         <h3 className="title">Published Challenges</h3>
 
         {mentorChallenges.map((c) => (
-          <div key={c.id}>
+          <div key={c.id} className="mt-2">
             <p>{c.title}</p>
             <p className="subtext">{c.difficulty}</p>
           </div>
@@ -65,16 +65,16 @@ function MentorProfile() {
       </div>
 
       {/* 🔹 BUTTON */}
-      <div className="card">
-        <button className="btn">View Availability</button>
+      <div className="card section">
+        <button className="btn btn-primary">View Availability</button>
       </div>
 
       {/* 🔹 REVIEWS */}
-      <div className="card">
+      <div className="card section">
         <h3 className="title">Reviews</h3>
 
-        <p>⭐ 5 - "Very helpful mentor!"</p>
-        <p>⭐ 4 - "Explained concepts clearly."</p>
+        <p className="subtext">⭐ 5 - "Very helpful mentor!"</p>
+        <p className="subtext">⭐ 4 - "Explained concepts clearly."</p>
       </div>
 
     </div>

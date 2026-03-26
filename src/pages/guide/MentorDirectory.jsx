@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { mockMentors } from "../../data/mockData";
+import "./Guide.css";
 
 function MentorDirectory() {
   // State for search input
@@ -21,16 +22,17 @@ function MentorDirectory() {
   });
 
   return (
-    <div className="p-4">
+    <div className="page-container">
 
       {/* Page Title */}
-      <h2>Mentor Directory</h2>
+      <h2 className="title">Mentor Directory</h2>
 
       {/* Search + Filter Section */}
-      <div style={{ marginBottom: "20px" }}>
+      <div className="card section flex gap-3">
         
         {/* Search Input */}
         <input
+        className="input"
           type="text"
           placeholder="Search by name or major..."
           value={search}
@@ -39,9 +41,9 @@ function MentorDirectory() {
 
         {/* University Dropdown */}
         <select
+        className="input"
           value={selectedUniversity}
           onChange={(e) => setSelectedUniversity(e.target.value)}
-          style={{ marginLeft: "10px" }}
         >
           <option value="">All Universities</option>
           <option value="KFUPM">KFUPM</option>
@@ -50,29 +52,31 @@ function MentorDirectory() {
       </div>
 
       {/* Mentor Cards */}
+      <div className="grid grid-3 section">
       {filteredMentors.map((mentor) => (
 
-        <div key={mentor.id} className="mentor-card">
+        <div key={mentor.id} className="card section">
 
           {/* Basic Info */}
-          <h3>{mentor.name}</h3>
-          <p>{mentor.university}</p>
-          <p>{mentor.major}</p>
+          <h3 className="title">{mentor.name}</h3>
+          <p className="subtext">{mentor.university}</p>
+          <p className="subtext">{mentor.major}</p>
 
           {/* Stats */}
-          <p>⭐ {mentor.rating}</p>
-          <p>Sessions: {mentor.totalSessions}</p>
-          <p>Rate: ${mentor.hourlyRate}/hr</p>
+          <p className="subtext">⭐ {mentor.rating}</p>
+          <p className="subtext">Sessions: {mentor.totalSessions}</p>
+          <p className="subtext">Rate: ${mentor.hourlyRate}/hr</p>
 
           {/* Action */}
-          <button>View Profile</button>
+          <button className="btn btn-secondary">View Profile</button>
 
         </div>
       ))}
+      </div>
 
       {/* Empty State */}
       {filteredMentors.length === 0 && (
-        <p>No mentors found.</p>
+        <p className="subtext mt-6">No mentors found.</p>
       )}
 
     </div>

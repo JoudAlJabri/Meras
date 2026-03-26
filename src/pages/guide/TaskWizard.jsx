@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./Guide.css";
 
 function TaskWizard() {
   const [step, setStep] = useState(1);
@@ -16,31 +17,31 @@ function TaskWizard() {
   };
 
   return (
-    <div className="p-4">
+    <div className="page-container">
 
       {/* Progress */}
-      <h2>Step {step} of 4</h2>
+      <h2 className="title">Step {step} of 4</h2>
 
       {/* STEP 1 */}
       {step === 1 && (
-        <div>
-          <h3>Basic Info</h3>
+        <div className="card section">
+          <h3 className="title">Basic Info</h3>
 
-          <input
+          <input className="input"
             name="title"
             placeholder="Challenge Title"
             value={form.title}
             onChange={handleChange}
           />
 
-          <input
+          <input className="input"
             name="major"
             placeholder="Major"
             value={form.major}
             onChange={handleChange}
           />
 
-          <select
+          <select className="input"
             name="difficulty"
             value={form.difficulty}
             onChange={handleChange}
@@ -54,10 +55,10 @@ function TaskWizard() {
 
       {/* STEP 2 */}
       {step === 2 && (
-        <div>
-          <h3>Instructions</h3>
+        <div className="card section">
+          <h3 className="title">Instructions</h3>
 
-          <textarea
+          <textarea className="input"
             name="instructions"
             placeholder="Write instructions..."
             value={form.instructions}
@@ -68,8 +69,8 @@ function TaskWizard() {
 
       {/* STEP 3 */}
       {step === 3 && (
-        <div>
-          <h3>Upload Resource</h3>
+        <div className="card section">
+          <h3 className="title">Upload Resource</h3>
 
           <input
             type="file"
@@ -82,8 +83,8 @@ function TaskWizard() {
 
       {/* STEP 4 */}
       {step === 4 && (
-        <div>
-          <h3>Preview</h3>
+        <div className="card section">
+          <h3 className="title">Preview</h3>
 
           <p><strong>Title:</strong> {form.title}</p>
           <p><strong>Major:</strong> {form.major}</p>
@@ -91,20 +92,20 @@ function TaskWizard() {
           <p><strong>Instructions:</strong> {form.instructions}</p>
           <p><strong>File:</strong> {form.file?.name}</p>
 
-          <button onClick={() => alert("Published Successfully ✅")}>
+          <button className="btn btn-primary" onClick={() => alert("Published Successfully ✅")}>
             Publish
           </button>
         </div>
       )}
 
       {/* Navigation */}
-      <div style={{ marginTop: "20px" }}>
+      <div className="flex gap-3 mt-6">
         {step > 1 && (
-          <button onClick={() => setStep(step - 1)}>Back</button>
+          <button className="btn btn-secondary" onClick={() => setStep(step - 1)}>Back</button>
         )}
 
         {step < 4 && (
-          <button onClick={() => setStep(step + 1)}>Next</button>
+          <button className="btn btn-primary" onClick={() => setStep(step + 1)}>Next</button>
         )}
       </div>
 

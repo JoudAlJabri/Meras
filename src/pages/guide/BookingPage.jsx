@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { mockMentors } from "../../data/mockData";
+import "./Guide.css";
 
 function BookingPage() {
   const guide = mockMentors[0];
@@ -19,20 +20,20 @@ function BookingPage() {
   ];
 
   return (
-    <div className="booking-container">
+    <div className="page-container">
 
       {/* Guide Info Card */}
-      <div className="card guide-card">
+      <div className="card flex">
         <div className="avatar">👤</div>
         <div>
-          <h2>{guide.name}</h2>
-          <p>{guide.major} • {guide.university}</p>
+          <h2 className="title">{guide.name}</h2>
+          <p className="subtext">{guide.major} • {guide.university}</p>
         </div>
       </div>
 
       {/* Time Slots */}
       <div className="card">
-        <h3>Select a Time Slot</h3>
+        <h3 className="title">Select a Time Slot</h3>
 
         <div className="slots-grid">
           {slots.map((slot, index) => (
@@ -49,7 +50,7 @@ function BookingPage() {
 
       {/* Topic Input */}
       <div className="card">
-        <h3>Session Topic</h3>
+        <h3 className="title">Session Topic</h3>
         <input
           type="text"
           placeholder="What do you need help with?"
@@ -61,7 +62,7 @@ function BookingPage() {
 
       {/* Confirm Button */}
       <button
-        className="confirm-btn"
+        className="btn btn-primary btn-full"
         disabled={!selectedSlot || !topic}
         onClick={() => setShowModal(true)}
       >
@@ -81,7 +82,7 @@ function BookingPage() {
             <p><strong>Meeting Link:</strong> coming soon</p>
 
             <button
-              className="close-btn"
+              className="btn"
               onClick={() => setShowModal(false)}
             >
               Close
