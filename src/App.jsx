@@ -10,6 +10,7 @@ import SignUpExplorer from './pages/auth/SignUpExplorer'
 import SignUpGuide from './pages/auth/SignUpGuide'
 import EmailVerification from './pages/auth/EmailVerification'
 import GuideWaitingRoom from './pages/auth/GuideWaitingRoom'
+import ExplorerLayout from './layouts/ExplorerLayout'
 
 // Explorer Pages
 import ExplorerDashboard from './pages/explorer/ExplorerDashboard'
@@ -47,27 +48,37 @@ function App() {
           {/* ── EXPLORER ROUTES ── */}
           <Route path="/explorer/dashboard" element={
             <ProtectedRoute allowedRoles={['explorer']}>
-              <ExplorerDashboard />
+              <ExplorerLayout>
+                <ExplorerDashboard />
+              </ExplorerLayout>
             </ProtectedRoute>
           } />
           <Route path="/explorer/challengeCatalog" element={
             <ProtectedRoute allowedRoles={['explorer']}>
-              <ChallengeCatalog />
+              <ExplorerLayout>
+                <ChallengeCatalog />
+              </ExplorerLayout>
             </ProtectedRoute>
           } />
           <Route path="/explorer/challenges/:index" element={
             <ProtectedRoute allowedRoles={['explorer']}>
-              <ChallengeDetail />
+              <ExplorerLayout>
+                <ChallengeDetail />
+              </ExplorerLayout>
             </ProtectedRoute>
           } />
           <Route path="/explorer/workspace/:index" element={
             <ProtectedRoute allowedRoles={['explorer']}>
-              <TaskWorkspace />
+              <ExplorerLayout>
+                <TaskWorkspace />
+              </ExplorerLayout>
             </ProtectedRoute>
           } />
           <Route path="/explorer/submission-confirmation/:index" element={
             <ProtectedRoute allowedRoles={['explorer']}>
-              <SubmissionConfirmation />
+              <ExplorerLayout>
+                <SubmissionConfirmation />
+            </ExplorerLayout>
             </ProtectedRoute>
           } />
 
@@ -139,4 +150,5 @@ function App() {
   )
 }
 
-export default App
+export default App;
+
