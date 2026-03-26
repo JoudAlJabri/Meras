@@ -183,6 +183,7 @@ const styles = {
     height: "100%",
     backgroundColor: "#3DB87A",
     borderRadius: "999px",
+    transition: "width 0.4s ease-in-out",
   },
   question: {
     fontSize: "28px",

@@ -19,8 +19,29 @@ function calculateResults(answers) {
     Literature: 0,
   };
 
+  if (!answers || answers.length === 0) {
+    return [
+      {
+        major: "Computer Science",
+        percentage: 50,
+        description: majorDescriptions["Computer Science"],
+      },
+      {
+        major: "Engineering",
+        percentage: 45,
+        description: majorDescriptions["Engineering"],
+      },
+      {
+        major: "Design",
+        percentage: 40,
+        description: majorDescriptions["Design"],
+      },
+    ];
+  }
+
   const yesValue = (answer) => answer === "Yes";
-  const littleValue = (answer) => answer === "A little" || answer === "Sometimes" || answer === "Both";
+  const littleValue = (answer) =>
+    answer === "A little" || answer === "Sometimes" || answer === "Both";
 
   if (yesValue(answers[0])) scores.Engineering += 30;
   else if (littleValue(answers[0])) scores.Engineering += 15;
@@ -34,7 +55,7 @@ function calculateResults(answers) {
   } else if (answers[2] === "Alone") {
     scores["Computer Science"] += 20;
     scores.Literature += 10;
-  } else {
+  } else if (answers[2] === "Both") {
     scores.Business += 15;
     scores["Computer Science"] += 10;
   }
