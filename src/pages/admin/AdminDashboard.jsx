@@ -1,6 +1,6 @@
 
 import AdminLayout from '../../layouts/AdminLayout'
-import { mockUsers, mockChallenges, mockMentors } from '../../data/mockData'
+import { mockUsers, mockChallenges, mockMentors,mockPendingApplications } from '../../data/mockData'
 import {
   BarChart,
   Bar,
@@ -10,13 +10,12 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
-
 export default function AdminDashboard() {
   const totalUsers = mockUsers.length
   const activeChallenges = mockChallenges.length
 
-  const pendingVerifications = mockUsers.filter(
-    (user) => user.role === 'guide' && user.isVerified === false
+  const pendingVerifications = mockPendingApplications.filter(
+    (app) => app.role === 'guide' && app.status === 'Pending'
   ).length
 
   const totalSessions = mockMentors.reduce(
