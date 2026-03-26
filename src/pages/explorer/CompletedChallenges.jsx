@@ -1,9 +1,13 @@
+import StarRating from "../../components/StarRating";
+import MajorBadge from "../../components/MajorBadge";
+
 function CompletedChallenges({ challenges }) {
   if (!challenges || challenges.length === 0) {
     return (
       <div style={styles.emptyBox}>
         <h3 style={styles.sectionTitle}>Completed Challenges</h3>
         <p style={styles.emptyText}>No completed challenges yet.</p>
+        <StarRating rating={challenge.rating} />
       </div>
     );
   }

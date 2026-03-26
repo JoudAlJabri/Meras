@@ -1,4 +1,7 @@
+import { useState } from "react";
 import CompletedChallenges from "./CompletedChallenges";
+import StatCard from "../../components/StatCard";
+import MajorBadge from "../../components/MajorBadge";
 
 const recommendedMajors = [
   { name: "Engineering", percentage: 65 },
@@ -30,8 +33,19 @@ const recentActivities = [
 ];
 
 function ExplorerDashboard() {
+  const [hasTakenQuiz, setHasTakenQuiz] = useState(false);
+
   return (
     <div style={styles.page}>
+      {!hasTakenQuiz && (
+        <div style={styles.quizBanner}>
+          <h2 style={styles.bannerTitle}>Take the Compass Quiz</h2>
+          <p style={styles.bannerText}>
+            Discover the best majors for you by taking the quiz.
+          </p>
+        </div>
+      )}
+
       <div style={styles.banner}>
         <h1 style={styles.bannerTitle}>Welcome back Sara!</h1>
         <p style={styles.bannerText}>
@@ -39,39 +53,32 @@ function ExplorerDashboard() {
         </p>
       </div>
 
-      <div style={styles.section}>
-        <h2 style={styles.sectionTitle}>My Path</h2>
-        <div style={styles.majorGrid}>
-          {recommendedMajors.map((major, index) => (
-            <div key={index} style={styles.majorCard}>
-              <h3 style={styles.majorName}>{major.name}</h3>
-              <p style={styles.percentText}>{major.percentage}% Match</p>
-              <div style={styles.progressBar}>
-                <div
-                  style={{
-                    ...styles.progressFill,
-                    width: `${major.percentage}%`,
-                  }}
-                />
+      {hasTakenQuiz && (
+        <div style={styles.section}>
+          <h2 style={styles.sectionTitle}>My Path</h2>
+          <div style={styles.majorGrid}>
+            {recommendedMajors.map((major, index) => (
+              <div key={index} style={styles.majorCard}>
+                <h3 style={styles.majorName}>{major.name}</h3>
+                <p style={styles.percentText}>{major.percentage}% Match</p>
+                <div style={styles.progressBar}>
+                  <div
+                    style={{
+                      ...styles.progressFill,
+                      width: `${major.percentage}%`,
+                    }}
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <div style={styles.statsGrid}>
-        <div style={styles.statCard}>
-          <h3 style={styles.statNumber}>2</h3>
-          <p style={styles.statLabel}>Challenges Completed</p>
-        </div>
-        <div style={styles.statCard}>
-          <h3 style={styles.statNumber}>1</h3>
-          <p style={styles.statLabel}>In Progress</p>
-        </div>
-        <div style={styles.statCard}>
-          <h3 style={styles.statNumber}>3</h3>
-          <p style={styles.statLabel}>Sessions Booked</p>
-        </div>
+        <StatCard number={2} label="Challenges Completed" />
+        <StatCard number={1} label="In Progress" />
+        <StatCard number={3} label="Sessions Booked" />
       </div>
 
       <div style={styles.continueCard}>
@@ -200,6 +207,13 @@ const styles = {
     marginBottom: "10px",
     color: "#333333",
   },
+  quizBanner: {
+  backgroundColor: "#FFF7ED",
+  border: "1px solid #FDBA74",
+  borderRadius: "14px",
+  padding: "20px",
+  marginBottom: "20px",
+},
 };
 
 export default ExplorerDashboard;
