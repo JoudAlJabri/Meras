@@ -19,6 +19,9 @@ function ExplorerLayout({ children }) {
           <Link to="/explorer/my-path" style={styles.link}>
             My Path
           </Link>
+          <Link to="/explorer/compass-quiz" style={styles.link}>
+            Compass Quiz
+          </Link>
         </nav>
       </aside>
 

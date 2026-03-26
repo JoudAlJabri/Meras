@@ -17,6 +17,7 @@ import ExplorerDashboard from './pages/explorer/ExplorerDashboard'
 import TaskWorkspace from './pages/explorer/Challenge/TaskWorkspace'
 import ChallengeCatalog from './pages/explorer/Challenge/ChallengeCatalog'
 import ChallengeDetail from './pages/explorer/Challenge/ChallengeDetail'
+import CompassQuiz from './pages/explorer/CompassQuiz'
 // Guide Pages
 import GuideDashboard from './pages/guide/GuideDashboard'
 // Admin Pages
@@ -81,6 +82,14 @@ function App() {
             </ExplorerLayout>
             </ProtectedRoute>
           } />
+
+          <Route path="/explorer/compass-quiz" element={
+          //<ProtectedRoute allowedRoles={['explorer']}>
+        <ExplorerLayout>
+            <CompassQuiz />
+        </ExplorerLayout>
+        //</ProtectedRoute>
+        } />
 
           
           {/* add more explorer routes here */}
