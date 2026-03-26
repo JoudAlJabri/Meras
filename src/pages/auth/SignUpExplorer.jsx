@@ -373,7 +373,7 @@ function SignUpExplorer() {
                 <div className="text-center">
                   <div style={{ fontSize: '48px' }}>🖼️</div>
                   <p style={{ color: 'var(--meras-green)', fontSize: '14px', marginTop: '8px' }}>
-                    Your illustration here
+                    
                   </p>
                 </div>
               </div>

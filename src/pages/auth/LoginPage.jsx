@@ -10,7 +10,7 @@ function LoginPage() {
     const {login} = useAuth();
 
     // form state
-    const [formData , setFromData] = useState(
+    const [formData , setFormData] = useState(
         {
             email: "",
             password: "",
@@ -23,7 +23,7 @@ function LoginPage() {
 
     //update from feilds as user types
     const handleChange = (e) => {
-        setFromData({...formData, [e.target.name]: e.target.value})
+        setFormData({...formData, [e.target.name]: e.target.value})
         setError('') // clear error when user starts typing
     }
 

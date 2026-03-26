@@ -1,7 +1,7 @@
 
 import { useState } from 'react'
 import './App.css'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom' // using react's React Router library
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import LandingPage from './pages/auth/LandingPage'
@@ -10,19 +10,29 @@ import SignUpExplorer from './pages/auth/SignUpExplorer'
 import SignUpGuide from './pages/auth/SignUpGuide'
 import EmailVerification from './pages/auth/EmailVerification'
 import GuideWaitingRoom from './pages/auth/GuideWaitingRoom'
+import ExplorerLayout from './layouts/ExplorerLayout'
+
 // Explorer Pages
 import ExplorerDashboard from './pages/explorer/ExplorerDashboard'
+import TaskWorkspace from './pages/explorer/Challenge/TaskWorkspace'
+import ChallengeCatalog from './pages/explorer/Challenge/ChallengeCatalog'
+import ChallengeDetail from './pages/explorer/Challenge/ChallengeDetail'
+import CompassQuiz from './pages/explorer/CompassQuiz'
+import QuizResults from './pages/explorer/QuizResults'
+
 // Guide Pages
 import GuideDashboard from './pages/guide/GuideDashboard'
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard'
 import PendingVerifications from './pages/admin/PendingVerifications'
 import UserDirectory from './pages/admin/UserDirectory'
-import ContentModeration from './pages/admin/ContentModeration'
 import Announcements from './pages/admin/Announcements'
-import TaxonomyManagement from './pages/admin/TaxonomyManagement'
-import EarningsDashboard from './pages/admin/EarningsDashboard'
+import ContentModeration from './pages/admin/ContentModeration'
 import OfficeHoursCalendar from './pages/admin/OfficeHoursCalendar'
+import EarningsDashboard from './pages/admin/EarningsDashboard'
+import TaxonomyManagement from './pages/admin/TaxonomyManagement'
+import SubmissionConfirmation from './pages/explorer/Challenge/SubmissionConfirmation'
+
 
 function App() {
   return (
@@ -41,9 +51,55 @@ function App() {
           {/* ── EXPLORER ROUTES ── */}
           <Route path="/explorer/dashboard" element={
             <ProtectedRoute allowedRoles={['explorer']}>
-              <ExplorerDashboard />
+              <ExplorerLayout>
+                <ExplorerDashboard />
+              </ExplorerLayout>
             </ProtectedRoute>
           } />
+          <Route path="/explorer/challengeCatalog" element={
+            <ProtectedRoute allowedRoles={['explorer']}>
+              <ExplorerLayout>
+                <ChallengeCatalog />
+              </ExplorerLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/explorer/challenges/:index" element={
+            <ProtectedRoute allowedRoles={['explorer']}>
+              <ExplorerLayout>
+                <ChallengeDetail />
+              </ExplorerLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/explorer/workspace/:index" element={
+            <ProtectedRoute allowedRoles={['explorer']}>
+              <ExplorerLayout>
+                <TaskWorkspace />
+              </ExplorerLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/explorer/submission-confirmation/:index" element={
+            <ProtectedRoute allowedRoles={['explorer']}>
+              <ExplorerLayout>
+                <SubmissionConfirmation />
+            </ExplorerLayout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/explorer/compass-quiz" element={
+          //<ProtectedRoute allowedRoles={['explorer']}>
+        <ExplorerLayout>
+            <CompassQuiz />
+        </ExplorerLayout>
+        //</ProtectedRoute>
+        } />
+
+        <Route path="/explorer/quiz-results" element={
+        <ExplorerLayout>
+          <QuizResults />
+        </ExplorerLayout>
+        } />
+
+          
           {/* add more explorer routes here */}
 
           {/* ── GUIDE ROUTES ── */}
@@ -55,7 +111,7 @@ function App() {
           {/* add more guide routes here */}
 
           {/* ── ADMIN ROUTES ── */}
-          <Route path="/admin/dashboard" element={
+          <Route path="/admin" element={
             <ProtectedRoute allowedRoles={['admin']}>
               <AdminDashboard />
             </ProtectedRoute>
@@ -111,4 +167,5 @@ function App() {
   )
 }
 
-export default App
+export default App;
+
