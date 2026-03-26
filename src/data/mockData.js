@@ -5,6 +5,8 @@ export const mockUsers = [
     email: 'sara@gmail.com',
     password: '123456',
     role: 'explorer',
+    joinDate: '2026-03-10',
+    status: 'Active',
     recommendedMajors: ['Computer Science', 'Software Engineering', 'Data Science']
   },
   {
@@ -15,14 +17,18 @@ export const mockUsers = [
     role: 'guide',
     major: 'Software Engineering',
     university: 'KFUPM',
-    isVerified: true
+    isVerified: true,
+    joinDate: '2026-03-12',     
+    status: 'Active'   
   },
   {
     id: 3,
-    name: 'Admin',
+    name: 'Dana Alsawad',
     email: 'admin@meras.com',
     password: 'admin123',
-    role: 'admin'
+    role: 'admin' ,
+   joinDate: '2026-03-01',     
+    status: 'Active'  
   }
 ]
 
