@@ -18,6 +18,8 @@ import TaskWorkspace from './pages/explorer/Challenge/TaskWorkspace'
 import ChallengeCatalog from './pages/explorer/Challenge/ChallengeCatalog'
 import ChallengeDetail from './pages/explorer/Challenge/ChallengeDetail'
 import CompassQuiz from './pages/explorer/CompassQuiz'
+import QuizResults from './pages/explorer/QuizResults'
+
 // Guide Pages
 import GuideDashboard from './pages/guide/GuideDashboard'
 // Admin Pages
@@ -89,6 +91,12 @@ function App() {
             <CompassQuiz />
         </ExplorerLayout>
         //</ProtectedRoute>
+        } />
+
+        <Route path="/explorer/quiz-results" element={
+        <ExplorerLayout>
+          <QuizResults />
+        </ExplorerLayout>
         } />
 
           
