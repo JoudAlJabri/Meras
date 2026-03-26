@@ -986,6 +986,7 @@ export const mockPendingApplications = [
     id: 2,
     name: 'Reem Abdullah',
     email: 'reem@kfupm.edu.sa',
+    role: 'guide',
     university: 'KFUPM',
     major: 'Software Engineering',
     submittedDate: '2026-03-15',
@@ -996,10 +997,53 @@ export const mockPendingApplications = [
     id: 4,
     name: 'Noura Salem',
     email: 'noura@example.com',
+    role: 'guide',
     university: 'KFUPM',
     major: 'Chemical Engineering',
     submittedDate: '2026-03-17',
     documentPreview: 'Transcript / ID / proof of enrollment preview.',
     status: 'Pending',
-  },
-]
+  },]
+  export const mockFlaggedContent = [
+    {
+      id: 1,
+      content: 'Calculator challenge has unclear instructions.',
+      reportedBy: 'Sara Mohammed',
+      reason: 'Misleading content',
+      date: '2026-03-24',
+      status: 'Pending',
+    },
+    {
+      id: 2,
+      content: 'Inappropriate comment on a challenge.',
+      reportedBy: 'Reem Abdullah',
+      reason: 'Inappropriate language',
+      date: '2026-03-23',
+      status: 'Pending',
+    },
+    {
+      id: 3,
+      content: 'Possible copied content in challenge description.',
+      reportedBy: 'Dana Alsawad',
+      reason: 'Plagiarism',
+      date: '2026-03-22',
+      status: 'Pending',
+    },]
+    export const mockAnnouncements = [
+      {
+        id: 1,
+        title: 'Welcome to Meras',
+        message: 'We are excited to have you on the platform.',
+        targetAudience: 'All',
+        status: 'Published',
+        date: '2026-03-20',
+      },
+      {
+        id: 2,
+        title: 'Guide Verification Reminder',
+        message: 'Please complete your verification process.',
+        targetAudience: 'Guides',
+        status: 'Draft',
+        date: '2026-03-22',
+      },
+    ]

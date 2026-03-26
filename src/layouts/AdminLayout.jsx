@@ -4,7 +4,7 @@ function AdminLayout({ children }) {
   const location = useLocation()
 
   const navItems = [
-    { label: 'Dashboard', path: '/admin/dashboard' },
+    { label: 'Dashboard', path: '/admin' },
     { label: 'Users', path: '/admin/users' },
     { label: 'Verify', path: '/admin/pending-verifications' },
     { label: 'Content', path: '/admin/content-moderation' },
