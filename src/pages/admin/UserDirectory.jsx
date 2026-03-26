@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import AdminLayout from '../../layouts/AdminLayout'
 import { mockUsers } from '../../data/mockData'
 
@@ -10,7 +10,13 @@ export default function UserDirectory() {
   const [selectedUser, setSelectedUser] = useState(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showProfileModal, setShowProfileModal] = useState(false)
+  const [actionMessage, setActionMessage] = useState('')
 
+  useEffect(() => {
+    if (!actionMessage) return
+    const timer = setTimeout(() => setActionMessage(''), 3000)
+    return () => clearTimeout(timer)
+  }, [actionMessage])
 
   const filteredUsers = useMemo(() => {
     return users.filter((user) => {
@@ -31,11 +37,21 @@ export default function UserDirectory() {
   }, [users, searchTerm, roleFilter, statusFilter])
 
   const handleSuspend = (id) => {
+    const userToSuspend = users.find((user) => user.id === id)
+    if (!userToSuspend) return
+
+    if (userToSuspend.status === 'Suspended') {
+      setActionMessage(`${userToSuspend.name} is already suspended`)
+      return
+    }
+
     setUsers((prev) =>
       prev.map((user) =>
         user.id === id ? { ...user, status: 'Suspended' } : user
       )
     )
+
+    setActionMessage(`${userToSuspend.name} is suspended`)
   }
 
   const handleDeleteClick = (user) => {
@@ -46,13 +62,20 @@ export default function UserDirectory() {
   const confirmDelete = () => {
     if (!selectedUser) return
 
+    const deletedName = selectedUser.name
     setUsers((prev) => prev.filter((user) => user.id !== selectedUser.id))
     setShowDeleteModal(false)
     setSelectedUser(null)
+    setActionMessage(`${deletedName} has been deleted`)
   }
 
   const closeDeleteModal = () => {
     setShowDeleteModal(false)
+    setSelectedUser(null)
+  }
+
+  const closeProfileModal = () => {
+    setShowProfileModal(false)
     setSelectedUser(null)
   }
 
@@ -101,6 +124,22 @@ export default function UserDirectory() {
         <p style={{ marginBottom: '24px', color: '#6b7280' }}>
           Search, filter, and manage platform users.
         </p>
+
+        {actionMessage && (
+          <div
+            style={{
+              backgroundColor: '#ecfdf5',
+              color: '#065f46',
+              padding: '12px 16px',
+              borderRadius: '10px',
+              marginBottom: '16px',
+              fontWeight: '600',
+              border: '1px solid #10b981',
+            }}
+          >
+            {actionMessage}
+          </div>
+        )}
 
         <div style={cardStyle}>
           <div
@@ -223,10 +262,12 @@ export default function UserDirectory() {
                         <button
                           style={{
                             ...buttonStyle,
-                            backgroundColor: '#f59e0b',
+                            backgroundColor: user.status === 'Suspended' ? '#9ca3af' : '#f59e0b',
                             color: 'white',
+                            cursor: user.status === 'Suspended' ? 'not-allowed' : 'pointer',
                           }}
                           onClick={() => handleSuspend(user.id)}
+                          disabled={user.status === 'Suspended'}
                         >
                           Suspend Account
                         </button>
@@ -237,10 +278,7 @@ export default function UserDirectory() {
                             backgroundColor: '#dc2626',
                             color: 'white',
                           }}
-                          onClick={() => {
-                            setSelectedUser(user)
-                            setShowDeleteModal(true)
-                          }}
+                          onClick={() => handleDeleteClick(user)}
                         >
                           Delete Account
                         </button>
@@ -269,157 +307,158 @@ export default function UserDirectory() {
         </div>
 
         {showProfileModal && selectedUser && (
-  <div
-    style={{
-      position: 'fixed',
-      inset: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 999,
-      padding: '20px',
-    }}
-  >
-    <div
-      style={{
-        backgroundColor: 'white',
-        width: '100%',
-        maxWidth: '500px',
-        borderRadius: '16px',
-        padding: '24px',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '20px',
-        }}
-      >
-        <h2 style={{ margin: 0, color: '#111827' }}>User Profile</h2>
-        <button
-          onClick={() => {
-            setShowProfileModal(false)
-            setSelectedUser(null)
-          }}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            fontSize: '20px',
-            cursor: 'pointer',
-            color: '#6b7280',
-          }}
-        >
-          ×
-        </button>
-      </div>
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 999,
+              padding: '20px',
+            }}
+            onClick={closeProfileModal}
+          >
+            <div
+              style={{
+                backgroundColor: 'white',
+                width: '100%',
+                maxWidth: '500px',
+                borderRadius: '16px',
+                padding: '24px',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '20px',
+                }}
+              >
+                <h2 style={{ margin: 0, color: '#111827' }}>User Profile</h2>
+                <button
+                  onClick={closeProfileModal}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    fontSize: '20px',
+                    cursor: 'pointer',
+                    color: '#6b7280',
+                  }}
+                >
+                  ×
+                </button>
+              </div>
 
-      <div style={{ display: 'grid', gap: '12px' }}>
-        <p><strong>Name:</strong> {selectedUser.name}</p>
-        <p><strong>Email:</strong> {selectedUser.email}</p>
-        <p><strong>Role:</strong> {selectedUser.role}</p>
-        <p><strong>Join Date:</strong> {selectedUser.joinDate || 'N/A'}</p>
-        <p><strong>Status:</strong> {selectedUser.status || 'N/A'}</p>
+              <div style={{ display: 'grid', gap: '12px' }}>
+                <p><strong>Name:</strong> {selectedUser.name}</p>
+                <p><strong>Email:</strong> {selectedUser.email}</p>
+                <p><strong>Role:</strong> {selectedUser.role}</p>
+                <p><strong>Join Date:</strong> {selectedUser.joinDate || 'N/A'}</p>
+                <p><strong>Status:</strong> {selectedUser.status || 'N/A'}</p>
 
-        {selectedUser.university && (
-          <p><strong>University:</strong> {selectedUser.university}</p>
+                {selectedUser.university && (
+                  <p><strong>University:</strong> {selectedUser.university}</p>
+                )}
+
+                {selectedUser.major && (
+                  <p><strong>Major:</strong> {selectedUser.major}</p>
+                )}
+
+                {selectedUser.recommendedMajors && (
+                  <div>
+                    <strong>Recommended Majors:</strong>
+                    <ul style={{ marginTop: '8px' }}>
+                      {selectedUser.recommendedMajors.map((major, index) => (
+                        <li key={index}>{major}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+                <button
+                  onClick={closeProfileModal}
+                  style={{
+                    backgroundColor: '#2E5C4E',
+                    color: 'white',
+                    border: 'none',
+                    padding: '10px 16px',
+                    borderRadius: '10px',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
         )}
 
-        {selectedUser.major && (
-          <p><strong>Major:</strong> {selectedUser.major}</p>
-        )}
+        {showDeleteModal && selectedUser && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 999,
+              padding: '20px',
+            }}
+            onClick={closeDeleteModal}
+          >
+            <div
+              style={{
+                backgroundColor: 'white',
+                width: '100%',
+                maxWidth: '480px',
+                borderRadius: '16px',
+                padding: '24px',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 style={{ marginTop: 0, color: '#111827' }}>Confirm Delete</h2>
+              <p style={{ color: '#4b5563', marginBottom: '20px' }}>
+                Are you sure you want to delete <strong>{selectedUser.name}</strong>?
+                This action cannot be undone.
+              </p>
 
-        {selectedUser.recommendedMajors && (
-          <div>
-            <strong>Recommended Majors:</strong>
-            <ul style={{ marginTop: '8px' }}>
-              {selectedUser.recommendedMajors.map((major, index) => (
-                <li key={index}>{major}</li>
-              ))}
-            </ul>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                <button
+                  onClick={closeDeleteModal}
+                  style={{
+                    ...buttonStyle,
+                    backgroundColor: '#e5e7eb',
+                    color: '#111827',
+                  }}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  onClick={confirmDelete}
+                  style={{
+                    ...buttonStyle,
+                    backgroundColor: '#dc2626',
+                    color: 'white',
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
-
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-        <button
-          onClick={() => {
-            setShowProfileModal(false)
-            setSelectedUser(null)
-          }}
-          style={{
-            backgroundColor: '#2E5C4E',
-            color: 'white',
-            border: 'none',
-            padding: '10px 16px',
-            borderRadius: '10px',
-            cursor: 'pointer',
-            fontWeight: '600',
-          }}
-        >
-          Close
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-{showDeleteModal && selectedUser && (
-  <div
-    style={{
-      position: 'fixed',
-      inset: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 999,
-      padding: '20px',
-    }}
-  >
-    <div
-      style={{
-        backgroundColor: 'white',
-        width: '100%',
-        maxWidth: '480px',
-        borderRadius: '16px',
-        padding: '24px',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
-      }}
-    >
-      <h2 style={{ marginTop: 0, color: '#111827' }}>Confirm Delete</h2>
-      <p style={{ color: '#4b5563', marginBottom: '20px' }}>
-        Are you sure you want to delete <strong>{selectedUser.name}</strong>?
-        This action cannot be undone.
-      </p>
-
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-        <button
-          onClick={closeDeleteModal}
-          style={{
-            ...buttonStyle,
-            backgroundColor: '#e5e7eb',
-            color: '#111827',
-          }}
-        >
-          Cancel
-        </button>
-
-        <button
-          onClick={confirmDelete}
-          style={{
-            ...buttonStyle,
-            backgroundColor: '#dc2626',
-            color: 'white',
-          }}
-        >
-          Delete
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-</div>
-</AdminLayout> )}
+    </AdminLayout>
+  )
+}
