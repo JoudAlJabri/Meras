@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import ChallengeCard from '../../components/ChallengeCard'
+import { mockChallenges } from '../../data/mockData'
 
 function LandingPage() {
   return (
@@ -42,7 +43,7 @@ function LandingPage() {
           <div className="row align-items-center">
 
             {/* Left side text */}
-            <div className="col-lg-6 mb-5 mb-lg-0">
+            <div className="col-lg-6 mb-5 mb-lg-0 pe-lg-5">
               <span className="badge px-3 py-2 mb-3 fw-semibold" style={{ backgroundColor: '#e8f5ef', color: 'var(--meras-green)', fontSize: '14px' }}>
                 🎓 For High School Students
               </span>
@@ -90,12 +91,12 @@ function LandingPage() {
 
             {/* Right side card preview */}
             <div className="col-lg-6 d-flex justify-content-center align-items-center">
-              <div style={{ transform: 'rotate(-3deg)', scale: '1.1', filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.15))' }}>
+              <div style={{ width: '320px', transform: 'rotate(-3deg)', scale: '1.1', filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.15))' }}>
                 <ChallengeCard
-                  challengeName="Build a Simple Calculator"
-                  description="Write a program that handles basic arithmetic operations. No experience needed!"
-                  major="Computer Science"
-                />
+                challengeName={mockChallenges[0].title}
+                description={mockChallenges[0].description}
+                major={mockChallenges[0].major}
+              />
               </div>
             </div>
 

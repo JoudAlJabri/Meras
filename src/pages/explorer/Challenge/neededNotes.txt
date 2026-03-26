@@ -1,0 +1,96 @@
+          <div className="col-lg-4 mt-4 mt-lg-0 d-none d-lg-block">
+              <div
+                className="p-4"
+                style={{
+                  backgroundColor: 'white',
+                  borderRadius: '16px',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.12)'
+                }}
+              >
+                {/* Mentor header */}
+                <div className="d-flex align-items-center gap-3 mb-3">
+                  <div
+                    className="d-flex align-items-center justify-content-center text-white fw-bold flex-shrink-0"
+                    style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '50%',
+                      backgroundColor: heroColor,
+                      fontSize: '18px'
+                    }}
+                  >
+                    {challenge.mentorName.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="fw-bold" style={{ color: 'var(--meras-text)', fontSize: '15px' }}>
+                      {challenge.mentorName}
+                    </div>
+                    <div style={{ color: 'var(--meras-gray)', fontSize: '12px' }}>
+                      {mentor?.major || challenge.major}
+                    </div>
+                    <div style={{ color: 'var(--meras-gray)', fontSize: '12px' }}>
+                      {mentor?.university || 'KFUPM'} ·{' '}
+                      <span style={{ color: heroColor }}>✓ Verified</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Rating */}
+                <div
+                  className="d-flex align-items-center justify-content-between p-2 mb-3"
+                  style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}
+                >
+                  <span style={{ fontSize: '13px', color: 'var(--meras-gray)' }}>Mentor Rating</span>
+                  <span className="fw-bold" style={{ color: 'var(--meras-text)' }}>
+                    ⭐ {mentor?.rating || '4.5'} / 5
+                  </span>
+                </div>
+
+                {/* Sessions */}
+                <div
+                  className="d-flex align-items-center justify-content-between p-2 mb-3"
+                  style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}
+                >
+                  <span style={{ fontSize: '13px', color: 'var(--meras-gray)' }}>Total Sessions</span>
+                  <span className="fw-bold" style={{ color: 'var(--meras-text)' }}>
+                    {mentor?.totalSessions || 23}
+                  </span>
+                </div>
+
+                {/* Difficulty dots */}
+                <div
+                  className="d-flex align-items-center justify-content-between p-2 mb-4"
+                  style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}
+                >
+                  <span style={{ fontSize: '13px', color: 'var(--meras-gray)' }}>Difficulty</span>
+                  <div className="d-flex gap-1">
+                    {[1, 2, 3].map((dot) => (
+                      <div
+                        key={dot}
+                        style={{
+                          width: '10px',
+                          height: '10px',
+                          borderRadius: '50%',
+                          backgroundColor: dot <= dots ? heroColor : '#e5e7eb'
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* More Details button */}
+                <button
+                  className="btn w-100 fw-semibold py-2"
+                  onClick={() => navigate(`/explorer/mentors/${challenge.mentorId}`)}
+                  style={{
+                    backgroundColor: heroColor,
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '10px',
+                    fontSize: '14px'
+                  }}
+                >
+                  View Mentor Profile
+                </button>
+              </div>
+            </div>

@@ -198,7 +198,7 @@ return (
               </Link>
 
               {/* Heading */}
-              <h2 className="fw-bold mt-4 mb-4" style={{ color: 'var(--meras-text)' }}>
+              <h2 className="fw-semibold mt-4 mb-4" style={{ color: 'var(--meras-text)' }}>
                 Sign up
               </h2>
 
