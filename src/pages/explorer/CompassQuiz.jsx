@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const questions = [
   {
@@ -34,6 +35,7 @@ const questions = [
 function CompassQuiz() {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState(Array(questions.length).fill(""));
+  const navigate = useNavigate();
 
   const currentQuestion = questions[currentStep];
   const progressPercent = ((currentStep + 1) / questions.length) * 100;
@@ -54,6 +56,12 @@ function CompassQuiz() {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
+  };
+
+  const handleFinish = () => {
+    navigate("/explorer/quiz-results", {
+      state: { answers },
+    });
   };
 
   return (
@@ -108,28 +116,32 @@ function CompassQuiz() {
             Back
           </button>
 
-          <button
-            onClick={handleNext}
-            disabled={!answers[currentStep] || currentStep === questions.length - 1}
-            style={{
-              ...styles.navButton,
-              opacity:
-                !answers[currentStep] || currentStep === questions.length - 1
-                  ? 0.5
-                  : 1,
-              cursor:
-                !answers[currentStep] || currentStep === questions.length - 1
-                  ? "not-allowed"
-                  : "pointer",
-            }}
-          >
-            Next
-          </button>
+          {currentStep < questions.length - 1 ? (
+            <button
+              onClick={handleNext}
+              disabled={!answers[currentStep]}
+              style={{
+                ...styles.navButton,
+                opacity: !answers[currentStep] ? 0.5 : 1,
+                cursor: !answers[currentStep] ? "not-allowed" : "pointer",
+              }}
+            >
+              Next
+            </button>
+          ) : (
+            <button
+              onClick={handleFinish}
+              disabled={!answers[currentStep]}
+              style={{
+                ...styles.navButton,
+                opacity: !answers[currentStep] ? 0.5 : 1,
+                cursor: !answers[currentStep] ? "not-allowed" : "pointer",
+              }}
+            >
+              See Results
+            </button>
+          )}
         </div>
-
-        {currentStep === questions.length - 1 && answers[currentStep] && (
-          <p style={styles.doneText}>Quiz completed.</p>
-        )}
       </div>
     </div>
   );
@@ -202,11 +214,6 @@ const styles = {
     backgroundColor: "#2A8C5C",
     color: "#FFFFFF",
     fontSize: "15px",
-  },
-  doneText: {
-    marginTop: "18px",
-    color: "#2A8C5C",
-    fontWeight: "600",
   },
 };
 
