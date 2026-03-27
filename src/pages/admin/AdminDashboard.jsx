@@ -1,6 +1,11 @@
-
+import { useEffect, useState } from 'react'
 import AdminLayout from '../../layouts/AdminLayout'
-import { mockUsers, mockChallenges, mockMentors,mockPendingApplications } from '../../data/mockData'
+import {
+  mockUsers,
+  mockChallenges,
+  mockMentors,
+  mockPendingApplications,
+} from '../../data/mockData'
 import {
   BarChart,
   Bar,
@@ -10,7 +15,21 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
+
 export default function AdminDashboard() {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+
+    handleResize()
+    window.addEventListener('resize', handleResize)
+
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   const totalUsers = mockUsers.length
   const activeChallenges = mockChallenges.length
 
@@ -43,16 +62,34 @@ export default function AdminDashboard() {
   const cardStyle = {
     backgroundColor: 'white',
     borderRadius: '16px',
-    padding: '20px',
+    padding: isMobile ? '16px' : '20px',
     boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
     border: '1px solid #e5e7eb',
+    minWidth: 0,
+    boxSizing: 'border-box',
   }
 
   return (
     <AdminLayout>
-      <div>
-        <h1 style={{ marginBottom: '8px', color: '#111827' }}>Admin Dashboard</h1>
-        <p style={{ marginBottom: '24px', color: '#6b7280' }}>
+      <div style={{ minWidth: 0 }}>
+        <h1
+          style={{
+            marginBottom: '8px',
+            color: '#111827',
+            fontSize: isMobile ? '30px' : '40px',
+            lineHeight: 1.1,
+          }}
+        >
+          Admin Dashboard
+        </h1>
+
+        <p
+          style={{
+            marginBottom: '24px',
+            color: '#6b7280',
+            fontSize: isMobile ? '16px' : '18px',
+          }}
+        >
           Overview of users, challenges, verifications, and sessions.
         </p>
 
@@ -60,9 +97,10 @@ export default function AdminDashboard() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(auto-fit, minmax(220px, 1fr))',
             gap: '16px',
             marginBottom: '24px',
+            minWidth: 0,
           }}
         >
           <div style={cardStyle}>
@@ -90,23 +128,45 @@ export default function AdminDashboard() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '2fr 1fr',
+            gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr',
             gap: '16px',
             marginBottom: '24px',
+            minWidth: 0,
           }}
         >
           <div style={cardStyle}>
-            <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#111827' }}>
+            <h3
+              style={{
+                marginTop: 0,
+                marginBottom: '16px',
+                color: '#111827',
+                fontSize: isMobile ? '20px' : '24px',
+              }}
+            >
               User Growth
             </h3>
 
-            <div style={{ width: '100%', height: 280 }}>
-              <ResponsiveContainer>
+            <div
+              style={{
+                width: '100%',
+                height: '260px',
+                minWidth: 0,
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={userGrowthData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis allowDecimals={false} />
-                  <Tooltip />
+                  <Tooltip
+                    cursor={{ fill: 'rgba(0, 0, 0, 0.06)' }}
+                    contentStyle={{
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '10px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                    }}
+                  />
                   <Bar dataKey="users" fill="#22c55e" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -114,7 +174,14 @@ export default function AdminDashboard() {
           </div>
 
           <div style={cardStyle}>
-            <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#111827' }}>
+            <h3
+              style={{
+                marginTop: 0,
+                marginBottom: '16px',
+                color: '#111827',
+                fontSize: isMobile ? '20px' : '24px',
+              }}
+            >
               Recent Activity
             </h3>
 
@@ -123,12 +190,13 @@ export default function AdminDashboard() {
                 <div
                   key={index}
                   style={{
-                    padding: '12px',
+                    padding: isMobile ? '14px' : '12px',
                     borderRadius: '10px',
                     backgroundColor: '#f9fafb',
                     border: '1px solid #e5e7eb',
                     color: '#374151',
-                    fontSize: '14px',
+                    fontSize: isMobile ? '15px' : '14px',
+                    lineHeight: 1.5,
                   }}
                 >
                   {activity}
@@ -140,12 +208,25 @@ export default function AdminDashboard() {
 
         {/* Recent Sign-ups Table */}
         <div style={cardStyle}>
-          <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#111827' }}>
+          <h3
+            style={{
+              marginTop: 0,
+              marginBottom: '16px',
+              color: '#111827',
+              fontSize: isMobile ? '20px' : '24px',
+            }}
+          >
             Recent Sign-ups
           </h3>
 
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <div style={{ overflowX: 'auto', width: '100%' }}>
+            <table
+              style={{
+                width: '100%',
+                minWidth: '600px',
+                borderCollapse: 'collapse',
+              }}
+            >
               <thead>
                 <tr style={{ backgroundColor: '#f9fafb', textAlign: 'left' }}>
                   <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>Name</th>
@@ -154,6 +235,7 @@ export default function AdminDashboard() {
                   <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>Status</th>
                 </tr>
               </thead>
+
               <tbody>
                 {recentSignUps.map((user) => (
                   <tr key={user.id}>
