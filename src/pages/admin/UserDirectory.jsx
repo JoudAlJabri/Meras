@@ -11,6 +11,18 @@ export default function UserDirectory() {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [actionMessage, setActionMessage] = useState('')
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+
+    handleResize()
+    window.addEventListener('resize', handleResize)
+
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   useEffect(() => {
     if (!actionMessage) return
@@ -102,10 +114,11 @@ export default function UserDirectory() {
 
   const cardStyle = {
     backgroundColor: 'white',
-    borderRadius: '16px',
-    padding: '20px',
+    borderRadius: isMobile ? '14px' : '16px',
+    padding: isMobile ? '16px' : '20px',
     boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
     border: '1px solid #e5e7eb',
+    minWidth: 0,
   }
 
   const buttonStyle = {
@@ -117,11 +130,38 @@ export default function UserDirectory() {
     fontWeight: '600',
   }
 
+  const inputStyle = {
+    width: '100%',
+    padding: isMobile ? '12px 14px' : '10px 12px',
+    borderRadius: '10px',
+    border: '1px solid #d1d5db',
+    fontSize: isMobile ? '16px' : '14px',
+    boxSizing: 'border-box',
+    minWidth: 0,
+    backgroundColor: 'white',
+  }
+
   return (
     <AdminLayout>
-      <div>
-        <h1 style={{ marginBottom: '8px', color: '#111827' }}>User Directory</h1>
-        <p style={{ marginBottom: '24px', color: '#6b7280' }}>
+      <div style={{ minWidth: 0 }}>
+        <h1
+          style={{
+            marginBottom: '8px',
+            color: '#111827',
+            fontSize: isMobile ? '30px' : '40px',
+            lineHeight: 1.1,
+          }}
+        >
+          User Directory
+        </h1>
+
+        <p
+          style={{
+            marginBottom: isMobile ? '20px' : '24px',
+            color: '#6b7280',
+            fontSize: isMobile ? '16px' : '18px',
+          }}
+        >
           Search, filter, and manage platform users.
         </p>
 
@@ -145,9 +185,10 @@ export default function UserDirectory() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '2fr 1fr 1fr',
+              gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr 1fr',
               gap: '12px',
               marginBottom: '20px',
+              minWidth: 0,
             }}
           >
             <input
@@ -155,23 +196,13 @@ export default function UserDirectory() {
               placeholder="Search by name or email"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{
-                padding: '10px 12px',
-                borderRadius: '10px',
-                border: '1px solid #d1d5db',
-                fontSize: '14px',
-              }}
+              style={inputStyle}
             />
 
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
-              style={{
-                padding: '10px 12px',
-                borderRadius: '10px',
-                border: '1px solid #d1d5db',
-                fontSize: '14px',
-              }}
+              style={inputStyle}
             >
               <option value="All">All Roles</option>
               <option value="Explorer">Explorer</option>
@@ -182,12 +213,7 @@ export default function UserDirectory() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              style={{
-                padding: '10px 12px',
-                borderRadius: '10px',
-                border: '1px solid #d1d5db',
-                fontSize: '14px',
-              }}
+              style={inputStyle}
             >
               <option value="All">All Statuses</option>
               <option value="Active">Active</option>
@@ -196,16 +222,40 @@ export default function UserDirectory() {
             </select>
           </div>
 
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <div
+            style={{
+              width: '100%',
+              overflowX: 'auto',
+              WebkitOverflowScrolling: 'touch',
+            }}
+          >
+            <table
+              style={{
+                width: '100%',
+                minWidth: '760px',
+                borderCollapse: 'collapse',
+              }}
+            >
               <thead>
                 <tr style={{ backgroundColor: '#f9fafb', textAlign: 'left' }}>
-                  <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>Name</th>
-                  <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>Email</th>
-                  <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>Role</th>
-                  <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>Join Date</th>
-                  <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>Status</th>
-                  <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>Actions</th>
+                  <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
+                    Name
+                  </th>
+                  <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
+                    Email
+                  </th>
+                  <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
+                    Role
+                  </th>
+                  <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
+                    Join Date
+                  </th>
+                  <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
+                    Status
+                  </th>
+                  <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
+                    Actions
+                  </th>
                 </tr>
               </thead>
 
@@ -215,9 +265,11 @@ export default function UserDirectory() {
                     <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
                       {user.name}
                     </td>
+
                     <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
                       {user.email}
                     </td>
+
                     <td
                       style={{
                         padding: '12px',
@@ -227,9 +279,11 @@ export default function UserDirectory() {
                     >
                       {user.role}
                     </td>
+
                     <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
                       {user.joinDate}
                     </td>
+
                     <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
                       <span
                         style={{
@@ -238,11 +292,13 @@ export default function UserDirectory() {
                           borderRadius: '999px',
                           fontSize: '13px',
                           fontWeight: '600',
+                          whiteSpace: 'nowrap',
                         }}
                       >
                         {user.status}
                       </span>
                     </td>
+
                     <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
                       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                         <button
@@ -262,9 +318,11 @@ export default function UserDirectory() {
                         <button
                           style={{
                             ...buttonStyle,
-                            backgroundColor: user.status === 'Suspended' ? '#9ca3af' : '#f59e0b',
+                            backgroundColor:
+                              user.status === 'Suspended' ? '#9ca3af' : '#f59e0b',
                             color: 'white',
-                            cursor: user.status === 'Suspended' ? 'not-allowed' : 'pointer',
+                            cursor:
+                              user.status === 'Suspended' ? 'not-allowed' : 'pointer',
                           }}
                           onClick={() => handleSuspend(user.id)}
                           disabled={user.status === 'Suspended'}
@@ -316,7 +374,7 @@ export default function UserDirectory() {
               alignItems: 'center',
               justifyContent: 'center',
               zIndex: 999,
-              padding: '20px',
+              padding: isMobile ? '16px' : '20px',
             }}
             onClick={closeProfileModal}
           >
@@ -326,8 +384,10 @@ export default function UserDirectory() {
                 width: '100%',
                 maxWidth: '500px',
                 borderRadius: '16px',
-                padding: '24px',
+                padding: isMobile ? '18px' : '24px',
                 boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+                maxHeight: '90vh',
+                overflowY: 'auto',
               }}
               onClick={(e) => e.stopPropagation()}
             >
@@ -337,9 +397,11 @@ export default function UserDirectory() {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   marginBottom: '20px',
+                  gap: '12px',
                 }}
               >
                 <h2 style={{ margin: 0, color: '#111827' }}>User Profile</h2>
+
                 <button
                   onClick={closeProfileModal}
                   style={{
@@ -348,6 +410,7 @@ export default function UserDirectory() {
                     fontSize: '20px',
                     cursor: 'pointer',
                     color: '#6b7280',
+                    flexShrink: 0,
                   }}
                 >
                   ×
@@ -381,7 +444,13 @@ export default function UserDirectory() {
                 )}
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  marginTop: '20px',
+                }}
+              >
                 <button
                   onClick={closeProfileModal}
                   style={{
@@ -392,6 +461,7 @@ export default function UserDirectory() {
                     borderRadius: '10px',
                     cursor: 'pointer',
                     fontWeight: '600',
+                    width: isMobile ? '100%' : 'auto',
                   }}
                 >
                   Close
@@ -411,7 +481,7 @@ export default function UserDirectory() {
               alignItems: 'center',
               justifyContent: 'center',
               zIndex: 999,
-              padding: '20px',
+              padding: isMobile ? '16px' : '20px',
             }}
             onClick={closeDeleteModal}
           >
@@ -421,24 +491,33 @@ export default function UserDirectory() {
                 width: '100%',
                 maxWidth: '480px',
                 borderRadius: '16px',
-                padding: '24px',
+                padding: isMobile ? '18px' : '24px',
                 boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
               }}
               onClick={(e) => e.stopPropagation()}
             >
               <h2 style={{ marginTop: 0, color: '#111827' }}>Confirm Delete</h2>
+
               <p style={{ color: '#4b5563', marginBottom: '20px' }}>
                 Are you sure you want to delete <strong>{selectedUser.name}</strong>?
-                This action cannot be undone.
+                {' '}This action cannot be undone.
               </p>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  gap: '10px',
+                  flexDirection: isMobile ? 'column' : 'row',
+                }}
+              >
                 <button
                   onClick={closeDeleteModal}
                   style={{
                     ...buttonStyle,
                     backgroundColor: '#e5e7eb',
                     color: '#111827',
+                    width: isMobile ? '100%' : 'auto',
                   }}
                 >
                   Cancel
@@ -450,6 +529,7 @@ export default function UserDirectory() {
                     ...buttonStyle,
                     backgroundColor: '#dc2626',
                     color: 'white',
+                    width: isMobile ? '100%' : 'auto',
                   }}
                 >
                   Delete
