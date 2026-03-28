@@ -62,7 +62,7 @@ function LoginPage() {
         navigate('/guide/dashboard')
       }
     }
-    if (user.role === 'admin') navigate('/admin/dashboard')
+    if (user.role === 'admin') navigate('/admin')
 
     setLoading(false)
   }
@@ -109,7 +109,7 @@ function LoginPage() {
                       <button
                         key={role}
                         type="button"
-                        onClick={() => setFromData({ ...formData, role })}
+                        onClick={() => handleRoleSelect(role)}
                         className="btn"
                         style={{
                           borderRadius: '999px',

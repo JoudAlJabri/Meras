@@ -944,7 +944,7 @@ export const mockChallenges = [
 ];
 
 
-const UNIVERSITIES = [
+export const UNIVERSITIES = [
   'King Fahd University of Petroleum and Minerals (KFUPM)',
   'King Abdulaziz University (KAU)',
   'King Saud University (KSU)',
@@ -958,7 +958,7 @@ const UNIVERSITIES = [
   'Other'
 ]
 
-const MAJORS = [
+export const MAJORS = [
   'Software Engineering',
   'Computer Science',
   'Information Technology',
@@ -986,6 +986,7 @@ export const mockPendingApplications = [
     id: 2,
     name: 'Reem Abdullah',
     email: 'reem@kfupm.edu.sa',
+    role: 'guide',
     university: 'KFUPM',
     major: 'Software Engineering',
     submittedDate: '2026-03-15',
@@ -996,10 +997,89 @@ export const mockPendingApplications = [
     id: 4,
     name: 'Noura Salem',
     email: 'noura@example.com',
+    role: 'guide',
     university: 'KFUPM',
     major: 'Chemical Engineering',
     submittedDate: '2026-03-17',
     documentPreview: 'Transcript / ID / proof of enrollment preview.',
     status: 'Pending',
-  },
-]
+  },]
+  export const mockFlaggedContent = [
+    {
+      id: 1,
+      content: 'Calculator challenge has unclear instructions.',
+      reportedBy: 'Sara Mohammed',
+      reason: 'Misleading content',
+      date: '2026-03-24',
+      status: 'Pending',
+    },
+    {
+      id: 2,
+      content: 'Inappropriate comment on a challenge.',
+      reportedBy: 'Reem Abdullah',
+      reason: 'Inappropriate language',
+      date: '2026-03-23',
+      status: 'Pending',
+    },
+    {
+      id: 3,
+      content: 'Possible copied content in challenge description.',
+      reportedBy: 'Dana Alsawad',
+      reason: 'Plagiarism',
+      date: '2026-03-22',
+      status: 'Pending',
+    },]
+    export const mockAnnouncements = [
+      {
+        id: 1,
+        title: 'Welcome to Meras',
+        message: 'We are excited to have you on the platform.',
+        targetAudience: 'All',
+        status: 'Published',
+        date: '2026-03-20',
+      },
+      {
+        id: 2,
+        title: 'Guide Verification Reminder',
+        message: 'Please complete your verification process.',
+        targetAudience: 'Guides',
+        status: 'Draft',
+        date: '2026-03-22',
+      },
+    ]
+
+    export const mockGuideEarnings = [
+      {
+        id: 1,
+        studentName: 'Sara Mohammed',
+        sessionDate: '2026-03-10',
+        duration: '30 mins',
+        amount: 50,
+      },
+      {
+        id: 2,
+        studentName: 'Noura Salem',
+        sessionDate: '2026-03-14',
+        duration: '45 mins',
+        amount: 75,
+      },
+      {
+        id: 3,
+        studentName: 'Faisal Ahmed',
+        sessionDate: '2026-03-18',
+        duration: '60 mins',
+        amount: 100,
+      },
+      {
+        id: 4,
+        studentName: 'Reem Abdullah',
+        sessionDate: '2026-03-22',
+        duration: '30 mins',
+        amount: 50,
+      },
+    ]
+    export const mockOfficeHoursSlots = [
+      { id: 1, day: 'Sunday', time: '9:00 AM', available: false },
+      { id: 2, day: 'Sunday', time: '11:00 AM', available: false },
+      { id: 3, day: 'Monday', time: '1:00 PM', available: false },
+    ]
