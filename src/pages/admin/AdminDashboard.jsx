@@ -69,6 +69,39 @@ export default function AdminDashboard() {
     boxSizing: 'border-box',
   }
 
+  const statCardBase = {
+    borderRadius: '16px',
+    padding: isMobile ? '16px' : '20px',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
+    border: '1px solid #e5e7eb',
+    minWidth: 0,
+    boxSizing: 'border-box',
+  }
+
+  const totalUsersCard = {
+    ...statCardBase,
+    backgroundColor: '#f9fafb',
+    borderTop: '4px solid #6b7280',
+  }
+
+  const activeChallengesCard = {
+    ...statCardBase,
+    backgroundColor: '#eff6ff',
+    borderTop: '4px solid #3b82f6',
+  }
+
+  const pendingVerificationsCard = {
+    ...statCardBase,
+    backgroundColor: '#fff7ed',
+    borderTop: '4px solid #f59e0b',
+  }
+
+  const totalSessionsCard = {
+    ...statCardBase,
+    backgroundColor: '#f0fdf4',
+    borderTop: '4px solid #22c55e',
+  }
+
   return (
     <AdminLayout>
       <div style={{ minWidth: 0 }}>
@@ -103,24 +136,24 @@ export default function AdminDashboard() {
             minWidth: 0,
           }}
         >
-          <div style={cardStyle}>
+          <div style={totalUsersCard}>
             <p style={{ margin: 0, color: '#6b7280', fontSize: '14px' }}>Total Users</p>
-            <h2 style={{ margin: '10px 0 0', color: '#111827' }}>{totalUsers}</h2>
+            <h2 style={{ margin: '10px 0 0', color: '#4b5563' }}>{totalUsers}</h2>
           </div>
 
-          <div style={cardStyle}>
+          <div style={activeChallengesCard}>
             <p style={{ margin: 0, color: '#6b7280', fontSize: '14px' }}>Active Challenges</p>
-            <h2 style={{ margin: '10px 0 0', color: '#111827' }}>{activeChallenges}</h2>
+            <h2 style={{ margin: '10px 0 0', color: '#2563eb' }}>{activeChallenges}</h2>
           </div>
 
-          <div style={cardStyle}>
+          <div style={pendingVerificationsCard}>
             <p style={{ margin: 0, color: '#6b7280', fontSize: '14px' }}>Pending Verifications</p>
-            <h2 style={{ margin: '10px 0 0', color: '#111827' }}>{pendingVerifications}</h2>
+            <h2 style={{ margin: '10px 0 0', color: '#d97706' }}>{pendingVerifications}</h2>
           </div>
 
-          <div style={cardStyle}>
+          <div style={totalSessionsCard}>
             <p style={{ margin: 0, color: '#6b7280', fontSize: '14px' }}>Total Sessions</p>
-            <h2 style={{ margin: '10px 0 0', color: '#111827' }}>{totalSessions}</h2>
+            <h2 style={{ margin: '10px 0 0', color: '#16a34a' }}>{totalSessions}</h2>
           </div>
         </div>
 

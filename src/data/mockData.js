@@ -944,7 +944,7 @@ export const mockChallenges = [
 ];
 
 
-const UNIVERSITIES = [
+export const UNIVERSITIES = [
   'King Fahd University of Petroleum and Minerals (KFUPM)',
   'King Abdulaziz University (KAU)',
   'King Saud University (KSU)',
@@ -958,7 +958,7 @@ const UNIVERSITIES = [
   'Other'
 ]
 
-const MAJORS = [
+export const MAJORS = [
   'Software Engineering',
   'Computer Science',
   'Information Technology',
@@ -1046,4 +1046,40 @@ export const mockPendingApplications = [
         status: 'Draft',
         date: '2026-03-22',
       },
+    ]
+
+    export const mockGuideEarnings = [
+      {
+        id: 1,
+        studentName: 'Sara Mohammed',
+        sessionDate: '2026-03-10',
+        duration: '30 mins',
+        amount: 50,
+      },
+      {
+        id: 2,
+        studentName: 'Noura Salem',
+        sessionDate: '2026-03-14',
+        duration: '45 mins',
+        amount: 75,
+      },
+      {
+        id: 3,
+        studentName: 'Faisal Ahmed',
+        sessionDate: '2026-03-18',
+        duration: '60 mins',
+        amount: 100,
+      },
+      {
+        id: 4,
+        studentName: 'Reem Abdullah',
+        sessionDate: '2026-03-22',
+        duration: '30 mins',
+        amount: 50,
+      },
+    ]
+    export const mockOfficeHoursSlots = [
+      { id: 1, day: 'Sunday', time: '9:00 AM', available: false },
+      { id: 2, day: 'Sunday', time: '11:00 AM', available: false },
+      { id: 3, day: 'Monday', time: '1:00 PM', available: false },
     ]
