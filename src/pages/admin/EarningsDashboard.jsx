@@ -55,6 +55,15 @@ export default function EarningsDashboard() {
       <h1 style={{ fontSize: isMobile ? '34px' : '40px', marginBottom: '20px' }}>
         Earnings Dashboard
       </h1>
+      <p
+        style={{
+          marginBottom: '24px',
+          color: '#6b7280',
+          fontSize: isMobile ? '16px' : '18px',
+        }}
+      >
+        Overview of mentor earnings, session activity, and income trends.
+      </p>
 
       {/* Stats */}
       <div
