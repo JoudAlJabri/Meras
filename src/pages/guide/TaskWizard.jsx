@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./Guide.css";
+import GuideLayout from "./GuideLayout";
 
 function TaskWizard() {
   const [step, setStep] = useState(1);
@@ -17,6 +18,7 @@ function TaskWizard() {
   };
 
   return (
+    <GuideLayout>
     <div className="page-container">
 
       {/* Progress */}
@@ -110,6 +112,7 @@ function TaskWizard() {
       </div>
 
     </div>
+    </GuideLayout>
   );
 }
 

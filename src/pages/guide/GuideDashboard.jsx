@@ -1,5 +1,6 @@
 import { mockUsers, mockChallenges } from "../../data/mockData";
 import "./Guide.css";
+import GuideLayout from "./GuideLayout";
 
 function GuideDashboard() {
   const guide = mockUsers.find(user => user.role === "guide");
@@ -22,6 +23,7 @@ const submissions = [
 ];
 
   return (
+    <GuideLayout>
     <div className="page-container">
 
       {/* Welcome Card */}
@@ -86,6 +88,7 @@ const submissions = [
     </div>
  
     </div>
+    </GuideLayout>
   );
 }
 

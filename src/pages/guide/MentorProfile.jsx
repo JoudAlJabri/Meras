@@ -1,5 +1,6 @@
 import { mockMentors, mockChallenges } from "../../data/mockData";
 import "./Guide.css";
+import GuideLayout from "./GuideLayout";
 
 function MentorProfile() {
 
@@ -12,6 +13,7 @@ function MentorProfile() {
   );
 
   return (
+    <GuideLayout>
     <div className="page-container">
 
       {/* 🔹 PROFILE HEADER */}
@@ -78,6 +80,7 @@ function MentorProfile() {
       </div>
 
     </div>
+    </GuideLayout>
   );
 }
 

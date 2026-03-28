@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { mockMentors } from "../../data/mockData";
 import "./Guide.css";
+import GuideLayout from "./GuideLayout";
 
 function MentorDirectory() {
   // State for search input
@@ -22,6 +23,7 @@ function MentorDirectory() {
   });
 
   return (
+    <GuideLayout>
     <div className="page-container">
 
       {/* Page Title */}
@@ -80,6 +82,7 @@ function MentorDirectory() {
       )}
 
     </div>
+    </GuideLayout>
   );
 }
 

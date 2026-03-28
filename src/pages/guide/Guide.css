@@ -1553,3 +1553,171 @@ textarea.input {
 
 /* --- No wrap --- */
 .nowrap { white-space: nowrap; }
+
+
+/* ============================================================
+   14. GUIDE LAYOUT (Sidebar + Main Content Shell)
+   ============================================================ */
+
+/* --- Outer shell: sidebar + content side by side --- */
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--color-bg);
+}
+
+/* --- Sidebar --- */
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background-color: #2A8C5C;
+  border-right: none;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-6) 0 var(--space-8);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-sm);
+  z-index: var(--z-raised);
+}
+
+/* --- Brand / App Name --- */
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-5) var(--space-6);
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: var(--space-4);
+}
+
+.sidebar-brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  flex-shrink: 0;
+}
+
+.sidebar-brand-name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: #ffffff;
+  line-height: var(--line-height-snug);
+  letter-spacing: -0.02em;
+}
+
+/* --- Nav container --- */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: 0 var(--space-3);
+  flex: 1;
+}
+
+/* --- Individual nav link --- */
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0.6rem var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  transition: var(--transition-fast);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+}
+
+.sidebar-item:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+/* --- Active nav link --- */
+.sidebar-active,
+.sidebar-item.sidebar-active {
+  background-color: #3DB87A;
+  color: #ffffff;
+  font-weight: var(--font-weight-semibold);
+  border-color: transparent;
+}
+
+.sidebar-active:hover {
+  background-color: #45c484;
+  color: #ffffff;
+}
+
+/* --- Main content area --- */
+.main-content {
+  flex: 1;
+  min-width: 0; /* prevents flex overflow */
+  overflow-y: auto;
+}
+
+/* --- Remove page-container's min-height when inside layout
+       (the layout shell already fills the viewport) --- */
+.layout .page-container {
+  min-height: unset;
+}
+
+/* --- Responsive: collapse sidebar on small screens --- */
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    flex-direction: row;
+    align-items: center;
+    padding: var(--space-3) var(--space-4);
+    border-right: none;
+    border-bottom: 1.5px solid rgba(255, 255, 255, 0.2);
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: var(--space-2);
+  }
+
+  .sidebar-brand {
+    padding: 0;
+    border-bottom: none;
+    margin-bottom: 0;
+    margin-right: var(--space-4);
+    flex-shrink: 0;
+  }
+
+  .sidebar-brand-name {
+    display: none; /* show icon only on mobile */
+  }
+
+  .sidebar-nav {
+    flex-direction: row;
+    padding: 0;
+    gap: var(--space-1);
+    flex-wrap: nowrap;
+  }
+
+  .sidebar-item {
+    white-space: nowrap;
+    padding: 0.45rem var(--space-3);
+    font-size: var(--font-size-xs);
+  }
+
+  .main-content {
+    overflow-y: unset;
+  }
+}

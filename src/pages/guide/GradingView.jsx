@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./Guide.css";
+import GuideLayout from "./GuideLayout";
 
 function GradingView() {
   const [rating, setRating] = useState(0);
@@ -7,6 +8,7 @@ function GradingView() {
   const [submitted, setSubmitted] = useState(false);
 
   return (
+    <GuideLayout>
     <div className="page-container">
 
       <h2 className="title">Student Submission</h2>
@@ -53,6 +55,7 @@ function GradingView() {
     </div>
 
     </div>
+    </GuideLayout>
   );
 }
 
