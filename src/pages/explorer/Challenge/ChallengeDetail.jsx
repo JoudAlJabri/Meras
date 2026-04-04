@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { mockChallenges, mockMentors } from '../../../data/mockData'
-import ExplorerLayout from '../../../layouts/ExplorerLayout'
+//import ExplorerLayout from '../../../layouts/ExplorerLayout'
 import puzzleImg from '../../../assets/General-Graphics/2PersonPuzzle.png'
 import handCodingImg from '../../../assets/Tech-Graphics/Hand coding-bro.png'
 
@@ -37,12 +37,10 @@ function ChallengeDetail() {
 
   if (!challenge) {
     return (
-      <ExplorerLayout>
         <div className="text-center py-5">
           <h3>Challenge not found</h3>
           <Link to="/explorer/challenges">Back to Catalog</Link>
         </div>
-      </ExplorerLayout>
     )
   }
 
@@ -90,7 +88,6 @@ function ChallengeDetail() {
   const dots = difficultyLevel[challenge.difficulty] || 1
 
   return (
-    <ExplorerLayout>
       <div style={{ backgroundColor: 'var(--meras-bg)', minHeight: '100vh' }}>
 
         {/* ── BREADCRUMB ── */}
@@ -655,7 +652,6 @@ function ChallengeDetail() {
         </div>
 
       </div>
-    </ExplorerLayout>
   )
 }
 

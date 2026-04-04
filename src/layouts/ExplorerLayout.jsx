@@ -10,14 +10,11 @@ function ExplorerLayout({ children }) {
           <Link to="/explorer/dashboard" style={styles.link}>
             Dashboard
           </Link>
-          <Link to="/explorer/challenges" style={styles.link}>
+          <Link to="/explorer/challengeCatalog" style={styles.link}>
             Challenges
           </Link>
           <Link to="/explorer/mentors" style={styles.link}>
             Mentors
-          </Link>
-          <Link to="/explorer/my-path" style={styles.link}>
-            My Path
           </Link>
           <Link to="/explorer/compass-quiz" style={styles.link}>
             Compass Quiz

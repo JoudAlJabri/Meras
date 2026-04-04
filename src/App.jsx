@@ -22,6 +22,7 @@ import QuizResults from './pages/explorer/QuizResults'
 
 // Guide Pages
 import GuideDashboard from './pages/guide/GuideDashboard'
+import MentorDirectory from './pages/guide/MentorDirectory'
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard'
 import PendingVerifications from './pages/admin/PendingVerifications'
@@ -58,39 +59,38 @@ function App() {
           } />
           <Route path="/explorer/challengeCatalog" element={
             <ProtectedRoute allowedRoles={['explorer']}>
-              <ExplorerLayout>
-                <ChallengeCatalog />
-              </ExplorerLayout>
+              <ChallengeCatalog />
             </ProtectedRoute>
           } />
+
           <Route path="/explorer/challenges/:index" element={
-            <ProtectedRoute allowedRoles={['explorer']}>
-              <ExplorerLayout>
+           <ProtectedRoute allowedRoles={['explorer']}>
                 <ChallengeDetail />
-              </ExplorerLayout>
             </ProtectedRoute>
           } />
           <Route path="/explorer/workspace/:index" element={
             <ProtectedRoute allowedRoles={['explorer']}>
-              <ExplorerLayout>
                 <TaskWorkspace />
-              </ExplorerLayout>
-            </ProtectedRoute>
+          </ProtectedRoute>
           } />
           <Route path="/explorer/submission-confirmation/:index" element={
             <ProtectedRoute allowedRoles={['explorer']}>
-              <ExplorerLayout>
                 <SubmissionConfirmation />
-            </ExplorerLayout>
             </ProtectedRoute>
           } />
 
+          <Route path="/explorer/mentors" element={
+            <ProtectedRoute allowedRoles={['explorer']}>
+              <MentorDirectory />
+            </ProtectedRoute>
+            } />
+
           <Route path="/explorer/compass-quiz" element={
-          //<ProtectedRoute allowedRoles={['explorer']}>
+          <ProtectedRoute allowedRoles={['explorer']}>
         <ExplorerLayout>
             <CompassQuiz />
         </ExplorerLayout>
-        //</ProtectedRoute>
+        </ProtectedRoute>
         } />
 
         <Route path="/explorer/quiz-results" element={
