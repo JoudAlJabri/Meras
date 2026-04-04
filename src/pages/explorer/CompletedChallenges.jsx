@@ -1,29 +1,25 @@
-import StarRating from "../../components/StarRating";
-import MajorBadge from "../../components/MajorBadge";
-
 function CompletedChallenges({ challenges }) {
   if (!challenges || challenges.length === 0) {
     return (
       <div style={styles.emptyBox}>
         <h3 style={styles.sectionTitle}>Completed Challenges</h3>
         <p style={styles.emptyText}>No completed challenges yet.</p>
-        <StarRating rating={challenge.rating} />
       </div>
     );
   }
 
   return (
-    <div style={styles.wrapper}>
+    <div>
       <h3 style={styles.sectionTitle}>Completed Challenges</h3>
-
-      <div style={styles.list}>
+      <div style={styles.grid}>
         {challenges.map((challenge, index) => (
           <div key={index} style={styles.card}>
-            <h4 style={styles.challengeName}>{challenge.name}</h4>
-            <p style={styles.text}><strong>Major:</strong> {challenge.major}</p>
-            <p style={styles.text}><strong>Completion Date:</strong> {challenge.date}</p>
-            <p style={styles.text}><strong>Rating:</strong> {"⭐".repeat(challenge.rating)}</p>
-            <p style={styles.text}><strong>Feedback:</strong> {challenge.feedback}</p>
+            <div style={styles.cardTop}>
+              <span style={styles.majorBadge}>{challenge.major}</span>
+            </div>
+            <h4 style={styles.cardTitle}>{challenge.title}</h4>
+            <p style={styles.cardDesc}>{challenge.feedback ?? challenge.description}</p>
+            <button style={styles.feedbackBtn}>View Feedback</button>
           </div>
         ))}
       </div>
@@ -32,45 +28,79 @@ function CompletedChallenges({ challenges }) {
 }
 
 const styles = {
-  wrapper: {
-    marginTop: "24px",
-  },
   sectionTitle: {
-    fontSize: "22px",
+    fontSize: "20px",
+    fontWeight: "700",
+    color: "#111827",
     marginBottom: "16px",
-    color: "#000000",
   },
-  list: {
+  grid: {
     display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
     gap: "16px",
   },
   card: {
     backgroundColor: "#FFFFFF",
     border: "1px solid #E5E7EB",
-    borderRadius: "14px",
+    borderRadius: "16px",
     padding: "18px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
     boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
   },
-  challengeName: {
-    marginBottom: "10px",
-    fontSize: "18px",
-    color: "#2A8C5C",
+  cardTop: {
+    display: "flex",
+    alignItems: "center",
   },
-  text: {
-    margin: "6px 0",
-    color: "#333333",
+  majorBadge: {
+    backgroundColor: "#F0FDF4",
+    color: "var(--meras-green-dark)",
+    border: "1px solid #BBF7D0",
+    borderRadius: "999px",
+    fontSize: "12px",
+    fontWeight: "600",
+    padding: "4px 12px",
+  },
+  cardTitle: {
+    margin: 0,
+    fontSize: "16px",
+    fontWeight: "700",
+    color: "#111827",
+    lineHeight: "1.3",
+  },
+  cardDesc: {
+    margin: 0,
+    fontSize: "13px",
+    color: "#6B7280",
+    lineHeight: "1.5",
+    flex: 1,
+    overflow: "hidden",
+    display: "-webkit-box",
+    WebkitLineClamp: 3,
+    WebkitBoxOrient: "vertical",
+  },
+  feedbackBtn: {
+    backgroundColor: "var(--meras-green-dark)",
+    color: "#FFFFFF",
+    border: "none",
+    borderRadius: "999px",
+    padding: "10px",
     fontSize: "14px",
+    fontWeight: "600",
+    cursor: "pointer",
+    marginTop: "4px",
   },
   emptyBox: {
-    marginTop: "24px",
-    backgroundColor: "#FFFFFF",
-    border: "1px solid #E5E7EB",
-    borderRadius: "14px",
     padding: "20px",
+    borderRadius: "14px",
+    border: "1px solid #E5E7EB",
+    backgroundColor: "#FAFAFA",
   },
   emptyText: {
-    color: "#A1A1A1",
-    fontSize: "15px",
+    color: "#6B7280",
+    fontSize: "14px",
+    margin: 0,
   },
 };
 

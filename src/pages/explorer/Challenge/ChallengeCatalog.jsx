@@ -19,18 +19,10 @@ function ChallengeCatalog() {
   const visible = filtered.slice((page - 1) * CARDS_PER_PAGE, page * CARDS_PER_PAGE)
 
   return (
-    <div style={{ backgroundColor: 'var(--meras-bg)', minHeight: '100vh' }}>
+    <div>
 
       {/* ── NAVBAR ── */}
-      <nav className="navbar navbar-expand-lg" style={{ backgroundColor: 'white', borderBottom: '1px solid var(--meras-border)' }}>
-        <div className="container">
-          {/* Logo */}
-          <span className="navbar-brand fw-semibold fs-4" style={{ color: 'var(--meras-green)' }}>
-            Meras
-          </span>
-            </div>
-      </nav>
-
+  
           {/* Mobile toggle */}
           <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span className="navbar-toggler-icon"></span>
