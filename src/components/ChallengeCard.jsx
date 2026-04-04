@@ -91,7 +91,7 @@ const badgeStrokeColors = {
   'var(--meras-gray)': 'var(--meras-black)',
 }
 
-function ChallengeCard({ challengeName, description, major, onMoreDetails }) {
+function ChallengeCard({ challengeName, description, major, onMoreDetails, buttonLabel = 'More Details' }) {
   const cardColor = majorCardColors[major?.toLowerCase()] ?? 'var(--meras-green)';
   const badgeColor = majorButtonColors[major?.toLowerCase()] ?? 'var(--meras-green)';
   const badgeStroke = badgeStrokeColors[cardColor] ?? 'var(--meras-black)';
@@ -204,7 +204,7 @@ function ChallengeCard({ challengeName, description, major, onMoreDetails }) {
             fontFamily: "'Plus Jakarta Sans', sans-serif",
           }}
         >
-          More Details
+          {buttonLabel}
         </button>
       </div>
     </div>

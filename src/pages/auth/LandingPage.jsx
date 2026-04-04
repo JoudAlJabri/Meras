@@ -1,6 +1,10 @@
 import { Link } from 'react-router-dom'
 import ChallengeCard from '../../components/ChallengeCard'
 import { mockChallenges } from '../../data/mockData'
+import compassQuiz from "../../assets/LandinPage3stepsPics/CompassQuiz.png";
+import mentorship from "../../assets/LandinPage3stepsPics/Mentorship.png";
+import challenge from "../../assets/LandinPage3stepsPics/MicroChallenge.png";
+
 
 function LandingPage() {
   return (
@@ -117,8 +121,8 @@ function LandingPage() {
             <div className="col-md-4">
               <div className="text-center p-4">
                 <div className="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-4 fw-bold fs-4 text-white"
-                  style={{ width: '70px', height: '70px', backgroundColor: 'var(--meras-green)' }}>
-                  1
+                  style={{ width: '70px', height: '70px'}}>
+                   <img src={compassQuiz} alt="illustration" style={{width:"150px"}} />
                 </div>
                 <h5 className="fw-bold mb-3" style={{ color: 'var(--meras-text)' }}>Take the Compass Quiz</h5>
                 <p style={{ color: 'var(--meras-gray)' }}>
@@ -132,8 +136,8 @@ function LandingPage() {
             <div className="col-md-4">
               <div className="text-center p-4">
                 <div className="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-4 fw-bold fs-4 text-white"
-                  style={{ width: '70px', height: '70px', backgroundColor: 'var(--meras-green)' }}>
-                  2
+                  style={{ width: '70px', height: '70px', }}>
+                   <img src={mentorship} alt="illustration" style={{width:"150px"}} />
                 </div>
                 <h5 className="fw-bold mb-3" style={{ color: 'var(--meras-text)' }}>Try Real Tasks</h5>
                 <p style={{ color: 'var(--meras-gray)' }}>
@@ -147,8 +151,9 @@ function LandingPage() {
             <div className="col-md-4">
               <div className="text-center p-4">
                 <div className="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-4 fw-bold fs-4 text-white"
-                  style={{ width: '70px', height: '70px', backgroundColor: 'var(--meras-green)' }}>
-                  3
+                  style={{ width: '70px', height: '70px', }}>
+                  <img src={challenge
+                  } alt="illustration" style={{width:"150px"}} />
                 </div>
                 <h5 className="fw-bold mb-3" style={{ color: 'var(--meras-text)' }}>Get Mentor Feedback</h5>
                 <p style={{ color: 'var(--meras-gray)' }}>

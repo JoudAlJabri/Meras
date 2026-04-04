@@ -1083,3 +1083,8 @@ export const mockPendingApplications = [
       { id: 2, day: 'Sunday', time: '11:00 AM', available: false },
       { id: 3, day: 'Monday', time: '1:00 PM', available: false },
     ]
+
+    export const mockCompletedChallenges = [
+     mockChallenges[0],
+     mockChallenges[1],
+    ]
