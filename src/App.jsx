@@ -22,6 +22,11 @@ import QuizResults from './pages/explorer/QuizResults'
 
 // Guide Pages
 import GuideDashboard from './pages/guide/GuideDashboard'
+import MentorDirectory from './pages/guide/MentorDirectory'
+import MentorProfile from './pages/guide/MentorProfile'
+import BookingPage from './pages/guide/BookingPage'
+import TaskWizard from './pages/guide/TaskWizard'
+import GradingView from './pages/guide/GradingView'
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard'
 import PendingVerifications from './pages/admin/PendingVerifications'
@@ -109,6 +114,7 @@ function App() {
             </ProtectedRoute>
           } />
           {/* add more guide routes here */}
+          
 
           {/* ── ADMIN ROUTES ── */}
           <Route path="/admin" element={
@@ -159,6 +165,8 @@ function App() {
           } />
            {/* add more admin routes here */}
           {/* ── FALLBACK ── */}
+          
+          
           <Route path="*" element={<Navigate to="/" replace />} />
 
         </Routes>
