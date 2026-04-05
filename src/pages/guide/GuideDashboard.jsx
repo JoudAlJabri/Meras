@@ -1,8 +1,11 @@
 import { mockUsers, mockChallenges } from "../../data/mockData";
 import "./Guide.css";
-import GuideLayout from "./GuideLayout";
+import { useNavigate } from "react-router-dom";
+// import GuideLayout from "./GuideLayout";
 
 function GuideDashboard() {
+  const navigate = useNavigate();
+  
   const guide = mockUsers.find(user => user.role === "guide");
   const totalChallenges = mockChallenges.filter(
   c => c.mentorId === guide.id
@@ -23,7 +26,7 @@ const submissions = [
 ];
 
   return (
-    <GuideLayout>
+    //<GuideLayout>
     <div className="page-container">
 
       {/* Welcome Card */}
@@ -82,13 +85,13 @@ const submissions = [
      
 
      <div className="flex gap-3 mt-6">
-      <button className="btn btn-primary">Create Challenge</button>
-      <button className="btn btn-secondary">View Submissions</button>
-      <button className="btn btn-secondary">Set Availability</button>
+      <button className="btn btn-primary" onClick={() => navigate("/guide/tasks")}>Create Challenge</button>
+      <button className="btn btn-secondary" onClick={() => navigate("/guide/grading")}>View Submissions</button>
+      <button className="btn btn-secondary" onClick={() => navigate("/guide/booking")}>Set Availability</button>
     </div>
  
     </div>
-    </GuideLayout>
+    //</GuideLayout>
   );
 }
 

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import "./Guide.css";
-import GuideLayout from "./GuideLayout";
 
 function GradingView() {
   const [rating, setRating] = useState(0);
@@ -8,10 +7,9 @@ function GradingView() {
   const [submitted, setSubmitted] = useState(false);
 
   return (
-    <GuideLayout>
     <div className="page-container">
 
-      <h2 className="title">Student Submission</h2>
+      <h2 className="title">Student Submissions</h2>
       <div className="card section">
 
       {/* Mock submission */}
@@ -45,7 +43,8 @@ function GradingView() {
       />
 
       {/* Submit */}
-      <button className="btn btn-primary" onClick={() => setSubmitted(true)}>
+      <button className="btn btn-primary" disabled={rating === 0 || feedback === ""}
+  onClick={() => setSubmitted(true)}>
         Submit Grade
       </button>
 
@@ -55,7 +54,6 @@ function GradingView() {
     </div>
 
     </div>
-    </GuideLayout>
   );
 }
 

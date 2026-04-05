@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { mockMentors } from "../../data/mockData";
-import GuideLayout from "./GuideLayout"; 
 import "./Guide.css";
+import { useLocation } from "react-router-dom";
 
 function BookingPage() {
-  const guide = mockMentors[0];
+  const { state: mentor } = useLocation();
+
+if (!mentor) {
+  return <p className="page-container">No mentor selected.</p>;
+}
+  const guide = mentor; 
 
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [topic, setTopic] = useState("");
@@ -21,7 +26,6 @@ function BookingPage() {
   ];
 
   return (
-    <GuideLayout> 
 
       <div className="page-container">
 
@@ -97,7 +101,6 @@ function BookingPage() {
 
       </div>
 
-    </GuideLayout>
   );
 }
 

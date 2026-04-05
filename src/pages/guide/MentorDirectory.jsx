@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { mockMentors } from "../../data/mockData";
 import "./Guide.css";
-import GuideLayout from "./GuideLayout";
+import { useNavigate } from "react-router-dom";
+
 
 function MentorDirectory() {
+  const navigate = useNavigate();
   // State for search input
   const [search, setSearch] = useState("");
 
@@ -23,7 +25,7 @@ function MentorDirectory() {
   });
 
   return (
-    <GuideLayout>
+    
     <div className="page-container">
 
       {/* Page Title */}
@@ -70,7 +72,7 @@ function MentorDirectory() {
           <p className="subtext">Rate: ${mentor.hourlyRate}/hr</p>
 
           {/* Action */}
-          <button className="btn btn-secondary">View Profile</button>
+          <button className="btn btn-secondary" onClick={() => navigate(`/guide/profile`, { state: mentor })}>View Profile</button>
 
         </div>
       ))}
@@ -82,7 +84,7 @@ function MentorDirectory() {
       )}
 
     </div>
-    </GuideLayout>
+    
   );
 }
 
