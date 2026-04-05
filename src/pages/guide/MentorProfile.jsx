@@ -1,22 +1,27 @@
 import { mockMentors, mockChallenges } from "../../data/mockData";
 import "./Guide.css";
-import GuideLayout from "./GuideLayout";
+import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function MentorProfile() {
+  const navigate = useNavigate();
+  const { state: mentor } = useLocation();
+  if (!mentor) {
+  return <p className="page-container">No mentor data found.</p>;
+}
 
-  // 🔹 Select mentor (temporary static)
-  const mentor = mockMentors[0];
+  //  Select mentor (temporary static)
+  //const mentor = mockMentors[0];
 
-  // 🔹 Filter mentor challenges
+  //  Filter mentor challenges
   const mentorChallenges = mockChallenges.filter(
     (c) => c.mentorId === mentor.id
   );
 
   return (
-    <GuideLayout>
     <div className="page-container">
 
-      {/* 🔹 PROFILE HEADER */}
+      {/*  PROFILE HEADER */}
       <div className="card section flex">
         <div className="avatar">👤</div>
 
@@ -33,13 +38,13 @@ function MentorProfile() {
         </p>
       </div>
 
-      {/* 🔹 BIO */}
+      {/*  BIO */}
       <div className="card section">
         <h3 className="title">About</h3>
         <p className="subtext">{mentor.bio}</p>
       </div>
 
-      {/* 🔹 SKILLS */}
+      {/*  SKILLS */}
       <div className="card section">
         <h3 className="title">Skills</h3>
 
@@ -50,7 +55,7 @@ function MentorProfile() {
         </div>
       </div>
 
-      {/* 🔹 CHALLENGES */}
+      {/*  CHALLENGES */}
       <div className="card section">
         <h3 className="title">Published Challenges</h3>
 
@@ -66,12 +71,12 @@ function MentorProfile() {
         )}
       </div>
 
-      {/* 🔹 BUTTON */}
+      {/*  BUTTON */}
       <div className="card section">
-        <button className="btn btn-primary">View Availability</button>
+        <button className="btn btn-primary" onClick={() => navigate("/guide/booking", { state: mentor })}>View Availability</button>
       </div>
 
-      {/* 🔹 REVIEWS */}
+      {/*  REVIEWS */}
       <div className="card section">
         <h3 className="title">Reviews</h3>
 
@@ -80,7 +85,6 @@ function MentorProfile() {
       </div>
 
     </div>
-    </GuideLayout>
   );
 }
 

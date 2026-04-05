@@ -1,7 +1,8 @@
 import { NavLink } from "react-router-dom";
 import "./Guide.css";
+import { Outlet } from "react-router-dom";
 
-// Navigation items — add or remove routes here as your app grows
+// Navigation items
 const NAV_ITEMS = [
   { label: "Dashboard",        to: "/guide/dashboard" },
   { label: "Mentor Directory", to: "/guide/mentors"   },
@@ -11,7 +12,7 @@ const NAV_ITEMS = [
   { label: "Grading",          to: "/guide/grading"   },
 ];
 
-function GuideLayout({ children }) {
+function GuideLayout() {
   return (
     <div className="layout">
 
@@ -43,7 +44,7 @@ function GuideLayout({ children }) {
 
       {/* ── Main content area ── */}
       <main className="main-content">
-        {children}
+        <Outlet />
       </main>
 
     </div>

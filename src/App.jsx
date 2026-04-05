@@ -21,6 +21,7 @@ import CompassQuiz from './pages/explorer/CompassQuiz'
 import QuizResults from './pages/explorer/QuizResults'
 
 // Guide Pages
+import GuideLayout from './pages/guide/GuideLayout';
 import GuideDashboard from './pages/guide/GuideDashboard'
 import MentorDirectory from './pages/guide/MentorDirectory'
 
@@ -107,14 +108,29 @@ function App() {
 
           
           {/* add more explorer routes here */}
+        
 
           {/* ── GUIDE ROUTES ── */}
-          <Route path="/guide/dashboard" element={
+          {/*<Route path="/guide/dashboard" element={
             <ProtectedRoute allowedRoles={['guide']}>
               <GuideDashboard />
             </ProtectedRoute>
-          } />
+          } />*/}
+        
           {/* add more guide routes here */}
+          <Route path="/guide/*" element={
+            <ProtectedRoute allowedRoles={['guide']}>
+              <GuideLayout />
+            </ProtectedRoute>
+          }>
+            <Route path="dashboard" element={<GuideDashboard />} />
+            <Route path="mentors" element={<MentorDirectory />} />
+            <Route path="profile" element={<MentorProfile />} />
+            <Route path="booking" element={<BookingPage />} />
+            <Route path="tasks" element={<TaskWizard />} />
+            <Route path="grading" element={<GradingView />} />
+          </Route>
+          
           
 
           {/* ── ADMIN ROUTES ── */}
