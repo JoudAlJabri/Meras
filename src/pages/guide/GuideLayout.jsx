@@ -6,8 +6,6 @@ import { Outlet } from "react-router-dom";
 const NAV_ITEMS = [
   { label: "Dashboard",        to: "/guide/dashboard" },
   { label: "Mentor Directory", to: "/guide/mentors"   },
-  { label: "Profile",          to: "/guide/profile"   },
-  { label: "Booking",          to: "/guide/booking"   },
   { label: "Task Wizard",      to: "/guide/tasks"     },
   { label: "Grading",          to: "/guide/grading"   },
 ];
