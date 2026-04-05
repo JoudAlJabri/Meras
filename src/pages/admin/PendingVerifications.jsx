@@ -5,17 +5,48 @@ import { mockPendingApplications } from '../../data/mockData'
 export default function PendingVerifications() {
   const [applications, setApplications] = useState(mockPendingApplications)
   const [selectedApplication, setSelectedApplication] = useState(null)
+  const [actionMessage, setActionMessage] = useState('')
+  const [messageType, setMessageType] = useState('success')
+
+  // temporary frontend-only user
+  const currentUser = {
+    name: 'Dana Alsawad',
+    role: 'admin', // change to 'guide' or 'explorer' to test restriction
+  }
+
+  const isAdmin = currentUser.role === 'admin'
+
+  const showMessage = (message, type = 'success') => {
+    setActionMessage(message)
+    setMessageType(type)
+
+    setTimeout(() => {
+      setActionMessage('')
+    }, 3000)
+  }
 
   const handleApprove = (id) => {
+    const applicationToApprove = applications.find((app) => app.id === id)
+
+    if (!applicationToApprove?.universityId || !applicationToApprove?.transcript) {
+      showMessage(
+        'Cannot approve application until both University ID and Transcript are uploaded.',
+        'error'
+      )
+      return
+    }
+
     setApplications((prev) =>
       prev.map((app) =>
-        app.id === id ? { ...app, status: 'Approved' } : app
+        app.id === id ? { ...app, status: 'Verified' } : app
       )
     )
 
     setSelectedApplication((prev) =>
-      prev && prev.id === id ? { ...prev, status: 'Approved' } : prev
+      prev && prev.id === id ? { ...prev, status: 'Verified' } : prev
     )
+
+    showMessage('Application verified and notification email sent to the applicant.', 'success')
   }
 
   const handleReject = (id) => {
@@ -28,10 +59,12 @@ export default function PendingVerifications() {
     setSelectedApplication((prev) =>
       prev && prev.id === id ? { ...prev, status: 'Rejected' } : prev
     )
+
+    showMessage('Application rejected and notification email sent to the applicant.', 'success')
   }
 
   const getBadgeStyle = (status) => {
-    if (status === 'Approved') {
+    if (status === 'Verified') {
       return {
         backgroundColor: '#dcfce7',
         color: '#166534',
@@ -59,6 +92,14 @@ export default function PendingVerifications() {
     border: '1px solid #e5e7eb',
   }
 
+  const actionButtonStyle = {
+    border: 'none',
+    padding: '10px 16px',
+    borderRadius: '10px',
+    cursor: 'pointer',
+    fontWeight: '600',
+  }
+
   return (
     <AdminLayout>
       <div>
@@ -68,6 +109,36 @@ export default function PendingVerifications() {
         <p style={{ marginBottom: '24px', color: '#6b7280' }}>
           Review guide applications and approve or reject them.
         </p>
+
+        <div
+          style={{
+            backgroundColor: '#eff6ff',
+            color: '#1d4ed8',
+            padding: '12px 16px',
+            borderRadius: '10px',
+            marginBottom: '16px',
+            fontWeight: '500',
+            border: '1px solid #bfdbfe',
+          }}
+        >
+          Sensitive verification documents are restricted to Administrator access only.
+        </div>
+
+        {actionMessage && (
+          <div
+            style={{
+              backgroundColor: messageType === 'error' ? '#fee2e2' : '#ecfdf5',
+              color: messageType === 'error' ? '#991b1b' : '#065f46',
+              padding: '12px 16px',
+              borderRadius: '10px',
+              marginBottom: '16px',
+              fontWeight: '600',
+              border: messageType === 'error' ? '1px solid #ef4444' : '1px solid #10b981',
+            }}
+          >
+            {actionMessage}
+          </div>
+        )}
 
         <div style={cardStyle}>
           <div style={{ overflowX: 'auto' }}>
@@ -112,23 +183,51 @@ export default function PendingVerifications() {
                       </span>
                     </td>
                     <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
-                      <button
-                        onClick={() => setSelectedApplication(app)}
-                        style={{
-                          backgroundColor: '#2E5C4E',
-                          color: 'white',
-                          border: 'none',
-                          padding: '8px 12px',
-                          borderRadius: '8px',
-                          cursor: 'pointer',
-                          fontSize: '14px',
-                        }}
-                      >
-                        View Details
-                      </button>
+                      {isAdmin ? (
+                        <button
+                          onClick={() => setSelectedApplication(app)}
+                          style={{
+                            backgroundColor: '#2E5C4E',
+                            color: 'white',
+                            border: 'none',
+                            padding: '8px 12px',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            fontWeight: '600',
+                          }}
+                        >
+                          View Details
+                        </button>
+                      ) : (
+                        <span
+                          style={{
+                            color: '#9ca3af',
+                            fontSize: '13px',
+                            fontWeight: '600',
+                          }}
+                        >
+                          Admin Only
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))}
+
+                {applications.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan="6"
+                      style={{
+                        padding: '20px',
+                        textAlign: 'center',
+                        color: '#6b7280',
+                      }}
+                    >
+                      No pending applications found.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -155,6 +254,8 @@ export default function PendingVerifications() {
                 borderRadius: '16px',
                 padding: '24px',
                 boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+                maxHeight: '90vh',
+                overflowY: 'auto',
               }}
             >
               <div
@@ -212,57 +313,85 @@ export default function PendingVerifications() {
                 }}
               >
                 <p style={{ marginTop: 0, fontWeight: '600', color: '#111827' }}>
-                  Document Preview
+                  Uploaded Documents
                 </p>
-                <div
-                  style={{
-                    minHeight: '120px',
-                    border: '2px dashed #cbd5e1',
-                    borderRadius: '10px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#6b7280',
-                    backgroundColor: 'white',
-                    padding: '12px',
-                    textAlign: 'center',
-                  }}
-                >
-                  {selectedApplication.documentPreview}
+
+                {isAdmin ? (
+                  <>
+                    <div
+                      style={{
+                        backgroundColor: 'white',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '10px',
+                        padding: '12px',
+                        marginBottom: '12px',
+                      }}
+                    >
+                      <p style={{ margin: '0 0 6px 0', fontWeight: '600', color: '#111827' }}>
+                        University ID
+                      </p>
+                      <p style={{ margin: 0, color: '#6b7280' }}>
+                        {selectedApplication.universityId || 'Not uploaded'}
+                      </p>
+                    </div>
+
+                    <div
+                      style={{
+                        backgroundColor: 'white',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '10px',
+                        padding: '12px',
+                      }}
+                    >
+                      <p style={{ margin: '0 0 6px 0', fontWeight: '600', color: '#111827' }}>
+                        Transcript
+                      </p>
+                      <p style={{ margin: 0, color: '#6b7280' }}>
+                        {selectedApplication.transcript || 'Not uploaded'}
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <div
+                    style={{
+                      backgroundColor: '#fff7ed',
+                      border: '1px solid #fdba74',
+                      borderRadius: '10px',
+                      padding: '12px',
+                      color: '#9a3412',
+                      fontWeight: '500',
+                    }}
+                  >
+                    Restricted: Only administrators can view sensitive verification documents.
+                  </div>
+                )}
+              </div>
+
+              {isAdmin && (
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => handleApprove(selectedApplication.id)}
+                    style={{
+                      ...actionButtonStyle,
+                      backgroundColor: '#16a34a',
+                      color: 'white',
+                    }}
+                  >
+                    Approve
+                  </button>
+
+                  <button
+                    onClick={() => handleReject(selectedApplication.id)}
+                    style={{
+                      ...actionButtonStyle,
+                      backgroundColor: '#dc2626',
+                      color: 'white',
+                    }}
+                  >
+                    Reject
+                  </button>
                 </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                <button
-                  onClick={() => handleApprove(selectedApplication.id)}
-                  style={{
-                    backgroundColor: '#16a34a',
-                    color: 'white',
-                    border: 'none',
-                    padding: '10px 16px',
-                    borderRadius: '10px',
-                    cursor: 'pointer',
-                    fontWeight: '600',
-                  }}
-                >
-                  Approve
-                </button>
-
-                <button
-                  onClick={() => handleReject(selectedApplication.id)}
-                  style={{
-                    backgroundColor: '#dc2626',
-                    color: 'white',
-                    border: 'none',
-                    padding: '10px 16px',
-                    borderRadius: '10px',
-                    cursor: 'pointer',
-                    fontWeight: '600',
-                  }}
-                >
-                  Reject
-                </button>
-              </div>
+              )}
             </div>
           </div>
         )}
