@@ -11,6 +11,7 @@ export default function TaxonomyManagement() {
 
   const [universityMessage, setUniversityMessage] = useState('')
   const [majorMessage, setMajorMessage] = useState('')
+  const [majorMessageType, setMajorMessageType] = useState('')
 
   useEffect(() => {
     if (!universityMessage) return
@@ -48,11 +49,27 @@ export default function TaxonomyManagement() {
   }
 
   const addMajor = () => {
-    if (!newMajor.trim()) return
-
     const majorToAdd = newMajor.trim()
+  
+    if (!majorToAdd) {
+      setMajorMessage('Please enter a major name')
+      setMajorMessageType('error')
+      return
+    }
+  
+    const majorExists = majors.some(
+      (major) => major.toLowerCase() === majorToAdd.toLowerCase()
+    )
+  
+    if (majorExists) {
+      setMajorMessage('This major already exists in the database')
+      setMajorMessageType('error')
+      return
+    }
+  
     setMajors([...majors, majorToAdd])
-    setMajorMessage(`${majorToAdd} has been added`)
+    setMajorMessage('New major added to system catalog')
+    setMajorMessageType('success')
     setNewMajor('')
   }
 
@@ -200,21 +217,26 @@ export default function TaxonomyManagement() {
             </h2>
 
             {majorMessage && (
-              <div
-                style={{
-                  backgroundColor: '#ecfdf5',
-                  color: '#065f46',
-                  padding: '10px 14px',
-                  borderRadius: '10px',
-                  marginBottom: '12px',
-                  fontWeight: '600',
-                  border: '1px solid #10b981',
-                  fontSize: '14px',
-                }}
-              >
-                {majorMessage}
-              </div>
-            )}
+                <div
+                  style={{
+                    backgroundColor:
+                      majorMessageType === 'error' ? '#fef2f2' : '#ecfdf5',
+                    color:
+                      majorMessageType === 'error' ? '#991b1b' : '#065f46',
+                    padding: '10px 14px',
+                    borderRadius: '10px',
+                    marginBottom: '12px',
+                    fontWeight: '600',
+                    border:
+                      majorMessageType === 'error'
+                        ? '1px solid #ef4444'
+                        : '1px solid #10b981',
+                    fontSize: '14px',
+                  }}
+                >
+                  {majorMessage}
+                </div>
+              )}
 
             <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
               <input

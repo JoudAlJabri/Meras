@@ -986,11 +986,13 @@ export const mockPendingApplications = [
     id: 2,
     name: 'Reem Abdullah',
     email: 'reem@kfupm.edu.sa',
-    role: 'guide',
     university: 'KFUPM',
     major: 'Software Engineering',
     submittedDate: '2026-03-15',
-    documentPreview: 'Guide verification document preview goes here.',
+
+    universityId: 'University ID uploaded',
+    transcript: 'Transcript uploaded',
+
     status: 'Pending',
   },
   {
@@ -1001,7 +1003,8 @@ export const mockPendingApplications = [
     university: 'KFUPM',
     major: 'Chemical Engineering',
     submittedDate: '2026-03-17',
-    documentPreview: 'Transcript / ID / proof of enrollment preview.',
+    universityId: 'University ID uploaded successfully.',
+    transcript: 'Transcript uploaded successfully.',
     status: 'Pending',
   },]
   export const mockFlaggedContent = [

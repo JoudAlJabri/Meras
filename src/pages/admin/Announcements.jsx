@@ -6,6 +6,8 @@ export default function Announcements() {
   const [announcements, setAnnouncements] = useState(mockAnnouncements)
   const [showFormModal, setShowFormModal] = useState(false)
   const [actionMessage, setActionMessage] = useState('')
+  const [messageType, setMessageType] = useState('success')
+  const [formError, setFormError] = useState('')
   const [formData, setFormData] = useState({
     title: '',
     message: '',
@@ -14,10 +16,12 @@ export default function Announcements() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
+    setFormError('')
   }
 
   const closeFormModal = () => {
     setShowFormModal(false)
+    setFormError('')
     setFormData({
       title: '',
       message: '',
@@ -25,30 +29,45 @@ export default function Announcements() {
     })
   }
 
+  const showMessage = (message, type = 'success') => {
+    setActionMessage(message)
+    setMessageType(type)
+
+    setTimeout(() => {
+      setActionMessage('')
+    }, 3000)
+  }
+
   const handleSave = (status) => {
-    if (!formData.title.trim() || !formData.message.trim()) return
+    if (!formData.title.trim()) {
+      setFormError('Please enter an announcement title.')
+      return
+    }
+
+    if (!formData.message.trim()) {
+      setFormError('Please enter a message before publishing.')
+      return
+    }
 
     const newAnnouncement = {
       id: Date.now(),
-      title: formData.title,
-      message: formData.message,
+      title: formData.title.trim(),
+      message: formData.message.trim(),
       targetAudience: formData.targetAudience,
       status,
       date: new Date().toISOString().split('T')[0],
     }
 
     setAnnouncements((prev) => [newAnnouncement, ...prev])
-    setActionMessage(
+
+    showMessage(
       status === 'Draft'
         ? 'Announcement saved as draft.'
-        : 'Announcement published successfully.'
+        : 'Announcement Published Successfully.',
+      'success'
     )
 
     closeFormModal()
-
-    setTimeout(() => {
-      setActionMessage('')
-    }, 3000)
   }
 
   const getStatusStyle = (status) => {
@@ -116,13 +135,13 @@ export default function Announcements() {
         {actionMessage && (
           <div
             style={{
-              backgroundColor: '#ecfdf5',
-              color: '#065f46',
+              backgroundColor: messageType === 'error' ? '#fee2e2' : '#ecfdf5',
+              color: messageType === 'error' ? '#991b1b' : '#065f46',
               padding: '12px 16px',
               borderRadius: '10px',
               marginBottom: '16px',
               fontWeight: '600',
-              border: '1px solid #10b981',
+              border: messageType === 'error' ? '1px solid #ef4444' : '1px solid #10b981',
             }}
           >
             {actionMessage}
@@ -136,7 +155,9 @@ export default function Announcements() {
                 <tr style={{ backgroundColor: '#f9fafb', textAlign: 'left' }}>
                   <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>Title</th>
                   <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>Message</th>
-                  <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>Target Audience</th>
+                  <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
+                    Target Audience
+                  </th>
                   <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>Date</th>
                   <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>Status</th>
                 </tr>
@@ -257,6 +278,7 @@ export default function Announcements() {
                       borderRadius: '10px',
                       border: '1px solid #d1d5db',
                       fontSize: '14px',
+                      boxSizing: 'border-box',
                     }}
                   />
                 </div>
@@ -275,11 +297,25 @@ export default function Announcements() {
                       width: '100%',
                       padding: '10px 12px',
                       borderRadius: '10px',
-                      border: '1px solid #d1d5db',
+                      border: formError ? '1px solid #ef4444' : '1px solid #d1d5db',
                       fontSize: '14px',
                       resize: 'vertical',
+                      boxSizing: 'border-box',
                     }}
                   />
+                  {formError && (
+                    <p
+                      style={{
+                        color: '#dc2626',
+                        fontSize: '13px',
+                        marginTop: '8px',
+                        marginBottom: 0,
+                        fontWeight: '500',
+                      }}
+                    >
+                      {formError}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -296,6 +332,7 @@ export default function Announcements() {
                       borderRadius: '10px',
                       border: '1px solid #d1d5db',
                       fontSize: '14px',
+                      boxSizing: 'border-box',
                     }}
                   >
                     <option value="All">All</option>
@@ -311,6 +348,7 @@ export default function Announcements() {
                   justifyContent: 'flex-end',
                   gap: '10px',
                   marginTop: '24px',
+                  flexWrap: 'wrap',
                 }}
               >
                 <button
