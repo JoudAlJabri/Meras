@@ -1046,7 +1046,7 @@ export const mockPendingApplications = [
         title: 'Guide Verification Reminder',
         message: 'Please complete your verification process.',
         targetAudience: 'Guides',
-        status: 'Draft',
+        status: 'Published',
         date: '2026-03-22',
       },
     ]
