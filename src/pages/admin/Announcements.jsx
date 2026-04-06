@@ -7,7 +7,13 @@ export default function Announcements() {
   const [showFormModal, setShowFormModal] = useState(false)
   const [actionMessage, setActionMessage] = useState('')
   const [messageType, setMessageType] = useState('success')
-  const [formError, setFormError] = useState('')
+
+  
+  const [formErrors, setFormErrors] = useState({
+    title: '',
+    message: '',
+  })
+
   const [formData, setFormData] = useState({
     title: '',
     message: '',
@@ -16,12 +22,14 @@ export default function Announcements() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
-    setFormError('')
+
+    // clear only the changed field error
+    setFormErrors({ ...formErrors, [e.target.name]: '' })
   }
 
   const closeFormModal = () => {
     setShowFormModal(false)
-    setFormError('')
+    setFormErrors({ title: '', message: '' })
     setFormData({
       title: '',
       message: '',
@@ -38,35 +46,35 @@ export default function Announcements() {
     }, 3000)
   }
 
-  const handleSave = (status) => {
+  const handleSave = () => {
+    let errors = { title: '', message: '' }
+  
     if (!formData.title.trim()) {
-      setFormError('Please enter an announcement title.')
-      return
+      errors.title = 'Please enter an announcement title.'
     }
-
+  
     if (!formData.message.trim()) {
-      setFormError('Please enter a message before publishing.')
+      errors.message = 'Please enter a message before publishing.'
+    }
+  
+    if (errors.title || errors.message) {
+      setFormErrors(errors)
       return
     }
-
+  
     const newAnnouncement = {
       id: Date.now(),
       title: formData.title.trim(),
       message: formData.message.trim(),
       targetAudience: formData.targetAudience,
-      status,
+      status: 'Published',
       date: new Date().toISOString().split('T')[0],
     }
-
+  
     setAnnouncements((prev) => [newAnnouncement, ...prev])
-
-    showMessage(
-      status === 'Draft'
-        ? 'Announcement saved as draft.'
-        : 'Announcement Published Successfully.',
-      'success'
-    )
-
+  
+    showMessage('Announcement Published Successfully.', 'success')
+  
     closeFormModal()
   }
 
@@ -141,7 +149,10 @@ export default function Announcements() {
               borderRadius: '10px',
               marginBottom: '16px',
               fontWeight: '600',
-              border: messageType === 'error' ? '1px solid #ef4444' : '1px solid #10b981',
+              border:
+                messageType === 'error'
+                  ? '1px solid #ef4444'
+                  : '1px solid #10b981',
             }}
           >
             {actionMessage}
@@ -153,32 +164,24 @@ export default function Announcements() {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ backgroundColor: '#f9fafb', textAlign: 'left' }}>
-                  <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>Title</th>
-                  <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>Message</th>
-                  <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
-                    Target Audience
-                  </th>
-                  <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>Date</th>
-                  <th style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>Status</th>
+                  <th style={{ padding: '12px' }}>Title</th>
+                  <th style={{ padding: '12px' }}>Message</th>
+                  <th style={{ padding: '12px' }}>Target Audience</th>
+                  <th style={{ padding: '12px' }}>Date</th>
+                  <th style={{ padding: '12px' }}>Status</th>
                 </tr>
               </thead>
 
               <tbody>
                 {announcements.map((announcement) => (
                   <tr key={announcement.id}>
-                    <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
-                      {announcement.title}
-                    </td>
-                    <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
-                      {announcement.message}
-                    </td>
-                    <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
+                    <td style={{ padding: '12px' }}>{announcement.title}</td>
+                    <td style={{ padding: '12px' }}>{announcement.message}</td>
+                    <td style={{ padding: '12px' }}>
                       {announcement.targetAudience}
                     </td>
-                    <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
-                      {announcement.date}
-                    </td>
-                    <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
+                    <td style={{ padding: '12px' }}>{announcement.date}</td>
+                    <td style={{ padding: '12px' }}>
                       <span
                         style={{
                           ...getStatusStyle(announcement.status),
@@ -193,189 +196,190 @@ export default function Announcements() {
                     </td>
                   </tr>
                 ))}
-
-                {announcements.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan="5"
-                      style={{
-                        padding: '20px',
-                        textAlign: 'center',
-                        color: '#6b7280',
-                      }}
-                    >
-                      No announcements found.
-                    </td>
-                  </tr>
-                )}
               </tbody>
             </table>
           </div>
         </div>
 
         {showFormModal && (
-          <div
-            style={{
-              position: 'fixed',
-              inset: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 999,
-              padding: '20px',
-            }}
-            onClick={closeFormModal}
-          >
-            <div
-              style={{
-                backgroundColor: 'white',
-                width: '100%',
-                maxWidth: '600px',
-                borderRadius: '16px',
-                padding: '24px',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '20px',
-                }}
-              >
-                <h2 style={{ margin: 0, color: '#111827' }}>Create Announcement</h2>
-                <button
-                  onClick={closeFormModal}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    fontSize: '20px',
-                    cursor: 'pointer',
-                    color: '#6b7280',
-                  }}
-                >
-                  ×
-                </button>
-              </div>
+  <div
+    style={{
+      position: 'fixed',
+      inset: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 999,
+      padding: '20px',
+    }}
+    onClick={closeFormModal}
+  >
+    <div
+      style={{
+        backgroundColor: 'white',
+        width: '100%',
+        maxWidth: '600px',
+        borderRadius: '16px',
+        padding: '24px',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {/* Header */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '20px',
+        }}
+      >
+        <h2 style={{ margin: 0, color: '#111827' }}>
+          Create Announcement
+        </h2>
 
-              <div style={{ display: 'grid', gap: '16px' }}>
-                <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>
-                    Title
-                  </label>
-                  <input
-                    type="text"
-                    name="title"
-                    value={formData.title}
-                    onChange={handleChange}
-                    placeholder="Enter announcement title"
-                    style={{
-                      width: '100%',
-                      padding: '10px 12px',
-                      borderRadius: '10px',
-                      border: '1px solid #d1d5db',
-                      fontSize: '14px',
-                      boxSizing: 'border-box',
-                    }}
-                  />
-                </div>
+        <button
+          onClick={closeFormModal}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            fontSize: '20px',
+            cursor: 'pointer',
+            color: '#6b7280',
+          }}
+        >
+          ×
+        </button>
+      </div>
 
-                <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>
-                    Message
-                  </label>
-                  <textarea
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    placeholder="Enter announcement message"
-                    rows="5"
-                    style={{
-                      width: '100%',
-                      padding: '10px 12px',
-                      borderRadius: '10px',
-                      border: formError ? '1px solid #ef4444' : '1px solid #d1d5db',
-                      fontSize: '14px',
-                      resize: 'vertical',
-                      boxSizing: 'border-box',
-                    }}
-                  />
-                  {formError && (
-                    <p
-                      style={{
-                        color: '#dc2626',
-                        fontSize: '13px',
-                        marginTop: '8px',
-                        marginBottom: 0,
-                        fontWeight: '500',
-                      }}
-                    >
-                      {formError}
-                    </p>
-                  )}
-                </div>
+      {/* Title */}
+      <div style={{ marginBottom: '16px' }}>
+        <label style={{ fontWeight: '600', color: '#374151' }}>
+          Title
+        </label>
 
-                <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>
-                    Target Audience
-                  </label>
-                  <select
-                    name="targetAudience"
-                    value={formData.targetAudience}
-                    onChange={handleChange}
-                    style={{
-                      width: '100%',
-                      padding: '10px 12px',
-                      borderRadius: '10px',
-                      border: '1px solid #d1d5db',
-                      fontSize: '14px',
-                      boxSizing: 'border-box',
-                    }}
-                  >
-                    <option value="All">All</option>
-                    <option value="Explorers">Explorers</option>
-                    <option value="Guides">Guides</option>
-                  </select>
-                </div>
-              </div>
+        <input
+          type="text"
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+          placeholder="Enter announcement title"
+          style={{
+            width: '100%',
+            marginTop: '6px',
+            padding: '10px',
+            borderRadius: '8px',
+            border: formErrors.title
+              ? '1px solid #ef4444'
+              : '1px solid #d1d5db',
+            outline: 'none',
+          }}
+        />
 
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'flex-end',
-                  gap: '10px',
-                  marginTop: '24px',
-                  flexWrap: 'wrap',
-                }}
-              >
-                <button
-                  onClick={() => handleSave('Draft')}
-                  style={{
-                    ...buttonStyle,
-                    backgroundColor: '#e5e7eb',
-                    color: '#111827',
-                  }}
-                >
-                  Save as Draft
-                </button>
-
-                <button
-                  onClick={() => handleSave('Published')}
-                  style={{
-                    ...buttonStyle,
-                    backgroundColor: '#2E5C4E',
-                    color: 'white',
-                  }}
-                >
-                  Publish
-                </button>
-              </div>
-            </div>
-          </div>
+        {formErrors.title && (
+          <p style={{ color: '#ef4444', fontSize: '13px', marginTop: '4px' }}>
+            {formErrors.title}
+          </p>
         )}
+      </div>
+
+      {/* Message */}
+      <div style={{ marginBottom: '16px' }}>
+        <label style={{ fontWeight: '600', color: '#374151' }}>
+          Message
+        </label>
+
+        <textarea
+          name="message"
+          value={formData.message}
+          onChange={handleChange}
+          placeholder="Write your announcement..."
+          rows={4}
+          style={{
+            width: '100%',
+            marginTop: '6px',
+            padding: '10px',
+            borderRadius: '8px',
+            border: formErrors.message
+              ? '1px solid #ef4444'
+              : '1px solid #d1d5db',
+            outline: 'none',
+            resize: 'none',
+          }}
+        />
+
+        {formErrors.message && (
+          <p style={{ color: '#ef4444', fontSize: '13px', marginTop: '4px' }}>
+            {formErrors.message}
+          </p>
+        )}
+      </div>
+
+      {/* Audience */}
+      <div style={{ marginBottom: '20px' }}>
+        <label style={{ fontWeight: '600', color: '#374151' }}>
+          Target Audience
+        </label>
+
+        <select
+          name="targetAudience"
+          value={formData.targetAudience}
+          onChange={handleChange}
+          style={{
+            width: '100%',
+            marginTop: '6px',
+            padding: '10px',
+            borderRadius: '8px',
+            border: '1px solid #d1d5db',
+          }}
+        >
+          <option value="All">All</option>
+          <option value="Explorers">Explorers</option>
+          <option value="Guides">Guides</option>
+        </select>
+      </div>
+
+      {/* Buttons */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          gap: '10px',
+        }}
+      >
+        <button
+          onClick={closeFormModal}
+          style={{
+            padding: '10px 16px',
+            borderRadius: '10px',
+            border: '1px solid #d1d5db',
+            backgroundColor: 'white',
+            cursor: 'pointer',
+            fontWeight: '600',
+          }}
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={handleSave}
+          style={{
+            padding: '10px 16px',
+            borderRadius: '10px',
+            border: 'none',
+            backgroundColor: '#2E5C4E',
+            color: 'white',
+            cursor: 'pointer',
+            fontWeight: '600',
+          }}
+        >
+          Publish
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       </div>
     </AdminLayout>
   )
