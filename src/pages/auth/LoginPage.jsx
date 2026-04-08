@@ -76,11 +76,7 @@ function LoginPage() {
           <div className="col-lg-6 d-flex align-items-center justify-content-center p-5">
             <div style={{ width: '100%', maxWidth: '420px' }}>
 
-              {/* Back button */}
-              <div className="mb-4">
-                <BackButton />
-              </div>
-
+          
               {/* Logo */}
               <Link to="/" style={{ textDecoration: 'none' }}>
                 <span className="fw-semibold fs-4" style={{ color: 'var(--meras-green)' }}>
@@ -101,7 +97,7 @@ function LoginPage() {
                     className="form-label fw-semibold"
                     style={{ color: 'var(--meras-text)', fontSize: '14px' }}
                   >
-                    Sign in as
+                   Log in as
                   </label>
 
                   <div className="d-flex gap-2">
@@ -207,33 +203,36 @@ function LoginPage() {
                   {loading ? 'Signing in...' : 'Sign in'}
                 </button>
 
-                {/* Divider */}
-                <div className="d-flex align-items-center gap-3 my-3">
-                  <hr className="flex-grow-1 m-0" />
-                  <span style={{ color: 'var(--meras-gray)', fontSize: '13px' }}>or</span>
-                  <hr className="flex-grow-1 m-0" />
-                </div>
+                {/* Divider + Google button — only for non-guide roles */}
+                {formData.role !== 'guide' && (
+                  <>
+                    <div className="d-flex align-items-center gap-3 my-3">
+                      <hr className="flex-grow-1 m-0" />
+                      <span style={{ color: 'var(--meras-gray)', fontSize: '13px' }}>or</span>
+                      <hr className="flex-grow-1 m-0" />
+                    </div>
 
-                {/* Google button */}
-                <button
-                  type="button"
-                  className="btn w-100 fw-semibold py-2"
-                  style={{
-                    border: '1.5px solid var(--meras-border)',
-                    borderRadius: '10px',
-                    fontSize: '15px',
-                    color: 'var(--meras-text)',
-                    backgroundColor: 'white'
-                  }}
-                >
-                  <img
-                    src="https://www.google.com/favicon.ico"
-                    alt="Google"
-                    width="18"
-                    className="me-2"
-                  />
-                  Sign in with Google
-                </button>
+                    <button
+                      type="button"
+                      className="btn w-100 fw-semibold py-2"
+                      style={{
+                        border: '1.5px solid var(--meras-border)',
+                        borderRadius: '10px',
+                        fontSize: '15px',
+                        color: 'var(--meras-text)',
+                        backgroundColor: 'white'
+                      }}
+                    >
+                      <img
+                        src="https://www.google.com/favicon.ico"
+                        alt="Google"
+                        width="18"
+                        className="me-2"
+                      />
+                      Sign in with Google
+                    </button>
+                  </>
+                )}
 
               </form>
 

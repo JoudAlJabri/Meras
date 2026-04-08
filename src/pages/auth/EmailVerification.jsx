@@ -1,8 +1,15 @@
-import { Link } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import EmailConfirmation from '../../assets/Submissions/EmailSubmission.png';
+
+
 
 function EmailVerification() {
   const { currentUser } = useAuth()
+
+  const destination = currentUser?.role === 'guide'
+    ? '/waiting-room'
+    : "/explorer/compass-quiz";
 
   return (
     <div
@@ -35,7 +42,7 @@ function EmailVerification() {
               backgroundColor: '#e8f5ef'
             }}
           >
-            <span style={{ fontSize: '36px' }}>📧</span>
+            <img src={EmailConfirmation} alt='email' style={{ width: '80px', height: '80px', objectFit: 'contain' }} />
           </div>
 
           {/* Logo */}
@@ -65,26 +72,41 @@ function EmailVerification() {
           {/* Steps */}
           <div className="text-start mb-4">
             {[
-              { icon: '1️⃣', text: 'Open your university email inbox' },
-              { icon: '2️⃣', text: 'Find the email from Meras' },
-              { icon: '3️⃣', text: 'Click the verification link' },
-              { icon: '4️⃣', text: 'You\'ll be redirected back automatically' }
-            ].map((item, index) => (
+              'Open your email inbox',
+              'Find the email from Meras',
+              'Click the verification link',
+              'You\'ll be redirected back automatically'
+            ].map((text, index) => (
               <div
                 key={index}
                 className="d-flex align-items-center gap-3 mb-3"
               >
-                <span style={{ fontSize: '20px' }}>{item.icon}</span>
+                <span
+                  style={{
+                    width: '26px',
+                    height: '26px',
+                    minWidth: '26px',
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--meras-green)',
+                    color: 'white',
+                    fontSize: '13px',
+                    fontWeight: '700',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  {index + 1}
+                </span>
                 <span style={{ color: 'var(--meras-text)', fontSize: '14px' }}>
-                  {item.text}
+                  {text}
                 </span>
               </div>
             ))}
           </div>
 
-          {/* Simulate verify button — for prototype only */}
           <Link
-            to="/waiting-room"
+            to={destination}
             className="btn w-100 text-white fw-semibold py-2 mb-3"
             style={{
               backgroundColor: 'var(--meras-green)',

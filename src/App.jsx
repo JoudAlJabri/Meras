@@ -21,14 +21,14 @@ import CompassQuiz from './pages/explorer/CompassQuiz'
 import QuizResults from './pages/explorer/QuizResults'
 
 // Guide Pages
-import GuideLayout from './pages/guide/GuideLayout';
+import GuideLayout from './layouts/GuideLayout';
 import GuideDashboard from './pages/guide/GuideDashboard'
 import MentorDirectory from './pages/guide/MentorDirectory'
-
 import MentorProfile from './pages/guide/MentorProfile'
 import BookingPage from './pages/guide/BookingPage'
 import TaskWizard from './pages/guide/TaskWizard'
 import GradingView from './pages/guide/GradingView'
+import GuideSettings from './pages/guide/GuideSettings'
 
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard'
@@ -40,6 +40,7 @@ import OfficeHoursCalendar from './pages/admin/OfficeHoursCalendar'
 import EarningsDashboard from './pages/admin/EarningsDashboard'
 import TaxonomyManagement from './pages/admin/TaxonomyManagement'
 import SubmissionConfirmation from './pages/explorer/Challenge/SubmissionConfirmation'
+import ExplorerSettings from './pages/explorer/ExplorerSettings'
 
 
 function App() {
@@ -59,52 +60,49 @@ function App() {
           {/* ── EXPLORER ROUTES ── */}
           <Route path="/explorer/dashboard" element={
             <ProtectedRoute allowedRoles={['explorer']}>
-              <ExplorerLayout>
-                <ExplorerDashboard />
-              </ExplorerLayout>
+              <ExplorerLayout><ExplorerDashboard /></ExplorerLayout>
             </ProtectedRoute>
           } />
           <Route path="/explorer/challengeCatalog" element={
             <ProtectedRoute allowedRoles={['explorer']}>
-              <ChallengeCatalog />
+              <ExplorerLayout><ChallengeCatalog /></ExplorerLayout>
             </ProtectedRoute>
           } />
-
           <Route path="/explorer/challenges/:index" element={
-           <ProtectedRoute allowedRoles={['explorer']}>
-                <ChallengeDetail />
+            <ProtectedRoute allowedRoles={['explorer']}>
+              <ExplorerLayout><ChallengeDetail /></ExplorerLayout>
             </ProtectedRoute>
           } />
           <Route path="/explorer/workspace/:index" element={
             <ProtectedRoute allowedRoles={['explorer']}>
-                <TaskWorkspace />
-          </ProtectedRoute>
+              <ExplorerLayout><TaskWorkspace /></ExplorerLayout>
+            </ProtectedRoute>
           } />
           <Route path="/explorer/submission-confirmation/:index" element={
             <ProtectedRoute allowedRoles={['explorer']}>
-                <SubmissionConfirmation />
+              <ExplorerLayout><SubmissionConfirmation /></ExplorerLayout>
             </ProtectedRoute>
           } />
-
           <Route path="/explorer/mentors" element={
             <ProtectedRoute allowedRoles={['explorer']}>
-              <MentorDirectory />
+              <ExplorerLayout><MentorDirectory /></ExplorerLayout>
             </ProtectedRoute>
-            } />
-
+          } />
           <Route path="/explorer/compass-quiz" element={
-          <ProtectedRoute allowedRoles={['explorer']}>
-        <ExplorerLayout>
-            <CompassQuiz />
-        </ExplorerLayout>
-        </ProtectedRoute>
-        } />
-
-        <Route path="/explorer/quiz-results" element={
-        <ExplorerLayout>
-          <QuizResults />
-        </ExplorerLayout>
-        } />
+            <ProtectedRoute allowedRoles={['explorer']}>
+              <ExplorerLayout><CompassQuiz /></ExplorerLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/explorer/quiz-results" element={
+            <ProtectedRoute allowedRoles={['explorer']}>
+              <ExplorerLayout><QuizResults /></ExplorerLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/explorer/settings" element={
+            <ProtectedRoute allowedRoles={['explorer']}>
+              <ExplorerLayout><ExplorerSettings /></ExplorerLayout>
+            </ProtectedRoute>
+          } />
 
           
           {/* add more explorer routes here */}
@@ -129,6 +127,7 @@ function App() {
             <Route path="booking" element={<BookingPage />} />
             <Route path="tasks" element={<TaskWizard />} />
             <Route path="grading" element={<GradingView />} />
+            <Route path="settings" element={<GuideSettings />} />
           </Route>
           
           

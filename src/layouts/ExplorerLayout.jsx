@@ -1,5 +1,6 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import {
   MdDashboard,
   MdExtension,
@@ -8,6 +9,7 @@ import {
   MdExplore,
   MdMenu,
   MdClose,
+  MdAccountCircle,
 } from "react-icons/md";
 
 const navItems = [
@@ -30,42 +32,7 @@ function NavLink({ to, label, icon: Icon, isActive, collapsed }) {
   };
 
   return (
-
-    <div style={styles.wrapper}>
-      <aside style={styles.sidebar}>
-        <h2 style={styles.logo}>Meras</h2>
-
-        <nav style={styles.nav}>
-          <Link to="/explorer/dashboard" style={styles.link}>
-            Dashboard
-          </Link>
-          <Link to="/explorer/challengeCatalog" style={styles.link}>
-            Challenges
-          </Link>
-          <Link to="/explorer/mentors" style={styles.link}>
-            Mentors
-          </Link>
-          <Link to="/explorer/compass-quiz" style={styles.link}>
-            Compass Quiz
-          </Link>
-        </nav>
-      </aside>
-
-      <div style={styles.rightSection}>
-        <header style={styles.navbar}>
-          <div style={styles.title}>Explorer</div>
-
-          <div style={styles.avatarSection}>
-            <div style={styles.avatar}>L</div>
-            <span style={styles.dropdown}>▼</span>
-          </div>
-        </header>
-
-        <main style={styles.content}>{children}</main>
-      </div>
-    </div>
-
-    /*<Link
+    <Link
       to={to}
       style={linkStyle}
       title={collapsed ? label : undefined}
@@ -75,13 +42,15 @@ function NavLink({ to, label, icon: Icon, isActive, collapsed }) {
       <Icon style={styles.icon} />
       {!collapsed && <span>{label}</span>}
     </Link>
-*/
   );
 }
 
 function ExplorerLayout({ children }) {
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(true); // true or false toggle when side bar is expnaded and when not
+  const { currentUser } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [avatarHovered, setAvatarHovered] = useState(false);
+
 
   return (
     <div style={styles.wrapper}>
@@ -90,8 +59,7 @@ function ExplorerLayout({ children }) {
       <aside style={{ ...styles.sidebar, width: sidebarOpen ? "220px" : "60px" }}>
         <div style={styles.sidebarTop}>
           {sidebarOpen && <h2 style={styles.logo}>Meras</h2>}
-          {/* clicking flips the state. The icon also swaps between ☰ (menu) and ✕ (close) depending on current state.*/}
-          <button 
+          <button
             style={styles.toggleBtn}
             onClick={() => setSidebarOpen(o => !o)}
             title={sidebarOpen ? "Collapse menu" : "Expand menu"}
@@ -99,6 +67,31 @@ function ExplorerLayout({ children }) {
             {sidebarOpen ? <MdClose size={22} /> : <MdMenu size={22} />}
           </button>
         </div>
+
+        {/* User profile */}
+        <Link
+          to="/explorer/settings"
+          style={{
+            ...styles.userProfile,
+            justifyContent: sidebarOpen ? "flex-start" : "center",
+            backgroundColor: avatarHovered ? "rgba(0,0,0,0.2)" : "rgba(0,0,0,0.15)",
+          }}
+          onMouseEnter={() => setAvatarHovered(true)}
+          onMouseLeave={() => setAvatarHovered(false)}
+          title={!sidebarOpen ? currentUser?.name || "Account" : undefined}
+        >
+          <div style={styles.avatar}>
+            {currentUser?.photoURL
+              ? <img src={currentUser.photoURL} alt="avatar" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
+              : <MdAccountCircle size={36} style={{ color: "rgba(255,255,255,0.85)" }} />
+            }
+          </div>
+          {sidebarOpen && (
+            <span style={styles.userName}>{currentUser?.name || "Account"}</span>
+          )}
+        </Link>
+
+        <div style={styles.divider} />
 
         <nav style={styles.nav}>
           {navItems.map(({ to, label, icon }) => (
@@ -184,6 +177,38 @@ const styles = {
   icon: {
     fontSize: "20px",
     flexShrink: 0,
+  },
+  userProfile: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    padding: "10px 8px",
+    borderRadius: "10px",
+    textDecoration: "none",
+    color: "#FFFFFF",
+    marginBottom: "8px",
+    transition: "background-color 0.15s ease",
+    overflow: "hidden",
+  },
+  avatar: {
+    width: "36px",
+    height: "36px",
+    borderRadius: "50%",
+    flexShrink: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  userName: {
+    fontSize: "14px",
+    fontWeight: "600",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  },
+  divider: {
+    borderTop: "1px solid rgba(255,255,255,0.2)",
+    marginBottom: "16px",
   },
   rightSection: {
     flex: 1,

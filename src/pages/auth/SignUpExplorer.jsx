@@ -10,6 +10,8 @@ function SignUpExplorer() {
     firstName: '',
     lastName: '',
     email: '',
+    gender: '',
+    grade: '',
     password: '',
     confirmPassword: ''
   })
@@ -41,6 +43,12 @@ function SignUpExplorer() {
     } else if (formData.password.length < 8) {
       newErrors.password = 'Must be at least 8 characters'
     }
+    if (!formData.gender) {
+      newErrors.gender = 'Please select a gender'
+    }
+    if (!formData.grade) {
+      newErrors.grade = 'Please select a grade'
+    }
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = 'Please confirm your password'
     } else if (formData.password !== formData.confirmPassword) {
@@ -65,6 +73,8 @@ function SignUpExplorer() {
       id: Date.now(), // temporary id
       name: `${formData.firstName} ${formData.lastName}`,
       email: formData.email,
+      gender: formData.gender,
+      grade: formData.grade,
       password: formData.password,
       role: 'explorer',
       recommendedMajors: []
@@ -74,7 +84,7 @@ function SignUpExplorer() {
     login(newUser)
 
     // Redirect to compass quiz
-    navigate('auth/explorer/CompassQuiz')
+    navigate("/verify-email" )
   }
 
   return (
@@ -148,7 +158,7 @@ function SignUpExplorer() {
                       type="text"
                       name="firstName"
                       className={`form-control py-2 ${errors.firstName ? 'is-invalid' : ''}`}
-                      placeholder="Enter your name"
+                      placeholder="Enter your first name"
                       value={formData.firstName}
                       onChange={handleChange}
                       style={{
@@ -176,7 +186,7 @@ function SignUpExplorer() {
                       type="text"
                       name="lastName"
                       className={`form-control py-2 ${errors.lastName ? 'is-invalid' : ''}`}
-                      placeholder="Enter your name"
+                      placeholder="Enter your last name"
                       value={formData.lastName}
                       onChange={handleChange}
                       style={{
@@ -223,6 +233,74 @@ function SignUpExplorer() {
                       {errors.email}
                     </div>
                   )}
+                </div>
+
+
+                {/* Gender + Grade side by side */}
+                <div className="row g-3 mb-3">
+                  <div className="col-6">
+                    <label
+                      className="form-label fw-semibold"
+                      style={{ color: 'var(--meras-text)', fontSize: '14px' }}
+                    >
+                      Gender*
+                    </label>
+                    <select
+                      name="gender"
+                      className={`form-control py-2 ${errors.gender ? 'is-invalid' : ''}`}
+                      value={formData.gender}
+                      onChange={handleChange}
+                      style={{
+                        borderRadius: '10px',
+                        border: errors.gender
+                          ? '1.5px solid #dc3545'
+                          : '1.5px solid var(--meras-border)',
+                        fontSize: '15px',
+                        color: formData.gender ? 'var(--meras-text)' : '#aaa'
+                      }}
+                    >
+                      <option value="" disabled>Select gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+                    {errors.gender && (
+                      <div style={{ color: '#dc3545', fontSize: '12px', marginTop: '4px' }}>
+                        {errors.gender}
+                      </div>
+                    )}
+                  </div>
+                  <div className="col-6">
+                    <label
+                      className="form-label fw-semibold"
+                      style={{ color: 'var(--meras-text)', fontSize: '14px' }}
+                    >
+                      Grade*
+                    </label>
+                    <select
+                      name="grade"
+                      className={`form-control py-2 ${errors.grade ? 'is-invalid' : ''}`}
+                      value={formData.grade}
+                      onChange={handleChange}
+                      style={{
+                        borderRadius: '10px',
+                        border: errors.grade
+                          ? '1.5px solid #dc3545'
+                          : '1.5px solid var(--meras-border)',
+                        fontSize: '15px',
+                        color: formData.grade ? 'var(--meras-text)' : '#aaa'
+                      }}
+                    >
+                      <option value="" disabled>Select grade</option>
+                      {[ 10, 11, 12].map(g => (
+                        <option key={g} value={g}>Grade {g}</option>
+                      ))}
+                    </select>
+                    {errors.grade && (
+                      <div style={{ color: '#dc3545', fontSize: '12px', marginTop: '4px' }}>
+                        {errors.grade}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Password */}

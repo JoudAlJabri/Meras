@@ -245,7 +245,8 @@ return (
                   border: '1px solid #b7dfcc'
                 }}
               >
-                <span style={{ fontSize: '16px' }}>ℹ️</span>
+              
+              <span style={{ fontSize: '16px' }}>💡</span> 
                 <p style={{ margin: 0, fontSize: '13px', color: 'var(--meras-green)' }}>
                   You must use your <strong>university email</strong> (.edu.sa or .edu)
                   and upload a valid university ID or transcript for verification.
@@ -564,15 +565,9 @@ return (
                   Create account
                 </button>
 
-                {/* Divider */}
-                <div className="d-flex align-items-center gap-3 my-3">
-                  <hr className="flex-grow-1 m-0" />
-                  <span style={{ color: 'var(--meras-gray)', fontSize: '13px' }}>or</span>
-                  <hr className="flex-grow-1 m-0" />
-                </div>
-
+         
                 {/* Google */}
-                <button
+                {/* <button
                   type="button"
                   className="btn w-100 fw-semibold py-2"
                   style={{
@@ -590,7 +585,7 @@ return (
                     className="me-2"
                   />
                   Sign up with Google
-                </button>
+                </button> */ }
 
               </form>
 
@@ -598,12 +593,13 @@ return (
               <p className="text-center mt-4" style={{ fontSize: '14px', color: 'var(--meras-gray)' }}>
                 Already have an account?{' '}
                 <Link
-                  to="/LoginPage"
+                  to="/login"
                   style={{ color: 'var(--meras-green)', fontWeight: '600', textDecoration: 'none' }}
                 >
                   Log in
                 </Link>
               </p>
+              
 
             </div>
           </div>

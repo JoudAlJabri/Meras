@@ -981,6 +981,13 @@ export const MAJORS = [
   'Graphic Design',
   'Other'
 ]
+
+export const SKILLS = [
+  'Python',
+  'JAVA',
+  'Engineering',
+]
+
 export const mockPendingApplications = [
   {
     id: 2,
@@ -1091,3 +1098,5 @@ export const mockPendingApplications = [
      mockChallenges[0],
      mockChallenges[1],
     ]
+
+  
