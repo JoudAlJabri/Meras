@@ -7,6 +7,8 @@ import {
   MdAutoAwesome,
 } from "react-icons/md";
 import mentoring from "../../assets/Dashboard-pics/MentorDashboard.png";
+import CompletedChallenges from "../explorer/CompletedChallenges";
+import { mockCompletedChallenges } from "../../data/mockData";
 
 
 
@@ -83,7 +85,6 @@ function GuideDashboard() {
             </button>
           </div>
 
-          <CompletedChallenges challenges={mockCompletedChallenges} />
 
         </div>
 
