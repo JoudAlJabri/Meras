@@ -42,7 +42,8 @@ export const mockMentors = [
     totalSessions: 23,
     bio: 'Senior SWE student. Love helping high schoolers discover coding!',
     isVerified: true,
-    hourlyRate: 50
+    hourlyRate: 50,
+    tags: ['#Python', '#Web Dev', '#Java'],
   },
   {
     id: 4,
@@ -53,10 +54,57 @@ export const mockMentors = [
     totalSessions: 15,
     bio: 'Architecture student with a passion for design.',
     isVerified: true,
-    hourlyRate: 45
-  }
-
-
+    hourlyRate: 45,
+    tags: ['2D Drafting', '3D Modeling & Rendering'],
+  },
+  {
+    id: 5,
+    name: 'Khawla Almalki',
+    major: 'Computer Science',
+    university: 'KFUPM',
+    rating: 5,
+    totalSessions: 23,
+    bio: 'Senior CS student passionate about cybersecurity and competitive programming.',
+    isVerified: true,
+    hourlyRate: 50,
+    tags: ['#Cyber Security'],
+  },
+  {
+    id: 6,
+    name: 'Ahmed Alharbi',
+    major: 'Mechanical Engineering',
+    university: 'KFUPM',
+    rating: 4,
+    totalSessions: 5,
+    bio: 'Mechanical engineering student specializing in thermodynamics and fluid systems.',
+    isVerified: true,
+    hourlyRate: 40,
+    tags: ['Fluid Mechanics', 'Heat Transfer'],
+  },
+  {
+    id: 7,
+    name: 'Manal Alotaibi',
+    major: 'Chemical Engineering',
+    university: 'KFUPM',
+    rating: 4,
+    totalSessions: 12,
+    bio: 'Chemical engineering student with a strong interest in process design and web technologies.',
+    isVerified: true,
+    hourlyRate: 45,
+    tags: ['#Python', '#Web Dev', '#Cyber Security'],
+  },
+  {
+    id: 8,
+    name: 'Nawaf Alqahtani',
+    major: 'Architecture',
+    university: 'KFUPM',
+    rating: 4,
+    totalSessions: 2,
+    bio: 'Architecture student focused on sustainable design and digital modeling.',
+    isVerified: true,
+    hourlyRate: 35,
+    tags: ['2D Drafting', '3D Modeling & Rendering'],
+  },
 ]
 
 

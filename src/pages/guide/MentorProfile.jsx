@@ -1,91 +1,185 @@
-import { mockMentors, mockChallenges } from "../../data/mockData";
-import "./Guide.css";
-import { useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useMemo } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { mockChallenges } from '../../data/mockData'
+import puzzleImg    from '../../assets/General-Graphics/2PersonPuzzle.png'
+import handCodingImg from '../../assets/Tech-Graphics/Hand coding-bro.png'
+import './Guide.css'
 
-function MentorProfile() {
-  const navigate = useNavigate();
-  const { state: mentor } = useLocation();
-  if (!mentor) {
-  return <p className="page-container">No mentor data found.</p>;
+// ── Same color/image maps as MentorCard ──────────────────────────
+const majorImages = {
+  'computer science':        handCodingImg,
+  'software engineering':    handCodingImg,
+  'computer engineering':    handCodingImg,
+  'mechanical engineering':  puzzleImg,
+  'electrical engineering':  puzzleImg,
+  'civil engineering':       puzzleImg,
+  'chemical engineering':    puzzleImg,
+  'aerospace engineering':   puzzleImg,
+  'bio engineering':         puzzleImg,
+  'architecture':            puzzleImg,
+  'finance':                 puzzleImg,
+  'business administration': puzzleImg,
+  'accounting':              puzzleImg,
+  'marketing':               puzzleImg,
 }
 
-  //  Select mentor (temporary static)
-  //const mentor = mockMentors[0];
+const majorCardColors = {
+  'mechanical engineering':  'var(--meras-yellow)',
+  'electrical engineering':  'var(--meras-gray)',
+  'computer science':        'var(--meras-green)',
+  'software engineering':    'var(--meras-green)',
+  'computer engineering':    'var(--meras-green)',
+  'civil engineering':       'var(--meras-green)',
+  'chemical engineering':    'var(--meras-black)',
+  'aerospace engineering':   'var(--meras-black)',
+  'bio engineering':         'var(--meras-gray)',
+  'architecture':            'var(--meras-gray)',
+  'finance':                 'var(--meras-yellow)',
+  'business administration': 'var(--meras-yellow)',
+  'accounting':              'var(--meras-yellow)',
+  'marketing':               'var(--meras-yellow)',
+}
 
-  //  Filter mentor challenges
-  const mentorChallenges = mockChallenges.filter(
-    (c) => c.mentorId === mentor.id
-  );
+const onColor = {
+  'var(--meras-green)':  '#ffffff',
+  'var(--meras-yellow)': '#1A0A00',
+  'var(--meras-black)':  '#ffffff',
+  'var(--meras-gray)':   '#1A0A00',
+}
+
+const tagFill = {
+  'var(--meras-green)':  '#E8F5EF',
+  'var(--meras-yellow)': '#FBF5DC',
+  'var(--meras-black)':  '#FBF5DC',
+  'var(--meras-gray)':   '#e1dfdf',
+}
+
+function MentorProfile() {
+  const navigate = useNavigate()
+  const { state: mentor } = useLocation()
+
+  const majorKey   = mentor?.major?.toLowerCase()
+  const cardColor  = majorCardColors[majorKey] ?? 'var(--meras-green)'
+  const textColor  = onColor[cardColor] ?? '#ffffff'
+  const illustration = useMemo(() => majorImages[majorKey] ?? puzzleImg, [majorKey])
+  const tagFillColor  = tagFill[cardColor] ?? '#E8F5EF'
+  const tagBorderColor = cardColor === 'var(--meras-black)' ? 'var(--meras-yellow)' : cardColor
+
+  if (!mentor) {
+    return <p className="page-container">No mentor data found.</p>
+  }
+
+  const mentorChallenges = mockChallenges.filter((c) => c.mentorId === mentor.id)
 
   return (
-    <div className="page-container">
+    <div className="mp-shell">
 
-      {/*  PROFILE HEADER */}
-      <div className="card section flex">
-        <div className="avatar">👤</div>
-
-        <h2 className="title">
-          {mentor.name} {mentor.isVerified && "✔️"}
-        </h2>
-
-        <p className="subtext">
-          {mentor.university} • {mentor.major}
-        </p>
-
-        <p className="subtext">
-          ⭐ {mentor.rating} | {mentor.totalSessions} sessions
-        </p>
-      </div>
-
-      {/*  BIO */}
-      <div className="card section">
-        <h3 className="title">About</h3>
-        <p className="subtext">{mentor.bio}</p>
-      </div>
-
-      {/*  SKILLS */}
-      <div className="card section">
-        <h3 className="title">Skills</h3>
-
-        <div className="flex gap-2 mt-2">
-          <span className="tag">#React</span>
-          <span className="tag">#Python</span>
-          <span className="tag">#DataScience</span>
+      {/* Banner */}
+      <div className="mp-banner" style={{ backgroundColor: cardColor }}>
+        <div className="mp-avatar" style={{ backgroundColor: cardColor }}>
+          <img src={illustration} alt={mentor.major} className="mp-avatar-img" />
         </div>
       </div>
 
-      {/*  CHALLENGES */}
-      <div className="card section">
-        <h3 className="title">Published Challenges</h3>
+      <div className="mp-cards">
 
-        {mentorChallenges.map((c) => (
-          <div key={c.id} className="mt-2">
-            <p>{c.title}</p>
-            <p className="subtext">{c.difficulty}</p>
+        {/* Header Card*/}
+        <div className="mp-card">
+          <div className="mp-name-row">
+            <span className="mp-name">{mentor.name}</span>
+            {mentor.isVerified && <span className="mp-verified">✓</span>}
           </div>
-        ))}
+          <div className="mp-meta">{mentor.university} · {mentor.major}</div>
+          <div className="mp-stats-row">
+            <span className="mp-stat"><span className="mp-star">★</span> {mentor.rating}</span>
+            <span className="mp-stat-divider" />
+            <span className="mp-stat">{mentor.totalSessions} sessions</span>
+            <span className="mp-stat-divider" />
+          </div>
+        </div>
 
-        {mentorChallenges.length === 0 && (
-          <p className="subtext">No challenges yet.</p>
+        {/* About mentor*/}
+        <div className="mp-card">
+          <h3 className="mp-section-title">About</h3>
+          <p className="mp-bio">{mentor.bio ?? 'No bio provided yet.'}</p>
+        </div>
+
+        {/* ── TAGS ── */}
+        {(mentor.tags ?? []).length > 0 && (
+          <div className="mp-card">
+            <h3 className="mp-section-title">Skills &amp; Topics</h3>
+            <div className="mp-skills-row">
+              {mentor.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="mp-skill-pill"
+                  style={{
+                    backgroundColor: tagFillColor,
+                    border: `1.5px solid ${tagBorderColor}`,
+                  }}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
         )}
+
+        {/* ── new chnanges by joud ── */}
+        <div className="mp-card">
+          <h3 className="mp-section-title">Published Challenges</h3>
+          {mentorChallenges.length === 0 ? (
+            <p className="mp-empty">No challenges published yet.</p>
+          ) : (
+            mentorChallenges.map((c, i) => {
+              const chKey   = c.major?.toLowerCase()
+              const chColor = majorCardColors[chKey] ?? 'var(--meras-green)'
+              const chImg   = majorImages[chKey] ?? puzzleImg
+              return (
+                <div key={i} className="mp-challenge-item">
+                  <div className="mp-ch-thumb" style={{ backgroundColor: chColor }}>
+                    <img src={chImg} alt={c.major} className="mp-ch-thumb-img" />
+                  </div>
+                  <div className="mp-ch-info">
+                    <div className="mp-ch-title">{c.title}</div>
+                    <div className="mp-ch-meta">{c.major} · {c.difficulty}</div>
+                  </div>
+                  <span className="mp-ch-badge">{c.timeEstimate ?? 30} min</span>
+                </div>
+              )
+            })
+          )}
+        </div>
+
+        {/* ── REVIEWS ── */}
+        <div className="mp-card">
+          <h3 className="mp-section-title">Reviews</h3>
+          <div className="mp-reviews-list">
+            {(mentor.reviews ?? [
+              { stars: 5, text: 'Very helpful mentor! Explained everything clearly.', author: 'Sara M.' },
+              { stars: 4, text: 'Explained concepts clearly and patiently.', author: 'Khalid H.' },
+            ]).map((r, i) => (
+              <div key={i} className="mp-review-item">
+                <div className="mp-review-stars">{'★'.repeat(r.stars)}{'☆'.repeat(5 - r.stars)}</div>
+                <div className="mp-review-text">"{r.text}"</div>
+                <div className="mp-review-author">— {r.author}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── CTA ── */}
+        <button
+          className="mp-avail-btn"
+          style={{ backgroundColor: cardColor, color: textColor }}
+          onClick={() => navigate('/guide/booking', { state: mentor })}
+        >
+          View Availability →
+        </button>
+
       </div>
-
-      {/*  BUTTON */}
-      <div className="card section">
-        <button className="btn btn-primary" onClick={() => navigate("/guide/booking", { state: mentor })}>View Availability</button>
-      </div>
-
-      {/*  REVIEWS */}
-      <div className="card section">
-        <h3 className="title">Reviews</h3>
-
-        <p className="subtext">⭐ 5 - "Very helpful mentor!"</p>
-        <p className="subtext">⭐ 4 - "Explained concepts clearly."</p>
-      </div>
-
     </div>
-  );
+  )
 }
 
-export default MentorProfile;
+export default MentorProfile

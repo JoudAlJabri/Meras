@@ -29,6 +29,7 @@ import BookingPage from './pages/guide/BookingPage'
 import TaskWizard from './pages/guide/TaskWizard'
 import GradingView from './pages/guide/GradingView'
 import GuideSettings from './pages/guide/GuideSettings'
+import AvailableTimes from './pages/guide/AvailableTimes'
 
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard'
@@ -128,6 +129,7 @@ function App() {
             <Route path="tasks" element={<TaskWizard />} />
             <Route path="grading" element={<GradingView />} />
             <Route path="settings" element={<GuideSettings />} />
+            <Route path="availability" element={<AvailableTimes />} />
           </Route>
           
           

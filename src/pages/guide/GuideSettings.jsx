@@ -37,7 +37,7 @@ function GuideSettings() {
 
   const handleUpdatePassword = () => {
     if (!newPassword || newPassword !== confirmPassword) return;
-    // password update logic goes here
+    // password update logic 
     setNewPassword("");
     setConfirmPassword("");
   };

@@ -1,91 +1,151 @@
-import { useState } from "react";
-import { mockMentors } from "../../data/mockData";
-import "./Guide.css";
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { mockMentors } from '../../data/mockData'
+import MentorCard from '../../components/MentorCard'
+import { useAuth } from '../../context/AuthContext'
 
+const CARDS_PER_PAGE = 8
+const majors = ['All', ...new Set(mockMentors.map(m => m.major))]
 
 function MentorDirectory() {
-  const navigate = useNavigate();
-  // State for search input
-  const [search, setSearch] = useState("");
+  const navigate = useNavigate()
+  const { currentUser } = useAuth()
+  const isGuide = currentUser?.role === 'guide'
+  const [page, setPage] = useState(1)
+  const [search, setSearch] = useState('')
+  const [selectedMajor, setSelectedMajor] = useState('All')
 
-  // State for university filter
-  const [selectedUniversity, setSelectedUniversity] = useState("");
+  const filtered = mockMentors.filter((mentor) => {
+    const matchesSearch = mentor.name.toLowerCase().includes(search.toLowerCase())
+    const matchesMajor = selectedMajor === 'All' || mentor.major === selectedMajor
+    return matchesSearch && matchesMajor
+  })
 
-  // Filter logic
-  const filteredMentors = mockMentors.filter((mentor) => {
-    const matchesSearch =
-      mentor.name.toLowerCase().includes(search.toLowerCase()) ||
-      mentor.major.toLowerCase().includes(search.toLowerCase());
-
-    const matchesUniversity =
-      selectedUniversity === "" || mentor.university === selectedUniversity;
-
-    return matchesSearch && matchesUniversity;
-  });
+  const totalPages = Math.ceil(filtered.length / CARDS_PER_PAGE)
+  const visible = filtered.slice((page - 1) * CARDS_PER_PAGE, page * CARDS_PER_PAGE)
 
   return (
-    
-    <div className="page-container">
+    <div>
 
-      {/* Page Title */}
-      <h2 className="title">Mentor Directory</h2>
+      {/* Hero */}
+      <section className="py-4">
+        <div className="container py-4">
+          <h1 className="fw-semibold mb-2" style={{ fontSize: '3rem', lineHeight: '1.2', color: 'var(--meras-text)' }}>
+            Talk to someone
+          </h1>
+          <h1 className="fw-semibold" style={{ fontSize: '3rem', lineHeight: '1.2', color: 'var(--meras-text)' }}>
+            who was just in <span style={{ color: 'var(--meras-green)' }}>your</span> shoes.
+          </h1>
 
-      {/* Search + Filter Section */}
-      <div className="card section flex gap-3">
-        
-        {/* Search Input */}
-        <input
-        className="input"
-          type="text"
-          placeholder="Search by name or major..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-
-        {/* University Dropdown */}
-        <select
-        className="input"
-          value={selectedUniversity}
-          onChange={(e) => setSelectedUniversity(e.target.value)}
-        >
-          <option value="">All Universities</option>
-          <option value="KFUPM">KFUPM</option>
-          <option value="KAU">KAU</option>
-        </select>
-      </div>
-
-      {/* Mentor Cards */}
-      <div className="grid grid-3 section">
-      {filteredMentors.map((mentor) => (
-
-        <div key={mentor.id} className="card section">
-
-          {/* Basic Info */}
-          <h3 className="title">{mentor.name}</h3>
-          <p className="subtext">{mentor.university}</p>
-          <p className="subtext">{mentor.major}</p>
-
-          {/* Stats */}
-          <p className="subtext">⭐ {mentor.rating}</p>
-          <p className="subtext">Sessions: {mentor.totalSessions}</p>
-          <p className="subtext">Rate: ${mentor.hourlyRate}/hr</p>
-
-          {/* Action */}
-          <button className="btn btn-secondary" onClick={() => navigate(`/guide/profile`, { state: mentor })}>View Profile</button>
-
+          {isGuide && (
+            <div className="d-flex gap-3 mt-5">
+              <button
+                onClick={() => navigate('/guide/availability')}
+                style={{
+                  backgroundColor: 'var(--meras-green)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: '5px 25px',
+                  fontSize: '16px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                }}
+              >
+                Set available times
+              </button>
+              <button
+                onClick={() => navigate('/guide/sessions')}
+                style={{
+                  backgroundColor: 'transparent',
+                  color: 'var(--meras-green)',
+                  border: '2px solid var(--meras-green)',
+                  borderRadius: '12px',
+                  padding: '5px 32px',
+                  fontSize: '16px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                }}
+              >
+                See upcoming sessions →
+              </button>
+            </div>
+          )}
         </div>
-      ))}
+      </section>
+
+      {/* Filter bar */}
+      <div className="d-flex align-items-center justify-content-between" style={{ padding: '0 65px 20px' }}>
+        <div className="d-flex align-items-center gap-2">
+          <label style={{ fontSize: '14px', color: 'var(--meras-text)', fontWeight: '500', whiteSpace: 'nowrap' }}>
+            Search by Mentor Name
+          </label>
+          <input
+            type="text"
+            placeholder="Ex: Rana Abdullah"
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+            style={{
+              border: '1px solid var(--meras-border)',
+              borderRadius: '8px',
+              padding: '4px 10px',
+              fontSize: '14px',
+              outline: 'none',
+            }}
+          />
+        </div>
+
+        <div className="d-flex align-items-center gap-2">
+          <label style={{ fontSize: '14px', color: 'var(--meras-text)', fontWeight: '500' }}>Major</label>
+          <select
+            value={selectedMajor}
+            onChange={(e) => { setSelectedMajor(e.target.value); setPage(1) }}
+            style={{ border: '1px solid var(--meras-border)', borderRadius: '8px', padding: '4px 10px', fontSize: '14px', cursor: 'pointer' }}
+          >
+            {majors.map(m => <option key={m} value={m}>{m}</option>)}
+          </select>
+
+          <button
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+            style={{ border: '1px solid var(--meras-border)', background: 'white', borderRadius: '8px', padding: '4px 10px', cursor: 'pointer' }}
+          >{'<'}</button>
+          <span style={{ fontSize: '14px', color: 'var(--meras-text)' }}>{page} / {totalPages || 1}</span>
+          <button
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages || totalPages === 0}
+            style={{ border: '1px solid var(--meras-border)', background: 'white', borderRadius: '8px', padding: '4px 10px', cursor: 'pointer' }}
+          >{'>'}</button>
+        </div>
       </div>
 
-      {/* Empty State */}
-      {filteredMentors.length === 0 && (
-        <p className="subtext mt-6">No mentors found.</p>
-      )}
+      {/* Cards grid */}
+      <div className="container-fluid px-5 pb-5">
+        {visible.length > 0 ? (
+          <div className="row g-4">
+            {visible.map((mentor) => (
+              <div key={mentor.id} className="col-lg-4 col-md-6">
+                <MentorCard
+                  name={mentor.name}
+                  major={mentor.major}
+                  university={mentor.university}
+                  rating={mentor.rating}
+                  totalSessions={mentor.totalSessions}
+                  tags={mentor.tags ?? []}
+                  onViewProfile={() => navigate('/guide/profile', { state: mentor })}
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p style={{ color: 'var(--meras-gray)', marginTop: '24px' }}>No mentors found.</p>
+        )}
+      </div>
 
     </div>
-    
-  );
+  )
 }
 
-export default MentorDirectory;
+export default MentorDirectory
