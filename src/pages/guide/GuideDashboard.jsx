@@ -80,7 +80,7 @@ function GuideDashboard() {
               <h2 style={styles.continueTitle}>Check our your upcoming submissions & sessions</h2>
               <p style={styles.continueText}>Remember to give honest and insightful feedback!</p>
             </div>
-            <button style={styles.exploreButton} onClick={() => navigate("/explorer/challengeCatalog")}>
+            <button style={styles.exploreButton} onClick={() => navigate("/guide/grading")}>
               Check →
             </button>
           </div>

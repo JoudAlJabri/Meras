@@ -13,7 +13,7 @@ const SLOTS = [
   'Thu 3:00 PM',
 ]
 
-// ── Same maps as MentorCard / MentorProfile ──────────────────────
+//  Same maps as MentorCard / MentorProfile 
 const majorImages = {
   'computer science':        handCodingImg,
   'software engineering':    handCodingImg,
@@ -143,7 +143,7 @@ function BookingPage() {
         Confirm Booking →
       </button>
 
-      {/* ── CONFIRMATION MODAL ── */}
+      {/* CONFIRMATION MODAL */}
       {showModal && (
         <div className="bk-modal-overlay">
           <div className="bk-modal">

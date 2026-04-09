@@ -1148,3 +1148,41 @@ export const mockPendingApplications = [
     ]
 
   
+    const mockSubmissions = [
+  {
+    id: 1,
+    student: "Sara Mohammed",
+    challenge: "Build a REST API",
+    major: "Software Engineering",
+    majorColor: "var(--color-primary)",
+    submittedAt: "Apr 7, 2026",
+    submissionType: "file",
+    file: "rest_api_sara.zip",
+    note: "I followed the spec closely and added Swagger docs as a bonus.",
+  },
+  {
+    id: 2,
+    student: "Nour Al-Rashid",
+    challenge: "Data Visualisation Dashboard",
+    major: "Data Science",
+    majorColor: "#F59E0B",
+    submittedAt: "Apr 8, 2026",
+    submissionType: "text",
+    textAnswer:
+      "Hi! Here is my submission for the expense audit task." +
+      "\n\nBased on the company's travel policy, I found the 3 items on the receipt list that should be flagged:" +
+      "\n\n1. $85 Steakhouse Dinner: The policy states there is a strict $50 daily limit for food." +
+      "\n2. $15 Hotel Mini-Bar (Beer): The policy explicitly says that alcohol is non-reimbursable." +
+      "\n3. $40 First-Class Train Upgrade: The rules state that all employees must book standard/economy tickets for travel.",
+  },
+  {
+    id: 3,
+    student: "Layla Hassan",
+    challenge: "Projectile Motion Problem",
+    major: "Mechanical Engineering",
+    majorColor: "#8B5CF6",
+    submittedAt: "Apr 9, 2026",
+    submissionType: "canvas",
+    canvasImage: CANVAS_MOCK,
+  },
+];

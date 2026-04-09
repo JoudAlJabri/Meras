@@ -5,7 +5,7 @@ import puzzleImg    from '../../assets/General-Graphics/2PersonPuzzle.png'
 import handCodingImg from '../../assets/Tech-Graphics/Hand coding-bro.png'
 import './Guide.css'
 
-// ── Same color/image maps as MentorCard ──────────────────────────
+
 const majorImages = {
   'computer science':        handCodingImg,
   'software engineering':    handCodingImg,

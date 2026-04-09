@@ -56,7 +56,7 @@ function MentorDirectory() {
                 Set available times
               </button>
               <button
-                onClick={() => navigate('/guide/sessions')}
+                onClick={() => navigate("/guide/grading")}
                 style={{
                   backgroundColor: 'transparent',
                   color: 'var(--meras-green)',
