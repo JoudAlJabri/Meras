@@ -106,7 +106,7 @@ function App() {
           } />
 
           
-          {/* add more explorer routes here */}
+          
         
 
           {/* ── GUIDE ROUTES ── */}

@@ -222,7 +222,7 @@ const styles = {
     color: "#111827",
   },
 
-  // Continue / no challenges card
+  // Continue
   continueCard: {
     backgroundColor: "var(--meras-yellow)",
     borderRadius: "20px",
@@ -254,7 +254,7 @@ const styles = {
     whiteSpace: "nowrap",
   },
 
-  // Recent sidebar
+  
   recentPanel: {
     width: "260px",
     flexShrink: 0,
