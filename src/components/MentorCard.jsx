@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
 import puzzleImg from '../assets/General-Graphics/2PersonPuzzle.png'
-import handCodingImg from '../assets/Tech-Graphics/Hand coding-bro.png'
+import softwareEngineering from '../assets/Tech-Graphics/Software-Engineering.png'
 
 const majorImages = {
-  'computer science':        handCodingImg,
-  'software engineering':    handCodingImg,
-  'computer engineering':    handCodingImg,
+  'computer science':        softwareEngineering,
+  'software engineering':    softwareEngineering,
+  'computer engineering':    softwareEngineering,
   'mechanical engineering':  puzzleImg,
   'electrical engineering':  puzzleImg,
   'civil engineering':       puzzleImg,

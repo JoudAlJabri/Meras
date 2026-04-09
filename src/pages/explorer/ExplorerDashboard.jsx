@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   MdExtension,
@@ -6,9 +7,16 @@ import {
   MdCalendarToday,
   MdAutoAwesome,
 } from "react-icons/md";
+import { MdStar, MdStarBorder, MdClose } from "react-icons/md";
+import { useAuth } from "../../context/AuthContext";
 import learningGirl from "../../assets/Dashboard-pics/Learning-girl-1.png";
+import learningBoy from "../../assets/Dashboard-pics/Learning-boy-1.png";
 import CompletedChallenges from "./CompletedChallenges";
 import { mockCompletedChallenges } from '../../data/mockData'
+
+const TEXT_PREVIEW_LIMIT = 150;
+
+
 
 
 
@@ -35,6 +43,21 @@ const recentActivities = [
 
 function ExplorerDashboard() {
   const navigate = useNavigate();
+  const { currentUser, login } = useAuth();
+  const [selectedChallenge, setSelectedChallenge] = useState(null);
+  const [expanded, setExpanded] = useState(false);
+
+  function openFeedback(challenge) {
+    setSelectedChallenge(challenge);
+    setExpanded(false);
+  }
+  function closeFeedback() {
+    setSelectedChallenge(null);
+    setExpanded(false);
+  }
+
+  // Activating this soon when we intergate the database for better usage
+  // const chosenImg = currentUser.gender === "female" ? learningGirl : learningBoy;
 
   return (
     <div style={styles.page}>
@@ -91,7 +114,10 @@ function ExplorerDashboard() {
             </button>
           </div>
 
-          <CompletedChallenges challenges={mockCompletedChallenges} />
+          <CompletedChallenges
+            challenges={mockCompletedChallenges}
+            onViewFeedback={openFeedback}
+          />
 
         </div>
 
@@ -117,9 +143,129 @@ function ExplorerDashboard() {
         </div>
 
       </div>
+      {/* ── Feedback modal ─────────────────────────────────── */}
+      {selectedChallenge && (
+        <div style={m.overlay} onClick={closeFeedback}>
+          <div style={m.panel} onClick={e => e.stopPropagation()}>
+
+            {/* Header */}
+            <div style={m.header}>
+              <div>
+                <h3 style={m.title}>{selectedChallenge.title}</h3>
+                <p style={m.sub}>
+                  graded by {selectedChallenge.gradedBy} · {selectedChallenge.gradedAt}
+                </p>
+              </div>
+              <button style={m.closeIcon} onClick={closeFeedback}>
+                <MdClose size={20} />
+              </button>
+            </div>
+
+            {/* Student's answer */}
+            {selectedChallenge.submissionType === "text" && (() => {
+              const full    = selectedChallenge.textAnswer ?? "";
+              const isLong  = full.length > TEXT_PREVIEW_LIMIT;
+              const preview = isLong && !expanded ? full.slice(0, TEXT_PREVIEW_LIMIT) + "…" : full;
+              return (
+                <div style={m.answerBox}>
+                  <p style={m.answerLabel}>Your Answer</p>
+                  <p style={{ ...m.answerText, whiteSpace: "pre-wrap" }}>{preview}</p>
+                  {isLong && (
+                    <div style={m.expandRow}>
+                      <button style={m.expandPill} onClick={() => setExpanded(e => !e)}>
+                        {expanded ? "See less" : "Expand"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
+            {selectedChallenge.submissionType === "file" && (
+              <div style={m.answerBox}>
+                <p style={m.answerLabel}>Your Answer</p>
+                <p style={m.fileText}>📎 {selectedChallenge.file}</p>
+                {selectedChallenge.note && (
+                  <p style={m.noteText}>"{selectedChallenge.note}"</p>
+                )}
+              </div>
+            )}
+
+            {selectedChallenge.submissionType === "canvas" && (() => {
+              return (
+                <div style={m.answerBox}>
+                  <p style={m.answerLabel}>Your Answer</p>
+                  <div style={{ ...m.canvasWrap, maxHeight: expanded ? "none" : "140px" }}>
+                    <img src={selectedChallenge.canvasImage} alt="canvas submission" style={m.canvasImg} />
+                  </div>
+                  <div style={m.expandRow}>
+                    <button style={m.expandPill} onClick={() => setExpanded(e => !e)}>
+                      {expanded ? "See less" : "Expand"}
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Rating (read-only) */}
+            <div style={m.section}>
+              <p style={m.fieldLabel}>RATING</p>
+              <div style={m.stars}>
+                {[1, 2, 3, 4, 5].map(star => (
+                  <span key={star} style={{ display: "flex" }}>
+                    {star <= selectedChallenge.rating
+                      ? <MdStar size={32} color="#F59E0B" />
+                      : <MdStarBorder size={32} color="#D1D5DB" />}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Feedback (read-only) */}
+            <div style={m.section}>
+              <p style={m.fieldLabel}>FEEDBACK</p>
+              <div style={m.feedbackBox}>
+                <p style={m.feedbackText}>{selectedChallenge.feedbackText}</p>
+              </div>
+            </div>
+
+            <div style={m.actions}>
+              <button style={m.closeBtn} onClick={closeFeedback}>Close</button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
+
+// Modal styles
+const m = {
+  overlay: { position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.35)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200, padding: "24px" },
+  panel: { backgroundColor: "#FFFFFF", borderRadius: "24px", padding: "32px", width: "100%", maxWidth: "540px", maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 50px rgba(0,0,0,0.13)", display: "flex", flexDirection: "column", gap: "20px" },
+  header: { display: "flex", justifyContent: "space-between", alignItems: "flex-start" },
+  title: { margin: "0 0 4px 0", fontSize: "20px", fontWeight: "700", color: "#111827" },
+  sub: { margin: 0, fontSize: "13px", color: "#6B7280" },
+  closeIcon: { background: "none", border: "none", cursor: "pointer", color: "#9CA3AF", padding: "4px", display: "flex", alignItems: "center" },
+  answerBox: { backgroundColor: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: "14px", padding: "16px 18px", display: "flex", flexDirection: "column", gap: "10px" },
+  answerLabel: { margin: 0, fontSize: "13px", fontWeight: "700", color: "#111827" },
+  answerText: { margin: 0, fontSize: "13px", color: "#374151", lineHeight: "1.65" },
+  fileText: { margin: 0, fontSize: "14px", fontWeight: "600", color: "#111827" },
+  noteText: { margin: 0, fontSize: "13px", color: "#6B7280", fontStyle: "italic", lineHeight: "1.5" },
+  canvasWrap: { overflow: "hidden", borderRadius: "8px", transition: "max-height 0.25s ease" },
+  canvasImg: { width: "100%", height: "auto", display: "block", borderRadius: "8px" },
+  expandRow: { display: "flex", justifyContent: "flex-end" },
+  expandPill: { backgroundColor: "#F5B800", color: "#111827", border: "none", borderRadius: "999px", padding: "4px 16px", fontSize: "13px", fontWeight: "600", cursor: "pointer" },
+  section: { display: "flex", flexDirection: "column", gap: "8px" },
+  fieldLabel: { margin: 0, fontSize: "13px", fontWeight: "600", color: "#374151", textTransform: "uppercase", letterSpacing: "0.06em" },
+  stars: { display: "flex", alignItems: "center", gap: "4px" },
+  feedbackBox: { backgroundColor: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: "12px", padding: "14px 16px" },
+  feedbackText: { margin: 0, fontSize: "14px", color: "#374151", lineHeight: "1.6" },
+  actions: { display: "flex", justifyContent: "flex-end" },
+  closeBtn: { backgroundColor: "#F3F4F6", color: "#374151", border: "none", borderRadius: "999px", padding: "11px 28px", fontSize: "14px", fontWeight: "600", cursor: "pointer" },
+};
 
 const styles = {
   page: {

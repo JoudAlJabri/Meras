@@ -1,26 +1,9 @@
 import { useState } from "react";
 import { MdStar, MdStarBorder, MdClose, MdVideoCall } from "react-icons/md";
-import mockSubmissions from "../../data/mockData";
+import {mockSubmissions} from "../../data/mockData"
 
-// ─── Canvas mock image ───────────────────────────────────────────────────────
-// In a real app a student draws on an HTML5 <canvas>, the app calls
-// canvas.toDataURL("image/png") and saves the resulting base64 string to the
-// database. Here we replicate that by building an SVG that looks like a
-// whiteboard sketch and encoding it as a data-URI so no network request is
-// needed. The <img> tag treats it exactly like any other image URL.
-const CANVAS_MOCK = `data:image/svg+xml,${encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" width="480" height="200"
-     style="background:#fff;border-radius:8px">
-  <text x="28" y="56"  font-family="cursive" font-size="22" fill="#111827">V&#8320; = 50 m /s</text>
-  <text x="28" y="92"  font-family="cursive" font-size="22" fill="#111827">&#952; = 45&#176;</text>
-  <text x="28" y="128" font-family="cursive" font-size="22" fill="#111827">Fd = -&#189;&#961;V&#178;C&#8336;A</text>
-  <text x="270" y="92" font-family="cursive" font-size="22" fill="#3DB87A">So&#160;&#160; x = 142m</text>
-</svg>
-`)}`;
-
-// Mock data
-// Each submission has a `submissionType` field: "file" | "text" | "canvas"
-// The panel detects this and renders a different preview for each type.
+// mockSubmissions is imported from mockData.js
+// Each entry has a submissionType: "file" | "text" | "canvas"
 
 
 // ─── Session / calendar data (unchanged) ─────────────────────────────────────

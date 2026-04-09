@@ -8,7 +8,15 @@ import {
 } from "react-icons/md";
 import mentoring from "../../assets/Dashboard-pics/MentorDashboard.png";
 import CompletedChallenges from "../explorer/CompletedChallenges";
-import { mockCompletedChallenges } from "../../data/mockData";
+import { mockChallenges } from "../../data/mockData";
+import { useAuth } from "../../context/AuthContext";
+import ChallengeCard from "../../components/ChallengeCard";
+
+// Challenges that belong to the logged-in guide
+const guideChallenges = mockChallenges.filter(
+  (c) => c.mentorName === "Rana Abdullah"
+);
+
 
 
 
@@ -29,6 +37,8 @@ const recentActivities = [
 
 function GuideDashboard() {
   const navigate = useNavigate();
+  const { currentUser, login } = useAuth();
+
 
   return (
     <div style={styles.page}>
@@ -85,6 +95,26 @@ function GuideDashboard() {
             </button>
           </div>
 
+          {/* My Challenges */}
+          <div>
+            <h2 style={styles.sectionTitle}>My Challenges</h2>
+            {guideChallenges.length === 0 ? (
+              <p style={styles.emptyText}>You haven't created any challenges yet.</p>
+            ) : (
+              <div style={styles.challengesGrid}>
+                {guideChallenges.map((challenge, i) => (
+                  <ChallengeCard
+                    key={i}
+                    challengeName={challenge.title}
+                    description={challenge.description}
+                    major={challenge.major}
+                    buttonLabel="Edit"
+                    onMoreDetails={() => {}}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
 
         </div>
 
@@ -245,6 +275,24 @@ const styles = {
     fontWeight: "600",
     cursor: "pointer",
     whiteSpace: "nowrap",
+  },
+
+  // My Challenges section
+  sectionTitle: {
+    margin: "0 0 16px 0",
+    fontSize: "20px",
+    fontWeight: "700",
+    color: "#111827",
+  },
+  challengesGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+    gap: "20px",
+  },
+  emptyText: {
+    margin: 0,
+    fontSize: "14px",
+    color: "#9CA3AF",
   },
 
   // Recent sidebar

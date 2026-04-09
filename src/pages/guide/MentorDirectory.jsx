@@ -7,7 +7,7 @@ import { useAuth } from '../../context/AuthContext'
 const CARDS_PER_PAGE = 8
 const majors = ['All', ...new Set(mockMentors.map(m => m.major))]
 
-function MentorDirectory() {
+function MentorDirectory({ profilePath = '/guide/profile' }) {
   const navigate = useNavigate()
   const { currentUser } = useAuth()
   const isGuide = currentUser?.role === 'guide'
@@ -134,7 +134,7 @@ function MentorDirectory() {
                   rating={mentor.rating}
                   totalSessions={mentor.totalSessions}
                   tags={mentor.tags ?? []}
-                  onViewProfile={() => navigate('/guide/profile', { state: mentor })}
+                  onViewProfile={() => navigate(profilePath, { state: mentor })}
                 />
               </div>
             ))}
