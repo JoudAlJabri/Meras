@@ -31,19 +31,20 @@ function NavLink({ to, label, icon: Icon, isActive, collapsed }) {
       isActive ? "rgba(0,0,0,0.25)" : hovered ? "rgba(0,0,0,0.15)" : "transparent",
   };
 
-  return (
-    <Link
-      to={to}
-      style={linkStyle}
-      title={collapsed ? label : undefined}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <Icon style={styles.icon} />
-      {!collapsed && <span>{label}</span>}
-    </Link>
-  );
-}
+
+return (
+  <Link
+    to={to}
+    style={linkStyle}
+    title={collapsed ? label : undefined}
+    onMouseEnter={() => setHovered(true)}
+    onMouseLeave={() => setHovered(false)}
+  >
+    <Icon style={styles.icon} />
+    {!collapsed && <span>{label}</span>}
+  </Link>
+);
+      
 
 function ExplorerLayout({ children }) {
   const location = useLocation();
