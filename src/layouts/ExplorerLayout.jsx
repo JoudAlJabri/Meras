@@ -5,7 +5,6 @@ import {
   MdDashboard,
   MdExtension,
   MdPeople,
-  MdRoute,
   MdExplore,
   MdMenu,
   MdClose,
@@ -13,11 +12,10 @@ import {
 } from "react-icons/md";
 
 const navItems = [
-  { to: "/explorer/dashboard", label: "Dashboard", icon: MdDashboard },
+  { to: "/explorer/dashboard",      label: "Dashboard",    icon: MdDashboard },
   { to: "/explorer/challengeCatalog", label: "Challenges", icon: MdExtension },
-  { to: "/explorer/mentors", label: "Mentors", icon: MdPeople },
-  { to: "/explorer/my-path", label: "My Path", icon: MdRoute },
-  { to: "/explorer/compass-quiz", label: "Compass Quiz", icon: MdExplore },
+  { to: "/explorer/mentors",        label: "Mentors",      icon: MdPeople    },
+  { to: "/explorer/compass-quiz",   label: "Compass Quiz", icon: MdExplore   },
 ];
 
 function NavLink({ to, label, icon: Icon, isActive, collapsed }) {
@@ -31,19 +29,21 @@ function NavLink({ to, label, icon: Icon, isActive, collapsed }) {
       isActive ? "rgba(0,0,0,0.25)" : hovered ? "rgba(0,0,0,0.15)" : "transparent",
   };
 
-  return (
-    <Link
-      to={to}
-      style={linkStyle}
-      title={collapsed ? label : undefined}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <Icon style={styles.icon} />
-      {!collapsed && <span>{label}</span>}
-    </Link>
-  );
+
+return (
+  <Link
+    to={to}
+    style={linkStyle}
+    title={collapsed ? label : undefined}
+    onMouseEnter={() => setHovered(true)}
+    onMouseLeave={() => setHovered(false)}
+  >
+    <Icon style={styles.icon} />
+    {!collapsed && <span>{label}</span>}
+  </Link>
+);
 }
+
 
 function ExplorerLayout({ children }) {
   const location = useLocation();
@@ -115,7 +115,7 @@ function ExplorerLayout({ children }) {
     </div>
   );
 }
- //  Without minWidth: 0, the right section would refuse to shrink when the sidebar was open, compressing the cards. Setting it to 0 tells it "you're allowed to shrink as small as needed."
+ //  Without minWidth: 0
 const styles = {
   wrapper: {
     display: "flex",

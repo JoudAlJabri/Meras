@@ -1,5 +1,4 @@
 
-import { useState } from 'react'
 import './App.css'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom' // using react's React Router library
 import { AuthProvider } from './context/AuthContext'
@@ -29,6 +28,7 @@ import BookingPage from './pages/guide/BookingPage'
 import TaskWizard from './pages/guide/TaskWizard'
 import GradingView from './pages/guide/GradingView'
 import GuideSettings from './pages/guide/GuideSettings'
+import AvailableTimes from './pages/guide/AvailableTimes'
 
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard'
@@ -85,7 +85,17 @@ function App() {
           } />
           <Route path="/explorer/mentors" element={
             <ProtectedRoute allowedRoles={['explorer']}>
-              <ExplorerLayout><MentorDirectory /></ExplorerLayout>
+              <ExplorerLayout><MentorDirectory profilePath="/explorer/mentors/profile" /></ExplorerLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/explorer/mentors/profile" element={
+            <ProtectedRoute allowedRoles={['explorer']}>
+              <ExplorerLayout><MentorProfile bookingPath="/explorer/mentors/booking" /></ExplorerLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/explorer/mentors/booking" element={
+            <ProtectedRoute allowedRoles={['explorer']}>
+              <ExplorerLayout><BookingPage /></ExplorerLayout>
             </ProtectedRoute>
           } />
           <Route path="/explorer/compass-quiz" element={
@@ -105,7 +115,7 @@ function App() {
           } />
 
           
-          {/* add more explorer routes here */}
+          
         
 
           {/* ── GUIDE ROUTES ── */}
@@ -128,6 +138,7 @@ function App() {
             <Route path="tasks" element={<TaskWizard />} />
             <Route path="grading" element={<GradingView />} />
             <Route path="settings" element={<GuideSettings />} />
+            <Route path="availability" element={<AvailableTimes />} />
           </Route>
           
           

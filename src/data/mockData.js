@@ -6,11 +6,28 @@ export const mockUsers = [
     password: '123456',
     role: 'explorer',
     joinDate: '2026-03-10',
+    gender: "female",
+    grade: "10",
     status: 'Active',
     recommendedMajors: ['Computer Science', 'Software Engineering', 'Data Science']
   },
-  {
+
+   {
     id: 2,
+    name: 'Ahmed Nasser',
+    email: 'ahmed@gmail.com',
+    password: '123456',
+    role: 'explorer',
+    joinDate: '2026-03-10',
+    gender: "male",
+    grade: "11",
+    status: 'Active',
+    recommendedMajors: ['Computer Science', 'Software Engineering', 'Data Science']
+  },
+
+  
+  {
+    id: 3,
     name: 'Rana Abdullah',
     email: 'rana@kfupm.edu.sa',
     password: '123456',
@@ -22,7 +39,7 @@ export const mockUsers = [
     status: 'Active'   
   },
   {
-    id: 3,
+    id: 4,
     name: 'Dana Alsawad',
     email: 'admin@meras.com',
     password: 'admin123',
@@ -42,7 +59,8 @@ export const mockMentors = [
     totalSessions: 23,
     bio: 'Senior SWE student. Love helping high schoolers discover coding!',
     isVerified: true,
-    hourlyRate: 50
+    hourlyRate: 50,
+    tags: ['#Python', '#Web Dev', '#Java'],
   },
   {
     id: 4,
@@ -53,10 +71,57 @@ export const mockMentors = [
     totalSessions: 15,
     bio: 'Architecture student with a passion for design.',
     isVerified: true,
-    hourlyRate: 45
-  }
-
-
+    hourlyRate: 45,
+    tags: ['2D Drafting', '3D Modeling & Rendering'],
+  },
+  {
+    id: 5,
+    name: 'Khawla Almalki',
+    major: 'Computer Science',
+    university: 'KFUPM',
+    rating: 5,
+    totalSessions: 23,
+    bio: 'Senior CS student passionate about cybersecurity and competitive programming.',
+    isVerified: true,
+    hourlyRate: 50,
+    tags: ['#Cyber Security'],
+  },
+  {
+    id: 6,
+    name: 'Ahmed Alharbi',
+    major: 'Mechanical Engineering',
+    university: 'KFUPM',
+    rating: 4,
+    totalSessions: 5,
+    bio: 'Mechanical engineering student specializing in thermodynamics and fluid systems.',
+    isVerified: true,
+    hourlyRate: 40,
+    tags: ['Fluid Mechanics', 'Heat Transfer'],
+  },
+  {
+    id: 7,
+    name: 'Manal Alotaibi',
+    major: 'Chemical Engineering',
+    university: 'KFUPM',
+    rating: 4,
+    totalSessions: 12,
+    bio: 'Chemical engineering student with a strong interest in process design and web technologies.',
+    isVerified: true,
+    hourlyRate: 45,
+    tags: ['#Python', '#Web Dev', '#Cyber Security'],
+  },
+  {
+    id: 8,
+    name: 'Nawaf Alqahtani',
+    major: 'Architecture',
+    university: 'KFUPM',
+    rating: 4,
+    totalSessions: 2,
+    bio: 'Architecture student focused on sustainable design and digital modeling.',
+    isVerified: true,
+    hourlyRate: 35,
+    tags: ['2D Drafting', '3D Modeling & Rendering'],
+  },
 ]
 
 
@@ -1095,8 +1160,78 @@ export const mockPendingApplications = [
     ]
 
     export const mockCompletedChallenges = [
-     mockChallenges[0],
-     mockChallenges[1],
+     {
+       ...mockChallenges[0],
+       gradedBy: "Rana Abdullah",
+       gradedAt: "Apr 8, 2026",
+       rating: 4,
+       feedbackText: "Amazing work! Focus on handling user errors and input fields next time!",
+       submissionType: "text",
+       textAnswer:
+         "Hi! Here is my submission for the expense audit task." +
+         "\n\nBased on the company's travel policy, I found the 3 items on the receipt list that should be flagged:" +
+         "\n\n1. $85 Steakhouse Dinner: The policy states there is a strict $50 daily limit for food." +
+         "\n2. $15 Hotel Mini-Bar (Beer): The policy explicitly says that alcohol is non-reimbursable." +
+         "\n3. $40 First-Class Train Upgrade: The rules state that all employees must book standard/economy tickets for travel.",
+     },
+     {
+       ...mockChallenges[1],
+       gradedBy: "Ahmed Al-Farsi",
+       gradedAt: "Apr 9, 2026",
+       rating: 5,
+       feedbackText: "Excellent gear ratio calculations! Your sketch was clear and well-labelled. Keep it up.",
+       submissionType: "file",
+       file: "gear_train_design.pdf",
+       note: "Used the motor datasheet provided and double-checked with the formula sheet.",
+     },
     ]
 
   
+const CANVAS_MOCK = `data:image/svg+xml,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="200"
+     style="background:#fff;border-radius:8px">
+  <text x="28" y="56"  font-family="cursive" font-size="22" fill="#111827">V&#8320; = 50 m /s</text>
+  <text x="28" y="92"  font-family="cursive" font-size="22" fill="#111827">&#952; = 45&#176;</text>
+  <text x="28" y="128" font-family="cursive" font-size="22" fill="#111827">Fd = -&#189;&#961;V&#178;C&#8336;A</text>
+  <text x="270" y="92" font-family="cursive" font-size="22" fill="#3DB87A">So&#160;&#160; x = 142m</text>
+</svg>
+`)}`;
+
+    export const mockSubmissions = [
+  {
+    id: 1,
+    student: "Sara Mohammed",
+    challenge: "Build a REST API",
+    major: "Software Engineering",
+    majorColor: "var(--color-primary)",
+    submittedAt: "Apr 7, 2026",
+    submissionType: "file",
+    file: "rest_api_sara.zip",
+    note: "I followed the spec closely and added Swagger docs as a bonus.",
+  },
+  {
+    id: 2,
+    student: "Nour Al-Rashid",
+    challenge: "Data Visualisation Dashboard",
+    major: "Data Science",
+    majorColor: "#F59E0B",
+    submittedAt: "Apr 8, 2026",
+    submissionType: "text",
+    textAnswer:
+      "Hi! Here is my submission for the expense audit task." +
+      "\n\nBased on the company's travel policy, I found the 3 items on the receipt list that should be flagged:" +
+      "\n\n1. $85 Steakhouse Dinner: The policy states there is a strict $50 daily limit for food." +
+      "\n2. $15 Hotel Mini-Bar (Beer): The policy explicitly says that alcohol is non-reimbursable." +
+      "\n3. $40 First-Class Train Upgrade: The rules state that all employees must book standard/economy tickets for travel.",
+  },
+  {
+    id: 3,
+    student: "Layla Hassan",
+    challenge: "Projectile Motion Problem",
+    major: "Mechanical Engineering",
+    majorColor: "#8B5CF6",
+    submittedAt: "Apr 9, 2026",
+    submissionType: "canvas",
+    canvasImage: CANVAS_MOCK,
+  },
+];

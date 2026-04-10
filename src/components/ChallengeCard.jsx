@@ -1,23 +1,41 @@
 import { useMemo } from 'react'
 import puzzleImg from '../assets/General-Graphics/2PersonPuzzle.png'
-import handCodingImg from '../assets/Tech-Graphics/Hand coding-bro.png'
+import swe from '../assets/Tech-Graphics/Software-Engineering.png'
+import cs from '../assets/Tech-Graphics/Computer-Science.png'
+import coe from '../assets/Tech-Graphics/Computer-Engineering.png'
+import me from '../assets/Engineering-Graphics/Mechanical-Engineering.png'
+import ee from '../assets/Engineering-Graphics/Electrical-Engineering.png'
+import che from '../assets/Engineering-Graphics/Chemical-Engineering.png'
+import phys from '../assets/Engineering-Graphics/Physics.png'
+import ind from '../assets/Engineering-Graphics/Industrial-Engineering.png'
+import math from '../assets/Engineering-Graphics/Math.png'
+import aero from '../assets/Engineering-Graphics/AeroSpace-Engineering.png'
+import arch from '../assets/Engineering-Graphics/Architecture.png'
+import bio from '../assets/Engineering-Graphics/Bio-Engineering.png'
+import fin from '../assets/Business-Graphics/Finance.svg'
+import acc from '../assets/Business-Graphics/Accounting.png'
+import mkt from '../assets/Business-Graphics/Marketing.png'
+import mis from '../assets/Business-Graphics/MIS.png'
+import bus from '../assets/Business-Graphics/Business.png'
 
 // Add more imports here as you get more images, then add them to the arrays below
 const majorImages = {
-  'computer science':           [handCodingImg],
-  'software engineering':       [handCodingImg],
-  'computer engineering':       [handCodingImg],
-  'mechanical engineering':     [puzzleImg],
-  'electrical engineering':     [puzzleImg],
+  'computer science':           [cs],
+  'software engineering':       [swe],
+  'computer engineering':       [coe],
+  'mechanical engineering':     [me],
+  'electrical engineering':     [ee],
   'civil engineering':          [puzzleImg],
-  'chemical engineering':       [puzzleImg],
-  'aerospace engineering':      [puzzleImg],
-  'bio engineering':            [puzzleImg],
-  'architecture':               [puzzleImg],
-  'finance':                    [puzzleImg],
-  'business administration':    [puzzleImg],
-  'accounting':                 [puzzleImg],
-  'marketing':                  [puzzleImg],
+  'chemical engineering':       [che],
+  'aerospace engineering':      [aero],
+  'bio engineering':            [bio],
+  'architecture':               [arch],
+  'finance':                    [fin],
+  'business administration':    [bus],
+  'accounting':                 [acc],
+  'marketing':                  [mkt],
+  'management information system': [mis],
+  'physics': [phys]
 }
 const fallbackImages = [puzzleImg]
 
@@ -38,7 +56,7 @@ const majorCardColors = {
   'geology': 'var(--meras-black)',
   'chemical engineering': 'var(--meras-black)',
   'aerospace engineering': 'var(--meras-black)',
-  'physics': 'var(--meras-black)',
+  'physics': 'var(--meras-gray)',
   'chemistry': 'var(--meras-green)',
   'math': 'var(--meras-black)',
   'bio engineering': 'var(--meras-gray)',
