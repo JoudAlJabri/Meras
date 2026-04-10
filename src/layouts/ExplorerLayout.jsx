@@ -5,7 +5,6 @@ import {
   MdDashboard,
   MdExtension,
   MdPeople,
-  MdRoute,
   MdExplore,
   MdMenu,
   MdClose,
@@ -13,10 +12,10 @@ import {
 } from "react-icons/md";
 
 const navItems = [
-  { to: "/explorer/dashboard", label: "Dashboard", icon: MdDashboard },
+  { to: "/explorer/dashboard",      label: "Dashboard",    icon: MdDashboard },
   { to: "/explorer/challengeCatalog", label: "Challenges", icon: MdExtension },
-  { to: "/explorer/mentors", label: "Mentors", icon: MdPeople },
-  { to: "/explorer/compass-quiz", label: "Compass Quiz", icon: MdExplore },
+  { to: "/explorer/mentors",        label: "Mentors",      icon: MdPeople    },
+  { to: "/explorer/compass-quiz",   label: "Compass Quiz", icon: MdExplore   },
 ];
 
 function NavLink({ to, label, icon: Icon, isActive, collapsed }) {
@@ -44,7 +43,7 @@ return (
   </Link>
 );
 }
-      
+
 
 function ExplorerLayout({ children }) {
   const location = useLocation();

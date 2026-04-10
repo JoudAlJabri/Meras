@@ -1,4 +1,4 @@
-function CompletedChallenges({ challenges }) {
+function CompletedChallenges({ challenges, onViewFeedback }) {
   if (!challenges || challenges.length === 0) {
     return (
       <div style={styles.emptyBox}>
@@ -19,7 +19,7 @@ function CompletedChallenges({ challenges }) {
             </div>
             <h4 style={styles.cardTitle}>{challenge.title}</h4>
             <p style={styles.cardDesc}>{challenge.feedback ?? challenge.description}</p>
-            <button style={styles.feedbackBtn}>View Feedback</button>
+            <button style={styles.feedbackBtn} onClick={() => onViewFeedback?.(challenge)}>View Feedback</button>
           </div>
         ))}
       </div>

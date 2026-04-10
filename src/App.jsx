@@ -1,5 +1,4 @@
 
-import { useState } from 'react'
 import './App.css'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom' // using react's React Router library
 import { AuthProvider } from './context/AuthContext'
@@ -86,7 +85,17 @@ function App() {
           } />
           <Route path="/explorer/mentors" element={
             <ProtectedRoute allowedRoles={['explorer']}>
-              <ExplorerLayout><MentorDirectory /></ExplorerLayout>
+              <ExplorerLayout><MentorDirectory profilePath="/explorer/mentors/profile" /></ExplorerLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/explorer/mentors/profile" element={
+            <ProtectedRoute allowedRoles={['explorer']}>
+              <ExplorerLayout><MentorProfile bookingPath="/explorer/mentors/booking" /></ExplorerLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/explorer/mentors/booking" element={
+            <ProtectedRoute allowedRoles={['explorer']}>
+              <ExplorerLayout><BookingPage /></ExplorerLayout>
             </ProtectedRoute>
           } />
           <Route path="/explorer/compass-quiz" element={
