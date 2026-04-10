@@ -16,7 +16,6 @@ const navItems = [
   { to: "/explorer/dashboard", label: "Dashboard", icon: MdDashboard },
   { to: "/explorer/challengeCatalog", label: "Challenges", icon: MdExtension },
   { to: "/explorer/mentors", label: "Mentors", icon: MdPeople },
-  { to: "/explorer/my-path", label: "My Path", icon: MdRoute },
   { to: "/explorer/compass-quiz", label: "Compass Quiz", icon: MdExplore },
 ];
 
@@ -44,6 +43,7 @@ return (
     {!collapsed && <span>{label}</span>}
   </Link>
 );
+}
       
 
 function ExplorerLayout({ children }) {
@@ -116,7 +116,7 @@ function ExplorerLayout({ children }) {
     </div>
   );
 }
- //  Without minWidth: 0, the right section would refuse to shrink when the sidebar was open, compressing the cards. Setting it to 0 tells it "you're allowed to shrink as small as needed."
+ //  Without minWidth: 0
 const styles = {
   wrapper: {
     display: "flex",
