@@ -73,7 +73,9 @@ function LoginPage() {
         <div className="row" style={{ minHeight: '100vh' }}>
 
           {/* ── LEFT SIDE — Login Form ── */}
-          <div className="col-lg-6 d-flex align-items-center justify-content-center p-5">
+          {/* p-3 on mobile, p-5 on large screens — avoids the form being
+              squeezed by 3rem padding on small phones */}
+          <div className="col-lg-6 d-flex align-items-center justify-content-center p-3 p-lg-5">
             <div style={{ width: '100%', maxWidth: '420px' }}>
 
           

@@ -11,32 +11,25 @@ function LandingPage() {
     <div style={{ backgroundColor: 'var(--meras-bg)', minHeight: '100vh' }}>
 
       {/* ── NAVBAR ── */}
-      <nav className="navbar navbar-expand-lg" style={{ backgroundColor: 'white', borderBottom: '1px solid var(--meras-border)' }}>
-        <div className="container">
+      {/* Bootstrap JS is not loaded in this project, so the data-bs-toggle
+          collapse won't work. Since the only nav items are Login and Sign Up,
+          we skip the collapsible pattern entirely and always show the buttons.
+          They sit in a flex row that naturally wraps on narrow screens. */}
+      <nav className="navbar" style={{ backgroundColor: 'white', borderBottom: '1px solid var(--meras-border)' }}>
+        <div className="container d-flex align-items-center justify-content-between flex-wrap gap-2">
           {/* Logo */}
-          <span className="navbar-brand fw-semibold fs-4" style={{ color: 'var(--meras-green)' }}>
+          <span className="navbar-brand fw-semibold fs-4 mb-0" style={{ color: 'var(--meras-green)' }}>
             Meras
           </span>
 
-          {/* Mobile toggle */}
-          <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span className="navbar-toggler-icon"></span>
-          </button>
-
-          {/* Nav links */}
-          <div className="collapse navbar-collapse" id="navbarNav">
-            <ul className="navbar-nav ms-auto align-items-center gap-2">
-              <li className="nav-item">
-                <Link to="/login" className="btn btn-outline-secondary btn-sm px-4">
-                  Login
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link to="/signup/explorer" className="btn btn-sm px-4 text-white" style={{ backgroundColor: 'var(--meras-green)' }}>
-                  Sign Up
-                </Link>
-              </li>
-            </ul>
+          {/* Login + Sign Up — always visible on all screen sizes */}
+          <div className="d-flex align-items-center gap-2">
+            <Link to="/login" className="btn btn-outline-secondary btn-sm px-4">
+              Login
+            </Link>
+            <Link to="/signup/explorer" className="btn btn-sm px-4 text-white" style={{ backgroundColor: 'var(--meras-green)' }}>
+              Sign Up
+            </Link>
           </div>
         </div>
       </nav>

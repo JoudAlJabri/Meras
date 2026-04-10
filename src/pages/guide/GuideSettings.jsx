@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { MdCameraAlt } from "react-icons/md";
 import { MAJORS } from '../../data/mockData'
@@ -18,6 +18,15 @@ function GuideSettings() {
 
   const [newPassword, setNewPassword]         = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  // Field pairs (First/Last, Email/Major, Password/Confirm) and the skills
+  // inline row (select + input + button) are too narrow side-by-side on mobile.
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 600);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const addSkill = (skill) => {
     const trimmed = skill.trim();
@@ -59,8 +68,8 @@ function GuideSettings() {
         </div>
       </div>
 
-      {/* Name row */}
-      <div style={styles.row}>
+      {/* Name row — side-by-side on desktop, stacked on mobile */}
+      <div style={{ ...styles.row, flexDirection: isMobile ? "column" : "row" }}>
         <div style={styles.field}>
           <label style={styles.label}>First Name <span style={styles.req}>*</span></label>
           <input style={styles.input} value={firstName} onChange={e => setFirstName(e.target.value)} />
@@ -71,8 +80,8 @@ function GuideSettings() {
         </div>
       </div>
 
-      {/* Email / Grade row */}
-      <div style={styles.row}>
+      {/* Email / Major row */}
+      <div style={{ ...styles.row, flexDirection: isMobile ? "column" : "row" }}>
         <div style={styles.field}>
           <label style={styles.label}>Email</label>
           <input style={styles.input} value={email} onChange={e => setEmail(e.target.value)} />
@@ -99,10 +108,11 @@ function GuideSettings() {
         <span style={{ fontSize: "12px", color: "#aaa", textAlign: "right" }}>{about.length}/500</span>
       </div>
 
-      {/* Skills */}
+      {/* Skills — select + text input + Add button stack vertically on mobile
+          because three inline elements are too cramped on a narrow screen */}
       <div style={{ ...styles.field, marginBottom: "20px" }}>
         <label style={styles.label}>Skills</label>
-        <div style={{ display: "flex", gap: "8px" }}>
+        <div style={{ display: "flex", gap: "8px", flexDirection: isMobile ? "column" : "row" }}>
           <select
             style={{ ...styles.input, flex: 1 }}
             value=""
@@ -162,7 +172,7 @@ function GuideSettings() {
       <h2 style={{ ...styles.sectionHeading, marginTop: "36px" }}>Change Password</h2>
       <hr style={styles.divider} />
 
-      <div style={styles.row}>
+      <div style={{ ...styles.row, flexDirection: isMobile ? "column" : "row" }}>
         <div style={styles.field}>
           <label style={styles.label}>New Password</label>
           <input style={styles.input} type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} />

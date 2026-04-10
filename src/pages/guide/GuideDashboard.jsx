@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   MdExtension,
@@ -39,10 +40,19 @@ function GuideDashboard() {
   const navigate = useNavigate();
   const { currentUser, login } = useAuth();
 
+  // Track viewport width so the layout reacts to resize / device rotation.
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
 
   return (
     <div style={styles.page}>
-      <div style={styles.mainLayout}>
+      {/* Stack vertically on mobile, side-by-side on desktop */}
+      <div style={{ ...styles.mainLayout, flexDirection: isMobile ? "column" : "row" }}>
 
         {/* Left column */}
         <div style={styles.mainColumn}>
@@ -50,17 +60,19 @@ function GuideDashboard() {
           {/* Banner */}
           <div style={styles.banner}>
             <div style={styles.bannerContent}>
-             
-              <h1 style={styles.bannerName}>Hi, Rana</h1>
+
+              {/* Reduced font on mobile to prevent overflow */}
+              <h1 style={{ ...styles.bannerName, fontSize: isMobile ? "32px" : "48px" }}>Hi, Rana</h1>
               <p style={styles.bannerText}>
                 Keep sharing your expertise and guiding the next generation.
               </p>
             </div>
-            <img src={mentoring} alt="illustration" style={styles.bannerImage} />
+            {/* Hide illustration on mobile — overlaps text at narrow widths */}
+            {!isMobile && <img src={mentoring} alt="illustration" style={styles.bannerImage} />}
           </div>
 
-          {/* Stat Cards */}
-          <div style={styles.statsGrid}>
+          {/* Stat Cards — 2 columns on mobile (3 would be too narrow), 3 on desktop */}
+          <div style={{ ...styles.statsGrid, gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(3, 1fr)" }}>
             <div style={styles.statCard}>
               <div style={{ ...styles.statIcon, backgroundColor: "var(--meras-green)" }}>
                 <MdExtension style={styles.statIconInner} />
@@ -118,8 +130,8 @@ function GuideDashboard() {
 
         </div>
 
-        {/* Recent sidebar */}
-        <div style={styles.recentPanel}>
+        {/* Recent sidebar — full width on mobile, fixed 260px on desktop */}
+        <div style={{ ...styles.recentPanel, width: isMobile ? "100%" : "260px" }}>
           <h2 style={styles.recentTitle}>Recent</h2>
           <div style={styles.recentList}>
             {recentActivities.map((item, index) => {

@@ -93,7 +93,8 @@ function SignUpExplorer() {
         <div className="row" style={{ minHeight: '100vh' }}>
 
           {/* ── LEFT SIDE — Signup Form ── */}
-          <div className="col-lg-6 d-flex align-items-center justify-content-center p-5">
+          {/* Reduced padding on mobile so the form isn't squeezed */}
+          <div className="col-lg-6 d-flex align-items-center justify-content-center p-3 p-lg-5">
             <div style={{ width: '100%', maxWidth: '520px' }}>
 
               {/* Logo */}
@@ -145,9 +146,9 @@ function SignUpExplorer() {
               {/* Form */}
               <form onSubmit={handleSubmit}>
 
-                {/* First Name + Last Name side by side */}
+                {/* First Name + Last Name — side-by-side on sm+ (≥576px), stacked on mobile */}
                 <div className="row g-3 mb-3">
-                  <div className="col-6">
+                  <div className="col-12 col-sm-6">
                     <label
                       className="form-label fw-semibold"
                       style={{ color: 'var(--meras-text)', fontSize: '14px' }}
@@ -175,7 +176,7 @@ function SignUpExplorer() {
                       </div>
                     )}
                   </div>
-                  <div className="col-6">
+                  <div className="col-12 col-sm-6">
                     <label
                       className="form-label fw-semibold"
                       style={{ color: 'var(--meras-text)', fontSize: '14px' }}
@@ -236,9 +237,9 @@ function SignUpExplorer() {
                 </div>
 
 
-                {/* Gender + Grade side by side */}
+                {/* Gender + Grade — side-by-side on sm+, stacked on mobile */}
                 <div className="row g-3 mb-3">
-                  <div className="col-6">
+                  <div className="col-12 col-sm-6">
                     <label
                       className="form-label fw-semibold"
                       style={{ color: 'var(--meras-text)', fontSize: '14px' }}
@@ -269,7 +270,7 @@ function SignUpExplorer() {
                       </div>
                     )}
                   </div>
-                  <div className="col-6">
+                  <div className="col-12 col-sm-6">
                     <label
                       className="form-label fw-semibold"
                       style={{ color: 'var(--meras-text)', fontSize: '14px' }}

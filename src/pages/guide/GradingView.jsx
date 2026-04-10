@@ -1,12 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MdStar, MdStarBorder, MdClose, MdVideoCall } from "react-icons/md";
 import {mockSubmissions} from "../../data/mockData"
 
-// mockSubmissions is imported from mockData.js
-// Each entry has a submissionType: "file" | "text" | "canvas"
 
-
-// ─── Session / calendar data (unchanged) ─────────────────────────────────────
 const TODAY = new Date(2026, 3, 9);
 function buildWeek(anchor) {
   const day = anchor.getDay();
@@ -31,9 +27,7 @@ function isSameDay(a, b) {
     a.getDate() === b.getDate();
 }
 
-// ─── Submission preview sub-components ───────────────────────────────────────
 
-// 1. FILE submission – shows file name + optional note (original behaviour)
 function FilePreview({ sub }) {
   return (
     <div style={s.submissionBox}>
@@ -100,7 +94,6 @@ function CanvasPreview({ sub, expanded, onToggle }) {
   );
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
 function GradingView() {
   const [selectedSubmission, setSelectedSubmission] = useState(null);
   const [ratings, setRatings]       = useState({});
@@ -111,6 +104,15 @@ function GradingView() {
 
   const [week]         = useState(() => buildWeek(TODAY));
   const [selectedDay, setSelectedDay] = useState(TODAY);
+
+  // The week strip (7 day buttons in a flex row) overflows on narrow phones.
+  // Submission rows also need their right-side button to move below on mobile.
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 600);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
   const sessionsForDay = mockSessions.filter(s => isSameDay(s.date, selectedDay));
 
   const currentRating   = selectedSubmission ? (ratings[selectedSubmission.id]   ?? 0) : 0;
@@ -157,7 +159,7 @@ function GradingView() {
   return (
     <div style={s.page}>
 
-      {/* ── Pending Submissions ─────────────────────────────── */}
+      {/* Pending Submissions */}
       <section style={s.section}>
         <h2 style={s.sectionTitle}>Pending Submissions</h2>
         <p style={s.sectionSub}>{mockSubmissions.filter(sub => !submitted[sub.id]).length} awaiting your review</p>
@@ -166,7 +168,9 @@ function GradingView() {
           {mockSubmissions.map(sub => {
             const isDone = submitted[sub.id];
             return (
-              <div key={sub.id} style={{ ...s.submissionRow, borderLeftColor: sub.majorColor, opacity: isDone ? 0.5 : 1 }}>
+              /* On mobile: stack info + grade button vertically so the button
+                 doesn't get squished beside the text */
+              <div key={sub.id} style={{ ...s.submissionRow, borderLeftColor: sub.majorColor, opacity: isDone ? 0.5 : 1, flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center" }}>
                 <div style={s.subInfo}>
                   <p style={s.subStudent}>{sub.student}</p>
                   <p style={s.subChallenge}>{sub.challenge}</p>
@@ -184,12 +188,14 @@ function GradingView() {
         </div>
       </section>
 
-      {/* ── Upcoming Sessions ───────────────────────────────── */}
+      {/*  Upcoming Sessions */}
       <section style={s.section}>
         <h2 style={s.sectionTitle}>Upcoming Sessions</h2>
         <p style={s.sectionSub}>Select a day to see booked sessions</p>
 
-        <div style={s.weekStrip}>
+        {/* Week strip — 7 buttons in a row. On very narrow phones they'd overflow,
+            so we allow wrapping into a 2-row grid. */}
+        <div style={{ ...s.weekStrip, flexWrap: isMobile ? "wrap" : "nowrap" }}>
           {week.map((day, i) => {
             const isToday     = isSameDay(day, TODAY);
             const isSelected  = isSameDay(day, selectedDay);
@@ -227,10 +233,11 @@ function GradingView() {
         }
       </section>
 
-      {/* ── Grading panel (modal) ───────────────────────────── */}
+      {/*  Grading panel (modal)*/}
       {selectedSubmission && (
         <div style={s.overlay} onClick={closePanel}>
-          <div style={s.panel} onClick={e => e.stopPropagation()}>
+          {/* Reduce panel padding on mobile so content isn't cramped */}
+          <div style={{ ...s.panel, padding: isMobile ? "20px 16px" : "32px" }} onClick={e => e.stopPropagation()}>
 
             <div style={s.panelHeader}>
               <div>
@@ -311,7 +318,7 @@ const s = {
   subChallenge: { margin: 0, fontSize: "14px", color: "#374151" },
   subMeta: { margin: 0, fontSize: "12px", color: "#9CA3AF" },
   subRight: { flexShrink: 0 },
-  gradeBtn: { backgroundColor: "#111827", color: "#FFFFFF", border: "none", borderRadius: "999px", padding: "9px 22px", fontSize: "14px", fontWeight: "600", cursor: "pointer" },
+  gradeBtn: { backgroundColor: "var(--meras-green)", color: "#FFFFFF", border: "none", borderRadius: "999px", padding: "9px 22px", fontSize: "14px", fontWeight: "600", cursor: "pointer" },
   gradedBadge: { display: "inline-block", backgroundColor: "#D1FAE5", color: "#065F46", borderRadius: "999px", padding: "6px 16px", fontSize: "13px", fontWeight: "600" },
 
   weekStrip: { display: "flex", gap: "8px", marginBottom: "20px" },

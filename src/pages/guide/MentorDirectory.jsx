@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { mockMentors } from '../../data/mockData'
 import MentorCard from '../../components/MentorCard'
@@ -14,6 +14,15 @@ function MentorDirectory({ profilePath = '/guide/profile' }) {
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [selectedMajor, setSelectedMajor] = useState('All')
+
+  // isMobile so we can swap the filter bar from a single wide row to a
+  // stacked column, and reduce the excessive px-5 / 65px padding on phones.
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const filtered = mockMentors.filter((mentor) => {
     const matchesSearch = mentor.name.toLowerCase().includes(search.toLowerCase())
@@ -76,9 +85,21 @@ function MentorDirectory({ profilePath = '/guide/profile' }) {
         </div>
       </section>
 
-      {/* Filter bar */}
-      <div className="d-flex align-items-center justify-content-between" style={{ padding: '0 65px 20px' }}>
-        <div className="d-flex align-items-center gap-2">
+      {/* Filter bar
+          On desktop: one wide row with search on the left, major+pagination on the right.
+          On mobile: stack them vertically and use container padding instead of the
+          hardcoded 65px which overflows on narrow screens. */}
+      <div
+        className="d-flex gap-3"
+        style={{
+          padding: isMobile ? '0 16px 20px' : '0 65px 20px',
+          flexDirection: isMobile ? 'column' : 'row',
+          alignItems: isMobile ? 'stretch' : 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        {/* Search */}
+        <div className="d-flex align-items-center gap-2" style={{ flexWrap: 'wrap' }}>
           <label style={{ fontSize: '14px', color: 'var(--meras-text)', fontWeight: '500', whiteSpace: 'nowrap' }}>
             Search by Mentor Name
           </label>
@@ -93,11 +114,14 @@ function MentorDirectory({ profilePath = '/guide/profile' }) {
               padding: '4px 10px',
               fontSize: '14px',
               outline: 'none',
+              flex: 1,
+              minWidth: '140px',
             }}
           />
         </div>
 
-        <div className="d-flex align-items-center gap-2">
+        {/* Major filter + pagination */}
+        <div className="d-flex align-items-center gap-2" style={{ flexWrap: 'wrap' }}>
           <label style={{ fontSize: '14px', color: 'var(--meras-text)', fontWeight: '500' }}>Major</label>
           <select
             value={selectedMajor}
@@ -121,12 +145,14 @@ function MentorDirectory({ profilePath = '/guide/profile' }) {
         </div>
       </div>
 
-      {/* Cards grid */}
-      <div className="container-fluid px-5 pb-5">
+      {/* Cards grid
+          px-5 (3rem) is too much on phones — use px-3 on mobile.
+          col-12 added so cards go full-width below the md breakpoint. */}
+      <div className={`container-fluid ${isMobile ? 'px-3' : 'px-5'} pb-5`}>
         {visible.length > 0 ? (
           <div className="row g-4">
             {visible.map((mentor) => (
-              <div key={mentor.id} className="col-lg-4 col-md-6">
+              <div key={mentor.id} className="col-12 col-md-6 col-lg-4">
                 <MentorCard
                   name={mentor.name}
                   major={mentor.major}

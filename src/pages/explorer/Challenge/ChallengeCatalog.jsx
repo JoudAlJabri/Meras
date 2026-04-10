@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { mockChallenges } from '../../../data/mockData'
 import ChallengeCard from '../../../components/ChallengeCard'
@@ -10,6 +10,15 @@ function ChallengeCatalog() {
   const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [selectedMajor, setSelectedMajor] = useState('All')
+
+  // The filter bar uses hardcoded padding: '0 65px' — way too wide on mobile.
+  // Cards use px-5 which is also excessive on small screens.
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const filtered = selectedMajor === 'All'
     ? mockChallenges
@@ -47,9 +56,17 @@ function ChallengeCatalog() {
         </div>
       </section>
       
-      <div className="d-flex align-items-center justify-content-between" style={{ padding: '0 65px 20px' }}>
+      {/* Filter bar — reduced padding on mobile, stacked on very small screens */}
+      <div
+        className="d-flex align-items-center justify-content-between"
+        style={{
+          padding: isMobile ? '0 16px 20px' : '0 65px 20px',
+          flexWrap: 'wrap',
+          gap: '12px',
+        }}
+      >
         <h4 className="fw-semibold mb-0" style={{ color: 'var(--meras-text)' }}>Micro-Challenges</h4>
-        <div className="d-flex align-items-center gap-2">
+        <div className="d-flex align-items-center gap-2" style={{ flexWrap: 'wrap' }}>
 
           <label style={{ fontSize: '14px', color: 'var(--meras-text)', fontWeight: '500' }}>Major</label>
           <select
@@ -75,12 +92,14 @@ function ChallengeCatalog() {
         </div>
       </div>
 
-      <div className="container-fluid px-5 pb-5">
+      {/* px-5 (3rem) is too much on phones, use px-3 on mobile.
+          col-12 added so each card takes full width on small screens. */}
+      <div className={`container-fluid ${isMobile ? 'px-3' : 'px-5'} pb-5`}>
         <div className="row g-4">
           {visible.map((challenge) => {
             const realIndex = mockChallenges.indexOf(challenge)
             return (
-            <div key={realIndex} className="col-lg-3 col-md-6">
+            <div key={realIndex} className="col-12 col-md-6 col-lg-3">
               <ChallengeCard
                 challengeName={challenge.title}
                 description={challenge.description}

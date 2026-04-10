@@ -187,7 +187,8 @@ return (
         <div className="row" style={{ minHeight: '100vh' }}>
 
           {/* ── LEFT SIDE — Signup Form ── */}
-          <div className="col-lg-6 d-flex align-items-center justify-content-center p-5">
+          {/* Reduced padding on mobile to give the form breathing room */}
+          <div className="col-lg-6 d-flex align-items-center justify-content-center p-3 p-lg-5">
             <div style={{ width: '100%', maxWidth: '520px' }}>
 
               {/* Logo */}
@@ -257,8 +258,9 @@ return (
               <form onSubmit={handleSubmit}>
 
                 {/* First Name + Last Name */}
+                {/* col-sm-6: side-by-side on sm+ (≥576px), full-width stacked below that */}
                 <div className="row g-3 mb-3">
-                  <div className="col-6">
+                  <div className="col-12 col-sm-6">
                     <label
                       className="form-label fw-semibold"
                       style={{ color: 'var(--meras-text)', fontSize: '14px' }}
@@ -286,7 +288,7 @@ return (
                       </div>
                     )}
                   </div>
-                  <div className="col-6">
+                  <div className="col-12 col-sm-6">
                     <label
                       className="form-label fw-semibold"
                       style={{ color: 'var(--meras-text)', fontSize: '14px' }}
@@ -350,9 +352,9 @@ return (
                   )}
                 </div>
 
-                {/* University + Major side by side */}
+                {/* University + Major side by side on sm+, stacked on mobile */}
                 <div className="row g-3 mb-3">
-                  <div className="col-6">
+                  <div className="col-12 col-sm-6">
                     <label
                       className="form-label fw-semibold"
                       style={{ color: 'var(--meras-text)', fontSize: '14px' }}
@@ -384,7 +386,7 @@ return (
                       </div>
                     )}
                   </div>
-                  <div className="col-6">
+                  <div className="col-12 col-sm-6">
                     <label
                       className="form-label fw-semibold"
                       style={{ color: 'var(--meras-text)', fontSize: '14px' }}

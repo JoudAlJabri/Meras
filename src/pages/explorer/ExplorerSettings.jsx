@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { MdCameraAlt } from "react-icons/md";
 
@@ -12,6 +12,15 @@ function ExplorerSettings() {
 
   const [newPassword, setNewPassword]         = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  // On mobile the two-column field rows (First/Last, Email/Grade, Password/Confirm)
+  // are too narrow — stack them vertically instead.
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 600);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleUpdateInfo = () => {
     login({ ...currentUser, name: `${firstName} ${lastName}`.trim(), email, grade });
@@ -41,8 +50,8 @@ function ExplorerSettings() {
         </div>
       </div>
 
-      {/* Name row */}
-      <div style={styles.row}>
+      {/* Name row — side-by-side on desktop, stacked on mobile */}
+      <div style={{ ...styles.row, flexDirection: isMobile ? "column" : "row" }}>
         <div style={styles.field}>
           <label style={styles.label}>First Name <span style={styles.req}>*</span></label>
           <input style={styles.input} value={firstName} onChange={e => setFirstName(e.target.value)} />
@@ -54,7 +63,7 @@ function ExplorerSettings() {
       </div>
 
       {/* Email / Grade row */}
-      <div style={styles.row}>
+      <div style={{ ...styles.row, flexDirection: isMobile ? "column" : "row" }}>
         <div style={styles.field}>
           <label style={styles.label}>Email</label>
           <input style={styles.input} value={email} onChange={e => setEmail(e.target.value)} />
@@ -74,7 +83,7 @@ function ExplorerSettings() {
       <h2 style={{ ...styles.sectionHeading, marginTop: "36px" }}>Change Password</h2>
       <hr style={styles.divider} />
 
-      <div style={styles.row}>
+      <div style={{ ...styles.row, flexDirection: isMobile ? "column" : "row" }}>
         <div style={styles.field}>
           <label style={styles.label}>New Password</label>
           <input style={styles.input} type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} />

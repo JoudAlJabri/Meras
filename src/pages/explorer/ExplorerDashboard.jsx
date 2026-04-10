@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   MdExtension,
@@ -47,6 +47,16 @@ function ExplorerDashboard() {
   const [selectedChallenge, setSelectedChallenge] = useState(null);
   const [expanded, setExpanded] = useState(false);
 
+  // Track whether the viewport is mobile-sized (≤768px).
+  // We use a state + resize listener so the layout re-renders when the
+  // user rotates their device or resizes the browser window.
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   function openFeedback(challenge) {
     setSelectedChallenge(challenge);
     setExpanded(false);
@@ -61,7 +71,9 @@ function ExplorerDashboard() {
 
   return (
     <div style={styles.page}>
-      <div style={styles.mainLayout}>
+      {/* On mobile: stack main column + sidebar vertically.
+          On desktop: side-by-side row layout. */}
+      <div style={{ ...styles.mainLayout, flexDirection: isMobile ? "column" : "row" }}>
 
         {/* Left column */}
         <div style={styles.mainColumn}>
@@ -69,17 +81,20 @@ function ExplorerDashboard() {
           {/* Banner */}
           <div style={styles.banner}>
             <div style={styles.bannerContent}>
-             
-              <h1 style={styles.bannerName}>Hi, Lamees</h1>
+
+              {/* Smaller heading font on mobile so it doesn't overflow the banner */}
+              <h1 style={{ ...styles.bannerName, fontSize: isMobile ? "32px" : "48px" }}>Hi, Lamees</h1>
               <p style={styles.bannerText}>
                 Keep exploring your path and continue building your future.
               </p>
             </div>
-            <img src={learningGirl} alt="illustration" style={styles.bannerImage} />
+            {/* Hide the illustration on mobile — it overlaps the text at narrow widths */}
+            {!isMobile && <img src={learningGirl} alt="illustration" style={styles.bannerImage} />}
           </div>
 
-          {/* Stat Cards */}
-          <div style={styles.statsGrid}>
+          {/* Stat Cards — 2 columns on mobile, 3 on desktop.
+              3 equal columns at full width would be too narrow on a phone. */}
+          <div style={{ ...styles.statsGrid, gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(3, 1fr)" }}>
             <div style={styles.statCard}>
               <div style={{ ...styles.statIcon, backgroundColor: "var(--meras-green)" }}>
                 <MdExtension style={styles.statIconInner} />
@@ -121,8 +136,8 @@ function ExplorerDashboard() {
 
         </div>
 
-        {/* Recent sidebar */}
-        <div style={styles.recentPanel}>
+        {/* Recent sidebar — fixed 260px on desktop, full width below main column on mobile */}
+        <div style={{ ...styles.recentPanel, width: isMobile ? "100%" : "260px" }}>
           <h2 style={styles.recentTitle}>Recent</h2>
           <div style={styles.recentList}>
             {recentActivities.map((item, index) => {

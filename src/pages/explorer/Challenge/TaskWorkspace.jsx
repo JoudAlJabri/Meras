@@ -58,6 +58,16 @@ function TaskWorkspace() {
   // ── Submit loading
   const [submitting, setSubmitting] = useState(false)
 
+  // Detect mobile viewport so we can stack panels vertically instead of
+  // side-by-side. On narrow screens the 380px left panel + right panel
+  // would overflow and be unusable.
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   // timer logic
    useEffect(() => {
     if (!timerRunning || timeLeft <= 0) return
@@ -276,8 +286,9 @@ function TaskWorkspace() {
           </button>
         </div>
 
-        {/* Right — actions */}
-        <div className="d-flex align-items-center gap-2">
+        {/* Right — actions. flexWrap so buttons move to a second line on
+            very narrow screens instead of overflowing off-screen. */}
+        <div className="d-flex align-items-center gap-2" style={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
 
           {/* Notes toggle */}
           <button
@@ -341,24 +352,33 @@ function TaskWorkspace() {
 
      
 
-      {/* MAIN WORKSPACE AREA*/}
+      {/* MAIN WORKSPACE AREA
+          On desktop: left instructions panel + right submission panel sit side-by-side.
+          On mobile: they stack vertically — instructions on top (scrollable, capped
+          height), submission area below. */}
       <div
         style={{
           flex: 1,
           display: 'flex',
-          overflow: 'hidden',
+          flexDirection: isMobile ? 'column' : 'row',
+          overflow: isMobile ? 'auto' : 'hidden',
           position: 'relative'
         }}
       >
 
         {/* ── LEFT PANEL — Instructions ── */}
+        {/* On desktop: fixed 380px wide column on the left.
+            On mobile: full-width block on top, capped at 260px tall with
+            its own scroll — so the submission area is still reachable. */}
         {!focusMode && (
           <div
             style={{
-              width: '380px',
+              width: isMobile ? '100%' : '380px',
+              maxHeight: isMobile ? '260px' : 'none',
               flexShrink: 0,
               backgroundColor: '#f8f9fa',
-              borderRight: '1px solid var(--meras-border)',
+              borderRight: isMobile ? 'none' : '1px solid var(--meras-border)',
+              borderBottom: isMobile ? '1px solid var(--meras-border)' : 'none',
               overflowY: 'auto',
               padding: '1.5rem',
               animation: 'slideInLeft 0.3s ease'
@@ -590,12 +610,14 @@ function TaskWorkspace() {
         )}
 
         {/* ── RIGHT PANEL — Submission Area ── */}
+        {/* On mobile this panel follows the instructions panel in the column flow.
+            overflow: 'auto' (not 'hidden') lets it scroll on mobile. */}
         <div
           style={{
             flex: 1,
             display: 'flex',
             flexDirection: 'column',
-            overflow: 'hidden',
+            overflow: isMobile ? 'auto' : 'hidden',
             animation: 'fadeIn 0.5s ease'
           }}
         >

@@ -1768,7 +1768,17 @@ textarea.input {
   .tw-row-3,
   .tw-experience-section,
   .tw-workspace-row { grid-template-columns: 1fr; }
-  .tw-header__img   { width: 130px; }
+
+  /* Header image shrinks, title font scales down */
+  .tw-header__img { width: 130px; }
+  .tw-header h1   { font-size: 2rem !important; }
+  .tw-header h2   { font-size: 1.1rem !important; }
+
+  /* Tags row — select + input + Add button stack vertically on small screens */
+  .tw-tags-row { flex-direction: column; align-items: stretch; }
+
+  /* Card padding reduced so content isn't squeezed on phones */
+  .tw-card { padding: 20px 16px; }
 }
 
 /* --- Alert / Notification Banner --- */
@@ -2735,5 +2745,13 @@ textarea.input {
 }
 
 @media (max-width: 600px) {
+  /* 2-column day grid on small phones */
   .at-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Reduce the outer wrapper padding so content isn't squeezed */
+  .at-wrap { padding: 16px 12px 40px; }
+
+  /* Footer: stack the slot count and save button vertically */
+  .at-footer { flex-direction: column; align-items: stretch; gap: 12px; }
+  .at-save-btn { text-align: center; }
 }
