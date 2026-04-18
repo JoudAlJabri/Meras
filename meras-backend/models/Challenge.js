@@ -10,40 +10,44 @@ const challengeSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    mentorName: {
+      type: String,
+    },
+    mentorId: {
+      type: String,
+    },
+    tags: [String],
+    description: {
+      type: String,
+    },
     difficulty: {
       type: String,
       enum: ["Beginner", "Intermediate", "Advanced"],
       required: true,
     },
     timeEstimate: {
-      type: String,
+      type: Number,
       required: true,
     },
+    whatYouWillLearn: [String],
+    whatYouWillDo: [String],
+    whatYouWillNeed: [String],
     instructions: {
       type: String,
       required: true,
     },
-    description: {
-      type: String,
-    },
-    category: {
-      type: String,
-    },
-    skills: [
+    referenceLinks: [
       {
-        type: String,
+        title: String,
+        url: String,
       },
     ],
-    resources: [
+    downloadableFiles: [
       {
-        type: String,
+        fileName: String,
+        fileUrl: String,
       },
     ],
-    status: {
-      type: String,
-      enum: ["Open", "Closed"],
-      default: "Open",
-    },
   },
   { timestamps: true }
 );
