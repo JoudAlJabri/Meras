@@ -18,20 +18,94 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["explorer", "mentor", "guide", "admin"],
+      enum: ["explorer", "guide", "admin"],
       default: "explorer",
     },
-    availability: [
-      {
-        date: {
-          type: String,
-        },
-        slots: [
-          {
-            type: String,
-          },
-        ],
+
+    // Shared
+    profilePhoto: { type: String },
+
+    // Guide-specific (required at signup)
+    university: {
+      type: String,
+      required: function () {
+        return this.role === "guide";
       },
+    },
+    major: {
+      type: String,
+      required: function () {
+        return this.role === "guide";
+      },
+    },
+    transcript: {
+      type: String,
+      validate: {
+        validator: function (v) {
+          return /\.(pdf|png|jpg|jpeg)$/i.test(v);
+        },
+        message: "Transcript must be a PDF or image file (png, jpg, jpeg)",
+      },
+    },
+
+    // Guide approval status (managed by admin)
+    guideStatus: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: function () {
+        return this.role === "guide" ? "pending" : undefined;
+      },
+    },
+
+    // Guide-specific (filled in GuideSettings)
+    about: { type: String }, // filled in edit account
+    skills: [{ type: String }], // filled in edit account
+    rating: { type: Number, default: 0 }, // filled by explorers
+    reviews: [ // filled by explorers
+      {
+        explorer: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        rating: { type: Number, min: 1, max: 5 },
+        comment: { type: String },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
+    availability: [  // filled in mentorDirectory 
+      {
+        date: { type: String },
+        slots: [{ type: String }],
+      },
+    ],
+
+    // Explorer-specific (required at signup)
+
+    gender: {
+      required: function () {
+        return this.role === "explorer";
+      },
+      type: String,
+      enum: ["female" , "male"],
+    },
+
+     grade: {
+      required: function () {
+        return this.role === "explorer";
+      },
+      type: String,
+      enum: ["Grade 10" , "Grade 11" , "Grade 12"],
+    },
+
+    // Explorer-specific (filles later)
+
+    interests: [{ type: String }], // incremented when the explorer takes the quiz
+
+    recommendedMajors: [{ type: String }], // depends on interests, to filter the recommended majors based on the interests
+
+    completedChallenges: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Challenge" },
+    ],
+
+    savedChallenges: [ // the challnges the user save for later (still no front-end for that yet)
+      { type: mongoose.Schema.Types.ObjectId, ref: "Challenge" },
     ],
   },
   { timestamps: true }
@@ -40,7 +114,7 @@ const userSchema = new mongoose.Schema(
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
-  const salt = await bcrypt.genSalt(10);
+  const salt = await bcrypt.genSalt(10); // 10 is the number of rounds, how complex the hash is. The higher=the more secure
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
