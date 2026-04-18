@@ -44,6 +44,7 @@ return (
 );
 }
 
+
 function ExplorerLayout({ children }) {
   const location = useLocation();
   const { currentUser } = useAuth();
@@ -114,7 +115,7 @@ function ExplorerLayout({ children }) {
     </div>
   );
 }
- //  Without minWidth: 0, the right section would refuse to shrink when the sidebar was open, compressing the cards. Setting it to 0 tells it "you're allowed to shrink as small as needed."
+ //  Without minWidth: 0
 const styles = {
   wrapper: {
     display: "flex",
