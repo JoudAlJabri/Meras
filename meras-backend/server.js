@@ -9,8 +9,10 @@ const app = express();
 
 connectDB();
 
-app.use(cors());
-app.use(express.json());
+// ── MIDDLEWARE ──
+
+app.use(cors()); // allows React frontend to talk to this server
+app.use(express.json()); // allows the server to read JSON from request bodies
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
