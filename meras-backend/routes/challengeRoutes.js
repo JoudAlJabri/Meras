@@ -9,6 +9,9 @@ const {
   createChallenge,
   updateChallenge,
   deleteChallenge,
+  completeChallenge,
+  saveChallenge,
+  unsaveChallenge,
 } = require("../controllers/challengeContoller");
 
 // Public
@@ -27,5 +30,10 @@ router.put("/:id", protect, requireRole("guide"), updateChallenge);
 
 // Guide or admin — delete
 router.delete("/:id", protect, requireRole("guide", "admin"), deleteChallenge);
+
+// Explorer only — complete / save / unsave
+router.post("/:id/complete", protect, requireRole("explorer"), completeChallenge);
+router.post("/:id/save", protect, requireRole("explorer"), saveChallenge);
+router.delete("/:id/save", protect, requireRole("explorer"), unsaveChallenge);
 
 module.exports = router;

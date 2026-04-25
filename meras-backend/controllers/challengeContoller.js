@@ -162,6 +162,54 @@ const deleteChallenge = async (req, res) => {
   }
 };
 
+// POST /challenges/:id/complete — explorer marks a challenge as done
+
+const completeChallenge = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (user.completedChallenges.map(id => id.toString()).includes(req.params.id)) {
+      return res.status(400).json({ message: "Challenge already marked as completed" });
+    }
+
+    await User.findByIdAndUpdate(req.user.id, {
+      $addToSet: { completedChallenges: req.params.id },
+    });
+
+    res.status(200).json({ message: "Challenge marked as completed" });
+  } catch (err) {
+    console.error("completeChallenge error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// POST /challenges/:id/save — explorer bookmarks a challenge
+
+const saveChallenge = async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.user.id, {
+      $addToSet: { savedChallenges: req.params.id },
+    });
+    res.status(200).json({ message: "Challenge saved" });
+  } catch (err) {
+    console.error("saveChallenge error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// DELETE /challenges/:id/save — explorer removes a bookmark
+
+const unsaveChallenge = async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.user.id, {
+      $pull: { savedChallenges: req.params.id },
+    });
+    res.status(200).json({ message: "Challenge removed from saved" });
+  } catch (err) {
+    console.error("unsaveChallenge error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   getChallenges,
   getChallengeById,
@@ -169,4 +217,7 @@ module.exports = {
   createChallenge,
   updateChallenge,
   deleteChallenge,
+  completeChallenge,
+  saveChallenge,
+  unsaveChallenge,
 };

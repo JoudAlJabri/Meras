@@ -29,4 +29,16 @@ const saveQuizResults = async (req, res) => {
   }
 };
 
-module.exports = { saveQuizResults };
+// GET /users/me/saved-challenges — returns explorer's saved challenges (populated)
+
+const getSavedChallenges = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).populate("savedChallenges");
+    res.status(200).json({ savedChallenges: user.savedChallenges });
+  } catch (err) {
+    console.error("getSavedChallenges error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { saveQuizResults, getSavedChallenges };
