@@ -110,6 +110,11 @@ const userSchema = new mongoose.Schema(
     savedChallenges: [ // the challnges the user save for later (still no front-end for that yet)
       { type: mongoose.Schema.Types.ObjectId, ref: "Challenge" },
     ],
+
+    // Email verification
+    emailVerified: { type: Boolean, default: false },
+    emailVerificationToken: { type: String },
+    emailVerificationExpires: { type: Date },
   },
   { timestamps: true }
 );
