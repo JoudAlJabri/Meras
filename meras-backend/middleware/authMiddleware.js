@@ -48,4 +48,4 @@ const protect = async (req, res, next) => {  // the malware function
   }
 };
 
-module.exports = { protect };
+module.exports = protect;

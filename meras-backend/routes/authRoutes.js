@@ -2,7 +2,7 @@ const express = require("express");  // importing express
 const router = express.Router();  // using the router from express
 
 const { register, login, verifyEmail, resendVerification, getMe } = require("../controllers/authController");
-const { protect } = require("../middleware/authMiddleware");  // to check if the users token is still valid
+const protect = require("../middleware/authMiddleware");  // to check if the users token is still valid
 
 // POST /auth/register  → anyone can hit this (no token needed)
 router.post("/register", register);
