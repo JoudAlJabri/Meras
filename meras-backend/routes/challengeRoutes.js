@@ -2,11 +2,16 @@ const express = require("express");
 const router = express.Router();
 const { protect } = require("../middleware/authMiddleware");
 const requireRole = require("../middleware/roleMiddleware");
+const {
+  getChallenges,
+  getChallengeById,
+} = require("../controllers/challengeController");
 
-// Public route
-router.get("/", (req, res) => {
-  res.send("Get all challenges");
-});
+// Public route - get all challenges with optional filters
+router.get("/", getChallenges);
+
+// Public route - get one challenge by id
+router.get("/:id", getChallengeById);
 
 // Protected route - only admin can create a challenge
 router.post("/", protect, requireRole("admin"), (req, res) => {

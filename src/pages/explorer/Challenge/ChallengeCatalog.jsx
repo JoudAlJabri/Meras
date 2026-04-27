@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { mockChallenges } from '../../../data/mockData'
 import ChallengeCard from '../../../components/ChallengeCard'
 
 const CARDS_PER_PAGE = 8
-const majors = ['All', ...new Set(mockChallenges.map(c => c.major))]
+
 
 function ChallengeCatalog() {
   const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [selectedMajor, setSelectedMajor] = useState('All')
+  const [challenges, setChallenges] = useState([])
+
+  const majors = ['All', ...new Set(challenges.map(c => c.major))]
 
   // The filter bar uses hardcoded padding: '0 65px' — way too wide on mobile.
   // Cards use px-5 which is also excessive on small screens.
@@ -20,11 +22,25 @@ function ChallengeCatalog() {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  const filtered = selectedMajor === 'All'
-    ? mockChallenges
-    : mockChallenges.filter(c => c.major === selectedMajor)
+  useEffect(() => {
+    const fetchChallenges = async () => {
+      try {
+        const res = await fetch("http://localhost:5001/api/challenges")
+        const data = await res.json()
+        setChallenges(data)
+      } catch (error) {
+        console.error("Error fetching challenges:", error)
+      }
+    }
 
-  const totalPages = Math.ceil(filtered.length / CARDS_PER_PAGE)
+    fetchChallenges()
+  }, [])
+
+  const filtered = selectedMajor === 'All'
+    ? challenges
+    : challenges.filter(c => c.major === selectedMajor)
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / CARDS_PER_PAGE))
   const visible = filtered.slice((page - 1) * CARDS_PER_PAGE, page * CARDS_PER_PAGE)
 
   return (
@@ -97,7 +113,7 @@ function ChallengeCatalog() {
       <div className={`container-fluid ${isMobile ? 'px-3' : 'px-5'} pb-5`}>
         <div className="row g-4">
           {visible.map((challenge) => {
-            const realIndex = mockChallenges.indexOf(challenge)
+            const realIndex = challenge._id
             return (
             <div key={realIndex} className="col-12 col-md-6 col-lg-3">
               <ChallengeCard
