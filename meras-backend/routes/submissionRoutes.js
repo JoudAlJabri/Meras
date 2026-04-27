@@ -10,7 +10,8 @@ const {
   getSubmissionsByExplorer,
 } = require("../controllers/submissionController");
 
-const protect     = require("../middleware/authMiddleware");
+//const protect     = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authMiddleware");
 const requireRole = require("../middleware/roleMiddleware");
 
 // ── MULTER SETUP ─────────────────────────────
