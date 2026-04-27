@@ -40,6 +40,9 @@ const userSchema = new mongoose.Schema(
     },
     transcript: {
       type: String,
+      required: function () {
+        return this.role === "guide";
+      },
       validate: {
         validator: function (v) {
           return /\.(pdf|png|jpg|jpeg)$/i.test(v);
@@ -107,16 +110,20 @@ const userSchema = new mongoose.Schema(
     savedChallenges: [ // the challnges the user save for later (still no front-end for that yet)
       { type: mongoose.Schema.Types.ObjectId, ref: "Challenge" },
     ],
+
+    // Email verification
+    emailVerified: { type: Boolean, default: false },
+    emailVerificationToken: { type: String },
+    emailVerificationExpires: { type: Date },
   },
   { timestamps: true }
 );
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
 
-  const salt = await bcrypt.genSalt(10); // 10 is the number of rounds, how complex the hash is. The higher=the more secure
+  const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
-  next();
 });
 
 userSchema.methods.matchPassword = async function (enteredPassword) {

@@ -1,26 +1,41 @@
 const express = require("express");
 const router = express.Router();
+
 const { protect } = require("../middleware/authMiddleware");
 const requireRole = require("../middleware/roleMiddleware");
+
 const {
   getChallenges,
   getChallengeById,
+  getChallengesByGuide,
+  createChallenge,
+  updateChallenge,
+  deleteChallenge,
+  completeChallenge,
+  saveChallenge,
+  unsaveChallenge,
 } = require("../controllers/challengeController");
 
-// Public route - get all challenges with optional filters
+// Public
 router.get("/", getChallenges);
 
-// Public route - get one challenge by id
+// /guide/:guideId must be before /:id to avoid conflict
+router.get("/guide/:guideId", protect, requireRole("guide"), getChallengesByGuide);
+
 router.get("/:id", getChallengeById);
 
-// Protected route - only admin can create a challenge
-router.post("/", protect, requireRole("admin"), (req, res) => {
-  res.send("Challenge created");
-});
+// Guide only — create
+router.post("/", protect, requireRole("guide"), createChallenge);
 
-// Protected route - admin or guide can update a challenge
-router.put("/:id", protect, requireRole("admin", "guide"), (req, res) => {
-  res.send("Challenge updated");
-});
+// Guide only — edit their own
+router.put("/:id", protect, requireRole("guide"), updateChallenge);
+
+// Guide or admin — delete
+router.delete("/:id", protect, requireRole("guide", "admin"), deleteChallenge);
+
+// Explorer only — complete / save / unsave
+router.post("/:id/complete", protect, requireRole("explorer"), completeChallenge);
+router.post("/:id/save", protect, requireRole("explorer"), saveChallenge);
+router.delete("/:id/save", protect, requireRole("explorer"), unsaveChallenge);
 
 module.exports = router;

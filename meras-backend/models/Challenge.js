@@ -14,11 +14,13 @@ const challengeSchema = new mongoose.Schema(
       type: String,
     },
     mentorId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
     tags: [String],
     description: {
       type: String,
+      required: true,
     },
     difficulty: {
       type: String,

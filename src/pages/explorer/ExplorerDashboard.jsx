@@ -6,6 +6,7 @@ import {
   MdEventNote,
   MdCalendarToday,
   MdAutoAwesome,
+  MdArticle,
 } from "react-icons/md";
 import { MdStar, MdStarBorder, MdClose } from "react-icons/md";
 import { useAuth } from "../../context/AuthContext";
@@ -136,25 +137,41 @@ function ExplorerDashboard() {
 
         </div>
 
-        {/* Recent sidebar — fixed 260px on desktop, full width below main column on mobile */}
-        <div style={{ ...styles.recentPanel, width: isMobile ? "100%" : "260px" }}>
-          <h2 style={styles.recentTitle}>Recent</h2>
-          <div style={styles.recentList}>
-            {recentActivities.map((item, index) => {
-              const Icon = item.icon;
-              return (
-                <div key={index} style={styles.recentItem}>
-                  <div style={{ ...styles.recentIcon, backgroundColor: item.color }}>
-                    <Icon style={styles.recentIconInner} />
+        {/* Right sidebar — fixed 260px on desktop, full width on mobile */}
+        <div style={{ width: isMobile ? "100%" : "260px", flexShrink: 0, display: "flex", flexDirection: "column", gap: "16px" }}>
+
+          {/* Recent panel */}
+          <div style={styles.recentPanel}>
+            <h2 style={styles.recentTitle}>Recent</h2>
+            <div style={styles.recentList}>
+              {recentActivities.map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <div key={index} style={styles.recentItem}>
+                    <div style={{ ...styles.recentIcon, backgroundColor: item.color }}>
+                      <Icon style={styles.recentIconInner} />
+                    </div>
+                    <div>
+                      <p style={styles.recentLabel}>{item.label}</p>
+                      <p style={styles.recentDetail}>{item.detail}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p style={styles.recentLabel}>{item.label}</p>
-                    <p style={styles.recentDetail}>{item.detail}</p>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
+
+          {/* Saved Challenges card */}
+          <div style={styles.savedCard}>
+            <div style={styles.savedIconWrap}>
+              <MdArticle style={{ fontSize: "28px", color: "#6B7280" }} />
+            </div>
+            <h2 style={styles.savedTitle}>Saved Challenges</h2>
+            <button style={styles.savedButton} onClick={() => navigate("/explorer/savedChallenges")}>
+              View →
+            </button>
+          </div>
+
         </div>
 
       </div>
@@ -417,13 +434,47 @@ const styles = {
 
   
   recentPanel: {
-    width: "260px",
-    flexShrink: 0,
     backgroundColor: "#FFFFFF",
     border: "1px solid #E5E7EB",
     borderRadius: "16px",
     padding: "20px",
     boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+  },
+  savedCard: {
+    backgroundColor: "#FFFFFF",
+    border: "1px solid #E5E7EB",
+    borderRadius: "16px",
+    padding: "24px 20px",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+    display: "flex",
+    flexDirection: "column",
+    gap: "14px",
+  },
+  savedIconWrap: {
+    width: "52px",
+    height: "52px",
+    borderRadius: "14px",
+    backgroundColor: "#F3F4F6",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  savedTitle: {
+    margin: 0,
+    fontSize: "20px",
+    fontWeight: "700",
+    color: "#111827",
+  },
+  savedButton: {
+    backgroundColor: "#3DB87A",
+    color: "#FFFFFF",
+    border: "none",
+    borderRadius: "999px",
+    padding: "12px 0",
+    fontSize: "15px",
+    fontWeight: "600",
+    cursor: "pointer",
+    width: "100%",
   },
   recentTitle: {
     margin: "0 0 16px 0",
