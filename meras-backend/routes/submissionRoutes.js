@@ -13,7 +13,7 @@ const {
 const { protect } = require("../middleware/authMiddleware");
 const requireRole = require("../middleware/roleMiddleware");
 
-// MULTER SETUP 
+// ── MULTER SETUP ─────────────────────────────
 // Tells multer where to save uploaded files and what to name them
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

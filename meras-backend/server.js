@@ -25,8 +25,8 @@ app.use("/api/challenges", require("./routes/challengeRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/submissions", submissionRoutes);
 app.use("/uploads", express.static("uploads"));
-
-
+app.use("/api/sessions", require("./routes/sessionRoutes"));
+app.use("/api/admin", require("./routes/adminRoutes"));
 
 const PORT = process.env.PORT || 5000;
 
