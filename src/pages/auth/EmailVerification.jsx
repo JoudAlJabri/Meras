@@ -1,16 +1,29 @@
-import { Link } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import EmailConfirmation from '../../assets/Submissions/EmailSubmission.png';
-
-
+import { useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { apiResendVerification } from '../../api/auth'
+import EmailConfirmation from '../../assets/Submissions/EmailSubmission.png'
 
 function EmailVerification() {
-  const { currentUser } = useAuth()
+  const { state } = useLocation()
+  const email = state?.email || ''
 
-  const destination = currentUser?.role === 'guide'
-    ? '/waiting-room'
-    : "/explorer/compass-quiz";
+  const [resendStatus, setResendStatus] = useState('') // 'sent' | 'error' | ''
+  const [resendLoading, setResendLoading] = useState(false)
 
+  const handleResend = async () => {
+    if (!email || resendLoading) return
+    setResendLoading(true)
+    setResendStatus('')
+    try {
+      await apiResendVerification(email)
+      setResendStatus('sent')
+    } catch {
+      setResendStatus('error')
+    } finally {
+      setResendLoading(false)
+    }
+  }
+  
   return (
     <div
       style={{
@@ -61,7 +74,7 @@ function EmailVerification() {
           <p style={{ color: 'var(--meras-gray)', lineHeight: '1.6' }}>
             We sent a verification link to{' '}
             <span className="fw-semibold" style={{ color: 'var(--meras-text)' }}>
-              {currentUser?.email || 'your email address'}
+              {email || 'your email address'}
             </span>
             . Click the link in the email to verify your account.
           </p>
@@ -75,7 +88,7 @@ function EmailVerification() {
               'Open your email inbox',
               'Find the email from Meras',
               'Click the verification link',
-              'You\'ll be redirected back automatically'
+              "You'll be redirected to log in"
             ].map((text, index) => (
               <div
                 key={index}
@@ -106,7 +119,7 @@ function EmailVerification() {
           </div>
 
           <Link
-            to={destination}
+            to="/login"
             className="btn w-100 text-white fw-semibold py-2 mb-3"
             style={{
               backgroundColor: 'var(--meras-green)',
@@ -119,33 +132,29 @@ function EmailVerification() {
           </Link>
 
           {/* Resend */}
+          {resendStatus === 'sent' && (
+            <p style={{ fontSize: '13px', color: 'var(--meras-green)' }}>
+              Verification email resent! Check your inbox.
+            </p>
+          )}
+          {resendStatus === 'error' && (
+            <p style={{ fontSize: '13px', color: '#dc3545' }}>
+              Failed to resend. Please try again.
+            </p>
+          )}
           <p style={{ fontSize: '13px', color: 'var(--meras-gray)' }}>
             Didn't receive the email?{' '}
             <span
               style={{
                 color: 'var(--meras-green)',
                 fontWeight: '600',
-                cursor: 'pointer'
+                cursor: resendLoading ? 'default' : 'pointer',
+                opacity: resendLoading ? 0.6 : 1
               }}
-              onClick={() => alert('Verification email resent!')}
+              onClick={handleResend}
             >
-              Resend email
+              {resendLoading ? 'Sending...' : 'Resend email'}
             </span>
-          </p>
-
-          {/* Wrong email */}
-          <p style={{ fontSize: '13px', color: 'var(--meras-gray)' }}>
-            Wrong email?{' '}
-            <Link
-              to="/signup/guide"
-              style={{
-                color: 'var(--meras-green)',
-                fontWeight: '600',
-                textDecoration: 'none'
-              }}
-            >
-              Go back
-            </Link>
           </p>
 
         </div>

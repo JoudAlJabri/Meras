@@ -8,6 +8,7 @@ import LoginPage from './pages/auth/LoginPage'
 import SignUpExplorer from './pages/auth/SignUpExplorer'
 import SignUpGuide from './pages/auth/SignUpGuide'
 import EmailVerification from './pages/auth/EmailVerification'
+import EmailVerified from './pages/auth/EmailVerified'
 import GuideWaitingRoom from './pages/auth/GuideWaitingRoom'
 import ExplorerLayout from './layouts/ExplorerLayout'
 
@@ -55,6 +56,7 @@ function App() {
           <Route path="/signup/explorer" element={<SignUpExplorer />} />
           <Route path="/signup/guide" element={<SignUpGuide />} />
           <Route path="/verify-email" element={<EmailVerification />} />
+          <Route path="/email-verified/:token" element={<EmailVerified />} />
           <Route path="/waiting-room" element={<GuideWaitingRoom />} />
 
           {/* ── EXPLORER ROUTES ── */}

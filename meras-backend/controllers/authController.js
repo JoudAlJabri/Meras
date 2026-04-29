@@ -12,7 +12,7 @@ const generateToken = (user) => {
 };
 
 const generateVerificationEmail = (name, token) => {
-  const link = `http://localhost:5001/api/auth/verify-email/${token}`;
+  const link = `http://localhost:5173/email-verified/${token}`;
   return {
     subject: "Verify your Meras account",
     html: `
@@ -28,7 +28,8 @@ const generateVerificationEmail = (name, token) => {
 
 const register = async (req, res) => {
   try {
-    const { name, email, password, role, gender, grade, university, major, transcript } = req.body;
+    const { name, email, password, role, gender, grade, university, major } = req.body;
+    const transcript = req.file ? req.file.path : undefined;
 
     // Check shared required fields
     if (!name || !email || !password || !role) {

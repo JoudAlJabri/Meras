@@ -10,10 +10,10 @@ const {
   getSubmissionsByExplorer,
 } = require("../controllers/submissionController");
 
-const protect     = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authMiddleware");
 const requireRole = require("../middleware/roleMiddleware");
 
-// ── MULTER SETUP ─────────────────────────────
+// MULTER SETUP 
 // Tells multer where to save uploaded files and what to name them
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -26,7 +26,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB max
 
-// ── ROUTES ───────────────────────────────────
+// ROUTES 
 // POST /submissions — explorer submits work
 router.post(
   "/",
