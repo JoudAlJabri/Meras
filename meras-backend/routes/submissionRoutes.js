@@ -8,6 +8,7 @@ const {
   gradeSubmission,
   getSubmissionsByGuide,
   getSubmissionsByExplorer,
+  getSubmissionById,
 } = require("../controllers/submissionController");
 
 const protect  = require("../middleware/authMiddleware");
@@ -58,6 +59,13 @@ router.get(
   protect,
   requireRole("explorer", "admin"),
   getSubmissionsByExplorer
+);
+
+// Get a single submission by ID (must be last to avoid route conflicts with /guide and /explorer)
+router.get(
+  "/:id",
+  protect,
+  getSubmissionById
 );
 
 module.exports = router;
