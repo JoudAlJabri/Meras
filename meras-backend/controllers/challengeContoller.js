@@ -43,17 +43,24 @@ const getChallengeById = async (req, res) => {
 
 // GET /challenges/guide/:guideId
 // Guide only — their own published challenges
-
 const getChallengesByGuide = async (req, res) => {
   try {
-    const challenges = await Challenge.find({ mentorId: req.params.guideId }).sort({ createdAt: -1 });
-    res.status(200).json({ challenges });
+    if (req.user.id !== req.params.guideId) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    const challenges = await Challenge.find({ mentorId: req.params.guideId })
+      .sort({ createdAt: -1 });
+
+      res.status(200).json({
+        count: challenges.length,
+        challenges,
+      });
   } catch (err) {
     console.error("getChallengesByGuide error:", err.message);
     res.status(500).json({ message: "Server error" });
   }
 };
-
 // POST /challenges
 // Guide only — Task Wizard publish
 
