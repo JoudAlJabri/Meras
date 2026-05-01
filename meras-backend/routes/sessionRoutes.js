@@ -1,11 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const {
-  createSession,
-  getSessions,
-} = require("../controllers/sessionController");
+const protect = require("../middleware/authMiddleware");
+const requireRole = require("../middleware/roleMiddleware");
+const sessionController = require("../controllers/sessionController");
 
-router.post("/", createSession);
-router.get("/", getSessions);
+router.post(
+  "/",
+  protect,
+  requireRole("explorer"),
+  sessionController.createSession
+);
+
+router.get("/", sessionController.getSessions);
 
 module.exports = router;
