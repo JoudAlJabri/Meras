@@ -1,22 +1,21 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { mockMentors } from '../../data/mockData'
 import MentorCard from '../../components/MentorCard'
 import { useAuth } from '../../context/AuthContext'
 
 const CARDS_PER_PAGE = 8
-const majors = ['All', ...new Set(mockMentors.map(m => m.major))]
 
 function MentorDirectory({ profilePath = '/guide/profile' }) {
   const navigate = useNavigate()
   const { currentUser } = useAuth()
   const isGuide = currentUser?.role === 'guide'
+
+  const [mentors, setMentors] = useState([])
+  const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [selectedMajor, setSelectedMajor] = useState('All')
 
-  // isMobile so we can swap the filter bar from a single wide row to a
-  // stacked column, and reduce the excessive px-5 / 65px padding on phones.
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768)
@@ -24,8 +23,27 @@ function MentorDirectory({ profilePath = '/guide/profile' }) {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  const filtered = mockMentors.filter((mentor) => {
-    const matchesSearch = mentor.name.toLowerCase().includes(search.toLowerCase())
+  // Fetch mentors from real backend
+  useEffect(() => {
+    const fetchMentors = async () => {
+      try {
+        const res = await fetch('/api/users/mentors')
+        const data = await res.json()
+        setMentors(data.mentors || [])
+      } catch (error) {
+        console.error('Error fetching mentors:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchMentors()
+  }, [])
+
+  // Build majors list dynamically from real data
+  const majors = ['All', ...new Set(mentors.map(m => m.major).filter(Boolean))]
+
+  const filtered = mentors.filter((mentor) => {
+    const matchesSearch = mentor.name?.toLowerCase().includes(search.toLowerCase())
     const matchesMajor = selectedMajor === 'All' || mentor.major === selectedMajor
     return matchesSearch && matchesMajor
   })
@@ -85,10 +103,7 @@ function MentorDirectory({ profilePath = '/guide/profile' }) {
         </div>
       </section>
 
-      {/* Filter bar
-          On desktop: one wide row with search on the left, major+pagination on the right.
-          On mobile: stack them vertically and use container padding instead of the
-          hardcoded 65px which overflows on narrow screens. */}
+      {/* Filter bar */}
       <div
         className="d-flex gap-3"
         style={{
@@ -98,7 +113,6 @@ function MentorDirectory({ profilePath = '/guide/profile' }) {
           justifyContent: 'space-between',
         }}
       >
-        {/* Search */}
         <div className="d-flex align-items-center gap-2" style={{ flexWrap: 'wrap' }}>
           <label style={{ fontSize: '14px', color: 'var(--meras-text)', fontWeight: '500', whiteSpace: 'nowrap' }}>
             Search by Mentor Name
@@ -120,7 +134,6 @@ function MentorDirectory({ profilePath = '/guide/profile' }) {
           />
         </div>
 
-        {/* Major filter + pagination */}
         <div className="d-flex align-items-center gap-2" style={{ flexWrap: 'wrap' }}>
           <label style={{ fontSize: '14px', color: 'var(--meras-text)', fontWeight: '500' }}>Major</label>
           <select
@@ -145,22 +158,22 @@ function MentorDirectory({ profilePath = '/guide/profile' }) {
         </div>
       </div>
 
-      {/* Cards grid
-          px-5 (3rem) is too much on phones — use px-3 on mobile.
-          col-12 added so cards go full-width below the md breakpoint. */}
+      {/* Cards grid */}
       <div className={`container-fluid ${isMobile ? 'px-3' : 'px-5'} pb-5`}>
-        {visible.length > 0 ? (
+        {loading ? (
+          <p style={{ color: 'var(--meras-gray)', marginTop: '24px' }}>Loading mentors...</p>
+        ) : visible.length > 0 ? (
           <div className="row g-4">
             {visible.map((mentor) => (
-              <div key={mentor.id} className="col-12 col-md-6 col-lg-4">
+              <div key={mentor._id} className="col-12 col-md-6 col-lg-4">
                 <MentorCard
                   name={mentor.name}
                   major={mentor.major}
                   university={mentor.university}
                   rating={mentor.rating}
                   totalSessions={mentor.totalSessions}
-                  tags={mentor.tags ?? []}
-                  onViewProfile={() => navigate(profilePath, { state: mentor })}
+                  tags={mentor.skills ?? []}
+                  onViewProfile={() => navigate(`/guide/profile/${mentor._id}`)}
                 />
               </div>
             ))}
