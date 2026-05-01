@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Announcement = require("../models/Announcement");
 
 // GET /api/admin/pending-guides
 exports.getPendingGuides = async (req, res) => {
@@ -142,6 +143,61 @@ exports.deleteUser = async (req, res) => {
     res.status(200).json({ message: `${user.name} has been deleted` });
   } catch (err) {
     console.error("deleteUser error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// GET /api/admin/announcements
+exports.getAnnouncements = async (req, res) => {
+  try {
+    const announcements = await Announcement.find()
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({ announcements });
+  } catch (err) {
+    console.error("getAnnouncements error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// POST /api/admin/announcements
+exports.createAnnouncement = async (req, res) => {
+  try {
+    const { title, message, targetAudience } = req.body;
+
+    if (!title || !message) {
+      return res.status(400).json({ message: "Title and message are required" });
+    }
+
+    const announcement = await Announcement.create({
+      title,
+      message,
+      targetAudience: targetAudience || "All",
+      status: "Published",
+      createdBy: req.user.id,
+    });
+
+    res.status(201).json({ announcement });
+  } catch (err) {
+    console.error("createAnnouncement error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// DELETE /api/admin/announcements/:id
+exports.deleteAnnouncement = async (req, res) => {
+  try {
+    const announcement = await Announcement.findById(req.params.id);
+
+    if (!announcement) {
+      return res.status(404).json({ message: "Announcement not found" });
+    }
+
+    await announcement.deleteOne();
+
+    res.status(200).json({ message: "Announcement deleted" });
+  } catch (err) {
+    console.error("deleteAnnouncement error:", err.message);
     res.status(500).json({ message: "Server error" });
   }
 };

@@ -16,4 +16,9 @@ router.get("/users/:id", protect, requireRole("admin"), adminController.getUserB
 router.patch("/users/:id/suspend", protect, requireRole("admin"), adminController.suspendUser);
 router.delete("/users/:id", protect, requireRole("admin"), adminController.deleteUser);
 
+// announcement routes
+router.get("/announcements",      protect, requireRole("admin"), adminController.getAnnouncements);
+router.post("/announcements",     protect, requireRole("admin"), adminController.createAnnouncement);
+router.delete("/announcements/:id", protect, requireRole("admin"), adminController.deleteAnnouncement);
+
 module.exports = router;
