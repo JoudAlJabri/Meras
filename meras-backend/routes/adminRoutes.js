@@ -21,4 +21,8 @@ router.get("/announcements",      protect, requireRole("admin"), adminController
 router.post("/announcements",     protect, requireRole("admin"), adminController.createAnnouncement);
 router.delete("/announcements/:id", protect, requireRole("admin"), adminController.deleteAnnouncement);
 
+// flagged content routes
+router.get("/flagged-content",              protect, requireRole("admin"), adminController.getFlaggedContent);
+router.patch("/flagged-content/:id/dismiss", protect, requireRole("admin"), adminController.dismissFlag);
+router.patch("/flagged-content/:id/remove",  protect, requireRole("admin"), adminController.removeContent);
 module.exports = router;

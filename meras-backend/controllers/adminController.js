@@ -1,6 +1,6 @@
 const User = require("../models/User");
 const Announcement = require("../models/Announcement");
-
+const FlaggedContent = require("../models/FlaggedContent");
 // GET /api/admin/pending-guides
 exports.getPendingGuides = async (req, res) => {
   try {
@@ -198,6 +198,65 @@ exports.deleteAnnouncement = async (req, res) => {
     res.status(200).json({ message: "Announcement deleted" });
   } catch (err) {
     console.error("deleteAnnouncement error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// GET /api/admin/flagged-content
+exports.getFlaggedContent = async (req, res) => {
+  try {
+    const flaggedItems = await FlaggedContent.find()
+      .populate("reportedBy", "name email")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({ flaggedItems });
+  } catch (err) {
+    console.error("getFlaggedContent error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// PATCH /api/admin/flagged-content/:id/dismiss
+exports.dismissFlag = async (req, res) => {
+  try {
+    const item = await FlaggedContent.findById(req.params.id);
+
+    if (!item) {
+      return res.status(404).json({ message: "Flagged content not found" });
+    }
+
+    item.status = "Dismissed";
+    await item.save();
+
+    res.status(200).json({ message: "Flag dismissed", item });
+  } catch (err) {
+    console.error("dismissFlag error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// PATCH /api/admin/flagged-content/:id/remove
+exports.removeContent = async (req, res) => {
+  try {
+    const { removalAuditReason } = req.body;
+
+    if (!removalAuditReason || !removalAuditReason.trim()) {
+      return res.status(400).json({ message: "Removal reason is required for audit purposes" });
+    }
+
+    const item = await FlaggedContent.findById(req.params.id);
+
+    if (!item) {
+      return res.status(404).json({ message: "Flagged content not found" });
+    }
+
+    item.status = "Deleted";
+    item.removalAuditReason = removalAuditReason.trim();
+    await item.save();
+
+    res.status(200).json({ message: "Content removed and warning notification sent to the user", item });
+  } catch (err) {
+    console.error("removeContent error:", err.message);
     res.status(500).json({ message: "Server error" });
   }
 };
