@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const protect = require("../middleware/authMiddleware");
 const requireRole = require("../middleware/roleMiddleware");
+
 const {
   getChallenges,
   getChallengeById,
@@ -12,14 +13,13 @@ const {
   completeChallenge,
   saveChallenge,
   unsaveChallenge,
-} = require("../controllers/challengeContoller");
+} = require("../controllers/challengeController");
 
 // Public
 router.get("/", getChallenges);
 
 // /guide/:guideId must be before /:id to avoid conflict
 router.get("/guide/:guideId", protect, requireRole("guide"), getChallengesByGuide);
-
 router.get("/:id", getChallengeById);
 
 // Guide only — create

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ReactSketchCanvas } from 'react-sketch-canvas'
-import { mockChallenges } from '../../../data/mockData'
+
 
 
 // available submission modes
@@ -13,14 +13,32 @@ const MODES = {
 
 function TaskWorkspace() {
   const navigate = useNavigate()
-  const { index } = useParams()
-  const challenge = mockChallenges[parseInt(index)] ?? null
+const { id } = useParams()  // change index → id
+const [challenge, setChallenge] = useState(null)
+
+useEffect(() => {
+  const fetchChallenge = async () => {
+    try {
+      const res = await fetch(`/api/challenges/${id}`)
+      const data = await res.json()
+      setChallenge(data.challenge)
+    } catch (error) {
+      console.error("Error fetching challenge:", error)
+    }
+  }
+  fetchChallenge()
+}, [id])
   const canvasRef = useRef(null)
 
   // STATES
 
   // timer states
-  const [timeLeft, setTimeLeft] = useState((challenge?.timeEstimate ?? 0) * 60)
+  const [timeLeft, setTimeLeft] = useState(0)
+  useEffect(() => {
+  if (challenge?.timeEstimate) {
+    setTimeLeft(challenge.timeEstimate * 60)
+  }
+}, [challenge])
   const [timerRunning, setTimerRunning] = useState(true)
   const [timerWarning, setTimerWarning] = useState(false)
 

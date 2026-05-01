@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { apiGetChallengeById } from '../../../api/challenges'
 import puzzleImg from '../../../assets/General-Graphics/2PersonPuzzle.png'
@@ -45,7 +46,10 @@ const fallbackImages = [puzzleImg]
 
 function ChallengeDetail() {
   const { id } = useParams()
+  const { id } = useParams()
   const navigate = useNavigate()
+
+  const [challenge, setChallenge] = useState(null)
   const [saved, setSaved] = useState(false)
   const [challenge, setChallenge] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -105,6 +109,7 @@ function ChallengeDetail() {
 }
 
 
+  const heroColor = majorCardColors[challenge.major?.toLowerCase()] || 'var(--meras-green)'
   const heroColor = majorCardColors[challenge.major?.toLowerCase()] || 'var(--meras-green)'
 
   // Difficulty dots
@@ -296,6 +301,7 @@ function ChallengeDetail() {
                 <button
                   className="btn ms-auto fw-semibold px-4 py-2"
                   onClick={() => navigate(`/explorer/workspace/${id}`)}
+                  onClick={() => navigate(`/explorer/workspace/${id}`)}
                   style={{
                     backgroundColor: 'white',
                     color: heroColor,
@@ -351,7 +357,7 @@ function ChallengeDetail() {
                 </h4>
                 <div className="d-flex flex-column gap-3">
                   {(challenge.whatYouWillDo ?? []).map((item, index) => (
-                    <div key={index} className="d-flex align-items-start gap-3">
+                    <div key={id} className="d-flex align-items-start gap-3">
                       <div
                         className="d-flex align-items-center justify-content-center flex-shrink-0 fw-bold"
                         style={{
@@ -380,8 +386,8 @@ function ChallengeDetail() {
                   What you'll need
                 </h4>
                 <div className="d-flex flex-column gap-3">
-                  {(challenge.whatYouWillNeed ?? []).map((item, index) => (
-                    <div key={index} className="d-flex align-items-start gap-3">
+                  {(challenge.whatYouWillNeed ?? []).map((item, id) => (
+                    <div key={id} className="d-flex align-items-start gap-3">
                       <span style={{ color: heroColor, fontSize: '18px', marginTop: '2px' }}>→</span>
                       <p style={{ color: 'var(--meras-text)', fontSize: '15px', margin: 0, lineHeight: '1.6' }}>
                         {item}
@@ -397,8 +403,8 @@ function ChallengeDetail() {
                   What you'll learn
                 </h4>
                 <div className="d-flex flex-column gap-3">
-                  {(challenge.whatYouWillLearn ?? []).map((item, index) => (
-                    <div key={index} className="d-flex align-items-start gap-3">
+                  {(challenge.whatYouWillLearn ?? []).map((item, id) => (
+                    <div key={id} className="d-flex align-items-start gap-3">
                       <div
                         className="d-flex align-items-center justify-content-center flex-shrink-0"
                         style={{
@@ -426,9 +432,9 @@ function ChallengeDetail() {
                     Helpful Resources
                   </h4>
                   <div className="d-flex flex-column gap-2">
-                    {challenge.referenceLinks.map((link, index) => (
+                    {challenge.referenceLinks.map((link, id) => (
                       <a
-                        key={index}
+                        key={id}
                         href={link.url}
                         target="_blank"
                         rel="noreferrer"
@@ -565,6 +571,7 @@ function ChallengeDetail() {
                   <button
                     className="btn w-100 fw-semibold py-2 mb-2 text-white"
                     onClick={() => navigate(`/explorer/workspace/${id}`)}
+                    onClick={() => navigate(`/explorer/workspace/${id}`)}
                     style={{
                       backgroundColor: heroColor,
                       border: 'none',
@@ -665,6 +672,7 @@ function ChallengeDetail() {
               </button>
               <button
                 className="btn fw-semibold px-5 text-white"
+                onClick={() => navigate(`/explorer/workspace/${id}`)}
                 onClick={() => navigate(`/explorer/workspace/${id}`)}
                 style={{
                   backgroundColor: heroColor,
