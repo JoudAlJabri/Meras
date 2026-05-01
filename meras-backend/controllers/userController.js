@@ -196,4 +196,47 @@ const getDashboard = async (req, res) => {
   }
 };
 
-module.exports = { saveQuizResults, getSavedChallenges, updateExplorerSettings, updateGuideSettings, getDashboard };
+// PATCH /users/me/availability — guide replaces their full availability array
+const updateAvailability = async (req, res) => {
+  try {
+    const { availability } = req.body;
+
+    if (!Array.isArray(availability)) {
+      return res.status(400).json({ message: "availability must be an array" });
+    }
+
+    for (const entry of availability) {
+      if (!entry.date || !Array.isArray(entry.slots)) {
+        return res.status(400).json({ message: "Each entry must have a date and slots array" });
+      }
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { availability },
+      { new: true }
+    ).select("availability");
+
+    res.status(200).json({ availability: user.availability });
+  } catch (err) {
+    console.error("updateAvailability error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// GET /users/:id/availability — public, returns a guide's available slots
+const getAvailability = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("availability role");
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (user.role !== "guide") return res.status(400).json({ message: "User is not a guide" });
+
+    res.status(200).json({ availability: user.availability });
+  } catch (err) {
+    console.error("getAvailability error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { saveQuizResults, getSavedChallenges, updateExplorerSettings, updateGuideSettings, getDashboard, updateAvailability, getAvailability };
