@@ -3,6 +3,7 @@ const Announcement = require("../models/Announcement");
 const FlaggedContent = require("../models/FlaggedContent");
 const Challenge = require("../models/Challenge");
 const Session = require("../models/Session");
+const Taxonomy = require("../models/Taxonomy");
 
 // GET /api/admin/pending-guides
 exports.getPendingGuides = async (req, res) => {
@@ -327,6 +328,145 @@ exports.getDashboardStats = async (req, res) => {
     });
   } catch (err) {
     console.error("getDashboardStats error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// helper — get or create the single taxonomy document
+const getTaxonomyDoc = async () => {
+  let taxonomy = await Taxonomy.findOne();
+  if (!taxonomy) {
+    taxonomy = await Taxonomy.create({ universities: [], majors: [] });
+  }
+  return taxonomy;
+};
+
+// GET /api/admin/taxonomy
+exports.getTaxonomy = async (req, res) => {
+  try {
+    const taxonomy = await getTaxonomyDoc();
+    res.status(200).json({
+      universities: taxonomy.universities,
+      majors: taxonomy.majors,
+    });
+  } catch (err) {
+    console.error("getTaxonomy error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// POST /api/admin/taxonomy/universities
+exports.addUniversity = async (req, res) => {
+  try {
+    const { name } = req.body;
+
+    if (!name || !name.trim()) {
+      return res.status(400).json({ message: "University name is required" });
+    }
+
+    const taxonomy = await getTaxonomyDoc();
+
+    const already = taxonomy.universities.some(
+      (u) => u.toLowerCase() === name.trim().toLowerCase()
+    );
+    if (already) {
+      return res.status(400).json({ message: "University already exists" });
+    }
+
+    taxonomy.universities.push(name.trim());
+    await taxonomy.save();
+
+    res.status(201).json({
+      message: `${name.trim()} has been added`,
+      universities: taxonomy.universities,
+    });
+  } catch (err) {
+    console.error("addUniversity error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// DELETE /api/admin/taxonomy/universities/:name
+exports.deleteUniversity = async (req, res) => {
+  try {
+    const name = decodeURIComponent(req.params.name);
+    const taxonomy = await getTaxonomyDoc();
+
+    const before = taxonomy.universities.length;
+    taxonomy.universities = taxonomy.universities.filter(
+      (u) => u.toLowerCase() !== name.toLowerCase()
+    );
+
+    if (taxonomy.universities.length === before) {
+      return res.status(404).json({ message: "University not found" });
+    }
+
+    await taxonomy.save();
+
+    res.status(200).json({
+      message: `${name} has been deleted`,
+      universities: taxonomy.universities,
+    });
+  } catch (err) {
+    console.error("deleteUniversity error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// POST /api/admin/taxonomy/majors
+exports.addMajor = async (req, res) => {
+  try {
+    const { name } = req.body;
+
+    if (!name || !name.trim()) {
+      return res.status(400).json({ message: "Major name is required" });
+    }
+
+    const taxonomy = await getTaxonomyDoc();
+
+    const already = taxonomy.majors.some(
+      (m) => m.toLowerCase() === name.trim().toLowerCase()
+    );
+    if (already) {
+      return res.status(400).json({ message: "This major already exists in the database" });
+    }
+
+    taxonomy.majors.push(name.trim());
+    await taxonomy.save();
+
+    res.status(201).json({
+      message: "New major added to system catalog",
+      majors: taxonomy.majors,
+    });
+  } catch (err) {
+    console.error("addMajor error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// DELETE /api/admin/taxonomy/majors/:name
+exports.deleteMajor = async (req, res) => {
+  try {
+    const name = decodeURIComponent(req.params.name);
+    const taxonomy = await getTaxonomyDoc();
+
+    const before = taxonomy.majors.length;
+    taxonomy.majors = taxonomy.majors.filter(
+      (m) => m.toLowerCase() !== name.toLowerCase()
+    );
+
+    if (taxonomy.majors.length === before) {
+      return res.status(404).json({ message: "Major not found" });
+    }
+
+    await taxonomy.save();
+
+    res.status(200).json({
+      message: `${name} has been deleted`,
+      majors: taxonomy.majors,
+    });
+  } catch (err) {
+    console.error("deleteMajor error:", err.message);
     res.status(500).json({ message: "Server error" });
   }
 };

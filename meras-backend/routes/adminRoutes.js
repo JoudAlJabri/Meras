@@ -28,3 +28,10 @@ router.get("/flagged-content",              protect, requireRole("admin"), admin
 router.patch("/flagged-content/:id/dismiss", protect, requireRole("admin"), adminController.dismissFlag);
 router.patch("/flagged-content/:id/remove",  protect, requireRole("admin"), adminController.removeContent);
 module.exports = router;
+
+// taxonomy routes
+router.get("/taxonomy",                          protect, requireRole("admin"), adminController.getTaxonomy);
+router.post("/taxonomy/universities",            protect, requireRole("admin"), adminController.addUniversity);
+router.delete("/taxonomy/universities/:name",    protect, requireRole("admin"), adminController.deleteUniversity);
+router.post("/taxonomy/majors",                  protect, requireRole("admin"), adminController.addMajor);
+router.delete("/taxonomy/majors/:name",          protect, requireRole("admin"), adminController.deleteMajor);
