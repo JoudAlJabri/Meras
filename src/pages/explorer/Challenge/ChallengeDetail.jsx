@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
-//import ExplorerLayout from '../../../layouts/ExplorerLayout'
+import { apiGetChallengeById } from '../../../api/challenges'
 import puzzleImg from '../../../assets/General-Graphics/2PersonPuzzle.png'
 import swe  from '../../../assets/Tech-Graphics/Software-Engineering.png'
 import cs   from '../../../assets/Tech-Graphics/Computer-Science.png'
@@ -49,40 +49,29 @@ function ChallengeDetail() {
 
   const [challenge, setChallenge] = useState(null)
   const [saved, setSaved] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-  const fetchChallenge = async () => {
-    try {
-      const res = await fetch(`/api/challenges/${id}`)
-      const data = await res.json()
-      setChallenge(data.challenge)
-    } catch (error) {
-      console.error("Error fetching challenge:", error)
-    }
+    apiGetChallengeById(id)
+      .then(data => setChallenge(data.challenge))
+      .catch(err => console.error('Failed to load challenge:', err.message))
+      .finally(() => setLoading(false))
+  }, [id])
+
+  const mentor = null
+
+  if (loading) {
+    return <div className="text-center py-5" style={{ color: 'var(--meras-gray)' }}>Loading...</div>
   }
 
-  fetchChallenge()
-}, [id])
-
-  // Find the mentor
-  const mentor = null // temporary until mentors are linked
-
-  if (challenge === null) {
-  return (
-    <div className="text-center py-5">
-      <h3>Loading...</h3>
-    </div>
-  )
-}
-
-if (challenge.message) {
-  return (
-    <div className="text-center py-5">
-      <h3>Challenge not found</h3>
-      <Link to="/explorer/challenges">Back to Catalog</Link>
-    </div>
-  )
-}
+  if (!challenge) {
+    return (
+      <div className="text-center py-5">
+        <h3>Challenge not found</h3>
+        <Link to="/explorer/challengeCatalog">Back to Catalog</Link>
+      </div>
+    )
+  }
 
   // Color per major
   const majorCardColors = {
@@ -230,7 +219,7 @@ if (challenge.message) {
 
               {/* Created by */}
               <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', marginBottom: '1.5rem' }}>
-                Created by Rana Abdullah 
+                Created by {challenge.mentorName}
                 </p>
                { /* <span
                   style={{ color: 'white', fontWeight: '600', cursor: 'pointer', textDecoration: 'underline' }}
@@ -307,6 +296,7 @@ if (challenge.message) {
                 {/* Start button in hero */}
                 <button
                   className="btn ms-auto fw-semibold px-4 py-2"
+                  onClick={() => navigate(`/explorer/workspace/${id}`)}
                   onClick={() => navigate(`/explorer/workspace/${id}`)}
                   style={{
                     backgroundColor: 'white',
@@ -577,6 +567,7 @@ if (challenge.message) {
                   <button
                     className="btn w-100 fw-semibold py-2 mb-2 text-white"
                     onClick={() => navigate(`/explorer/workspace/${id}`)}
+                    onClick={() => navigate(`/explorer/workspace/${id}`)}
                     style={{
                       backgroundColor: heroColor,
                       border: 'none',
@@ -677,6 +668,7 @@ if (challenge.message) {
               </button>
               <button
                 className="btn fw-semibold px-5 text-white"
+                onClick={() => navigate(`/explorer/workspace/${id}`)}
                 onClick={() => navigate(`/explorer/workspace/${id}`)}
                 style={{
                   backgroundColor: heroColor,
