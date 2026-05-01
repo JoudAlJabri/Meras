@@ -1,6 +1,5 @@
-import { useMemo } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { mockChallenges } from '../../data/mockData'
+import { useMemo, useState, useEffect } from 'react'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import puzzleImg from '../../assets/General-Graphics/2PersonPuzzle.png'
 import swe  from '../../assets/Tech-Graphics/Software-Engineering.png'
 import cs   from '../../assets/Tech-Graphics/Computer-Science.png'
@@ -75,20 +74,43 @@ const tagFill = {
 
 function MentorProfile({ bookingPath = '/guide/booking' }) {
   const navigate = useNavigate()
-  const { state: mentor } = useLocation()
+  const { state: mentorFromState } = useLocation()
+  const { id } = useParams()
 
-  const majorKey   = mentor?.major?.toLowerCase()
-  const cardColor  = majorCardColors[majorKey] ?? 'var(--meras-green)'
-  const textColor  = onColor[cardColor] ?? '#ffffff'
-  const illustration = useMemo(() => majorImages[majorKey] ?? puzzleImg, [majorKey])
-  const tagFillColor  = tagFill[cardColor] ?? '#E8F5EF'
+  const [mentor, setMentor] = useState(mentorFromState || null)
+  const [challenges, setChallenges] = useState([])
+  const [loading, setLoading] = useState(!mentorFromState)
+
+  // If we navigated directly (no state), fetch mentor from backend
+  useEffect(() => {
+    const mentorId = id || mentorFromState?._id
+    if (!mentorId) return
+
+    const fetchMentor = async () => {
+      try {
+        const res = await fetch(`/api/users/mentors/${mentorId}`)
+        const data = await res.json()
+        if (data.mentor) setMentor(data.mentor)
+        if (data.challenges) setChallenges(data.challenges)
+      } catch (err) {
+        console.error('Error fetching mentor:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchMentor()
+  }, [id, mentorFromState?._id])
+
+  if (loading) return <p className="page-container">Loading...</p>
+  if (!mentor)  return <p className="page-container">No mentor data found.</p>
+
+  const majorKey     = mentor?.major?.toLowerCase()
+  const cardColor    = majorCardColors[majorKey] ?? 'var(--meras-green)'
+  const textColor    = onColor[cardColor] ?? '#ffffff'
+  const illustration = majorImages[majorKey] ?? puzzleImg
+  const tagFillColor   = tagFill[cardColor] ?? '#E8F5EF'
   const tagBorderColor = cardColor === 'var(--meras-black)' ? 'var(--meras-yellow)' : cardColor
-
-  if (!mentor) {
-    return <p className="page-container">No mentor data found.</p>
-  }
-
-  const mentorChallenges = mockChallenges.filter((c) => c.mentorId === mentor.id)
 
   return (
     <div className="mp-shell">
@@ -102,7 +124,7 @@ function MentorProfile({ bookingPath = '/guide/booking' }) {
 
       <div className="mp-cards">
 
-        {/* Header Card*/}
+        {/* Header Card */}
         <div className="mp-card">
           <div className="mp-name-row">
             <span className="mp-name">{mentor.name}</span>
@@ -117,18 +139,18 @@ function MentorProfile({ bookingPath = '/guide/booking' }) {
           </div>
         </div>
 
-        {/* About mentor*/}
+        {/* About */}
         <div className="mp-card">
           <h3 className="mp-section-title">About</h3>
-          <p className="mp-bio">{mentor.bio ?? 'No bio provided yet.'}</p>
+          <p className="mp-bio">{mentor.about ?? mentor.bio ?? 'No bio provided yet.'}</p>
         </div>
 
-        {/* ── TAGS ── */}
-        {(mentor.tags ?? []).length > 0 && (
+        {/* Skills */}
+        {(mentor.skills ?? []).length > 0 && (
           <div className="mp-card">
             <h3 className="mp-section-title">Skills &amp; Topics</h3>
             <div className="mp-skills-row">
-              {mentor.tags.map((tag) => (
+              {mentor.skills.map((tag) => (
                 <span
                   key={tag}
                   className="mp-skill-pill"
@@ -144,13 +166,13 @@ function MentorProfile({ bookingPath = '/guide/booking' }) {
           </div>
         )}
 
-        {/* ── new chnanges by joud ── */}
+        {/* Published Challenges — real data */}
         <div className="mp-card">
           <h3 className="mp-section-title">Published Challenges</h3>
-          {mentorChallenges.length === 0 ? (
+          {challenges.length === 0 ? (
             <p className="mp-empty">No challenges published yet.</p>
           ) : (
-            mentorChallenges.map((c, i) => {
+            challenges.map((c, i) => {
               const chKey   = c.major?.toLowerCase()
               const chColor = majorCardColors[chKey] ?? 'var(--meras-green)'
               const chImg   = majorImages[chKey] ?? puzzleImg
@@ -170,7 +192,7 @@ function MentorProfile({ bookingPath = '/guide/booking' }) {
           )}
         </div>
 
-        {/* ── REVIEWS ── */}
+        {/* Reviews */}
         <div className="mp-card">
           <h3 className="mp-section-title">Reviews</h3>
           <div className="mp-reviews-list">
@@ -187,7 +209,7 @@ function MentorProfile({ bookingPath = '/guide/booking' }) {
           </div>
         </div>
 
-        {/* ── CTA ── */}
+        {/* CTA */}
         <button
           className="mp-avail-btn"
           style={{ backgroundColor: cardColor, color: textColor }}

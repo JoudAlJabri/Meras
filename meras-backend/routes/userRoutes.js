@@ -4,7 +4,17 @@ const path = require("path");
 const router = express.Router();
 const protect = require("../middleware/authMiddleware");
 const requireRole = require("../middleware/roleMiddleware");
-const { saveQuizResults, getSavedChallenges, updateExplorerSettings, updateGuideSettings, getDashboard } = require("../controllers/userController");
+
+const {
+  saveQuizResults,
+  getSavedChallenges,
+  updateExplorerSettings,
+  updateGuideSettings,
+  getDashboard,
+  getMentors,
+  getMentorById,
+  updateAvailability,
+} = require("../controllers/userController");
 
 const profileStorage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "uploads/profiles/"),
@@ -20,19 +30,28 @@ const uploadProfileImage = multer({
   },
 });
 
-// POST /users/:id/quiz-results — explorer saves their compass quiz results
+// POST /api/users/:id/quiz-results — explorer saves compass quiz results
 router.post("/:id/quiz-results", protect, requireRole("explorer"), saveQuizResults);
 
-// GET /users/me/saved-challenges — explorer fetches their saved challenges
+// GET /api/users/me/saved-challenges — explorer fetches their saved challenges
 router.get("/me/saved-challenges", protect, requireRole("explorer"), getSavedChallenges);
 
-// PATCH /users/me/settings — explorer updates their profile settings
+// PATCH /api/users/me/settings — explorer updates their profile
 router.patch("/me/settings", protect, requireRole("explorer"), uploadProfileImage.single("profileImage"), updateExplorerSettings);
 
-// PATCH /users/me/guide-settings — guide updates their profile settings
+// PATCH /api/users/me/guide-settings — guide updates their profile
 router.patch("/me/guide-settings", protect, requireRole("guide"), uploadProfileImage.single("profileImage"), updateGuideSettings);
 
-// GET /users/me/dashboard — explorer dashboard summary
+// GET /api/users/me/dashboard — explorer dashboard summary
 router.get("/me/dashboard", protect, requireRole("explorer"), getDashboard);
+
+// GET /api/mentors — public, all approved guides with ?major= and ?university= filters
+router.get("/mentors", getMentors);
+
+// GET /api/mentors/:id — public, single mentor profile + their challenges
+router.get("/mentors/:id", getMentorById);
+
+// PUT /api/users/:id/availability — guide saves their weekly availability
+router.put("/:id/availability", protect, requireRole("guide"), updateAvailability);
 
 module.exports = router;

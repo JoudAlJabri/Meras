@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Session = require("../models/Session");
+const Challenge = require("../models/Challenge");
 
 // POST /users/:id/quiz-results
 // Explorer only — save Compass Quiz results
@@ -12,7 +13,6 @@ const saveQuizResults = async (req, res) => {
       return res.status(400).json({ message: "recommendedMajors must be an array" });
     }
 
-    // Explorer can only update their own quiz results
     if (req.params.id !== req.user.id.toString()) {
       return res.status(403).json({ message: "Not authorized" });
     }
@@ -50,7 +50,6 @@ const updateExplorerSettings = async (req, res) => {
 
     const { firstName, lastName, grade, currentPassword, newPassword } = req.body;
 
-    // Name update — split existing name to fill missing half
     if (firstName || lastName) {
       const [existingFirst = "", existingLast = ""] = user.name.split(" ");
       const updatedFirst = firstName?.trim() || existingFirst;
@@ -58,7 +57,6 @@ const updateExplorerSettings = async (req, res) => {
       user.name = `${updatedFirst} ${updatedLast}`.trim();
     }
 
-    // Grade update
     if (grade) {
       const validGrades = ["Grade 10", "Grade 11", "Grade 12"];
       if (!validGrades.includes(grade)) {
@@ -67,7 +65,6 @@ const updateExplorerSettings = async (req, res) => {
       user.grade = grade;
     }
 
-    // Password update — requires current password verification
     if (newPassword) {
       if (!currentPassword) {
         return res.status(400).json({ message: "Current password is required to set a new password" });
@@ -76,10 +73,9 @@ const updateExplorerSettings = async (req, res) => {
       if (!isMatch) {
         return res.status(401).json({ message: "Current password is incorrect" });
       }
-      user.password = newPassword; // pre-save hook will hash it
+      user.password = newPassword;
     }
 
-    // Profile image update
     if (req.file) {
       user.profilePhoto = req.file.path;
     }
@@ -157,7 +153,6 @@ const getDashboard = async (req, res) => {
 
     const firstName = user.name.split(" ")[0];
 
-    // Build recent activity from last completed challenge + last booked session
     const recentActivity = [];
 
     if (user.completedChallenges.length > 0) {
@@ -196,4 +191,85 @@ const getDashboard = async (req, res) => {
   }
 };
 
-module.exports = { saveQuizResults, getSavedChallenges, updateExplorerSettings, updateGuideSettings, getDashboard };
+// GET /api/mentors
+// Public — all approved guides with optional ?major= and ?university= filters
+const getMentors = async (req, res) => {
+  try {
+    const filter = { role: "guide", guideStatus: "approved" };
+
+    if (req.query.major)      filter.major      = req.query.major;
+    if (req.query.university) filter.university = req.query.university;
+
+    const mentors = await User.find(filter)
+      .select("-password")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({ mentors });
+  } catch (err) {
+    console.error("getMentors error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// GET /api/mentors/:id
+// Public — single mentor profile with their published challenges
+const getMentorById = async (req, res) => {
+  try {
+    const mentor = await User.findOne({
+      _id: req.params.id,
+      role: "guide",
+      status: "active",
+      guideStatus: "approved",
+    }).select("-password");
+
+    if (!mentor) {
+      return res.status(404).json({ message: "Mentor not found" });
+    }
+
+    const challenges = await Challenge.find({ mentorId: req.params.id })
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({ mentor, challenges });
+  } catch (err) {
+    console.error("getMentorById error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// PUT /api/users/:id/availability
+// Guide only — save weekly slot schedule
+const updateAvailability = async (req, res) => {
+  try {
+    const { availability } = req.body;
+
+    if (!availability || !Array.isArray(availability)) {
+      return res.status(400).json({ message: "availability must be an array" });
+    }
+
+    if (req.params.id !== req.user.id.toString()) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { availability },
+      { new: true }
+    ).select("-password");
+
+    res.status(200).json({ user });
+  } catch (err) {
+    console.error("updateAvailability error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = {
+  saveQuizResults,
+  getSavedChallenges,
+  updateExplorerSettings,
+  updateGuideSettings,
+  getDashboard,
+  getMentors,
+  getMentorById,
+  updateAvailability,
+};
