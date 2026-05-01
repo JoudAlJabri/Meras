@@ -4,6 +4,7 @@ const FlaggedContent = require("../models/FlaggedContent");
 const Challenge = require("../models/Challenge");
 const Session = require("../models/Session");
 const Taxonomy = require("../models/Taxonomy");
+const OfficeHours = require("../models/OfficeHours");
 
 // GET /api/admin/pending-guides
 exports.getPendingGuides = async (req, res) => {
@@ -467,6 +468,58 @@ exports.deleteMajor = async (req, res) => {
     });
   } catch (err) {
     console.error("deleteMajor error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// GET /api/admin/office-hours
+exports.getOfficeHours = async (req, res) => {
+  try {
+    let officeHours = await OfficeHours.findOne();
+
+    // if nothing saved yet return empty slots
+    if (!officeHours) {
+      return res.status(200).json({ slots: [] });
+    }
+
+    res.status(200).json({ slots: officeHours.slots });
+  } catch (err) {
+    console.error("getOfficeHours error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// POST /api/admin/office-hours
+exports.saveOfficeHours = async (req, res) => {
+  try {
+    const { slots } = req.body;
+
+    if (!slots || !Array.isArray(slots)) {
+      return res.status(400).json({ message: "Slots array is required" });
+    }
+
+    const selectedCount = slots.filter((s) => s.available).length;
+
+    if (selectedCount === 0) {
+      return res.status(400).json({ message: "Please select at least one available slot before saving" });
+    }
+
+    // replace the whole document each time
+    let officeHours = await OfficeHours.findOne();
+
+    if (officeHours) {
+      officeHours.slots = slots;
+      await officeHours.save();
+    } else {
+      officeHours = await OfficeHours.create({ slots });
+    }
+
+    res.status(200).json({
+      message: `Schedule saved successfully. ${selectedCount} slot(s) selected.`,
+      slots: officeHours.slots,
+    });
+  } catch (err) {
+    console.error("saveOfficeHours error:", err.message);
     res.status(500).json({ message: "Server error" });
   }
 };

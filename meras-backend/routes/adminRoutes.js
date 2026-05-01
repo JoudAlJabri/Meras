@@ -35,3 +35,7 @@ router.post("/taxonomy/universities",            protect, requireRole("admin"), 
 router.delete("/taxonomy/universities/:name",    protect, requireRole("admin"), adminController.deleteUniversity);
 router.post("/taxonomy/majors",                  protect, requireRole("admin"), adminController.addMajor);
 router.delete("/taxonomy/majors/:name",          protect, requireRole("admin"), adminController.deleteMajor);
+
+// office hours
+router.get("/office-hours",  protect, requireRole("admin"), adminController.getOfficeHours);
+router.post("/office-hours", protect, requireRole("admin"), adminController.saveOfficeHours);
