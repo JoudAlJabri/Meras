@@ -1,6 +1,9 @@
 const User = require("../models/User");
 const Announcement = require("../models/Announcement");
 const FlaggedContent = require("../models/FlaggedContent");
+const Challenge = require("../models/Challenge");
+const Session = require("../models/Session");
+
 // GET /api/admin/pending-guides
 exports.getPendingGuides = async (req, res) => {
   try {
@@ -257,6 +260,73 @@ exports.removeContent = async (req, res) => {
     res.status(200).json({ message: "Content removed and warning notification sent to the user", item });
   } catch (err) {
     console.error("removeContent error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+// GET /api/admin/dashboard
+exports.getDashboardStats = async (req, res) => {
+  try {
+    // 4 stat cards
+    const totalUsers = await User.countDocuments();
+
+    const activeChallenges = await Challenge.countDocuments();
+
+    const pendingVerifications = await User.countDocuments({
+      role: "guide",
+      guideStatus: "pending",
+    });
+
+    const totalSessions = await Session.countDocuments();
+
+    // Recent sign-ups table — last 10 users
+    const recentSignUps = await User.find()
+      .select("-password")
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    // User growth chart — count new users per month for current year
+    const currentYear = new Date().getFullYear();
+
+    const userGrowth = await User.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $gte: new Date(`${currentYear}-01-01`),
+            $lte: new Date(`${currentYear}-12-31`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: "$createdAt" },
+          users: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    // Convert month numbers to names
+    const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+    const userGrowthData = monthNames.map((name, i) => {
+      const found = userGrowth.find((m) => m._id === i + 1);
+      return { name, users: found ? found.users : 0 };
+    });
+
+    res.status(200).json({
+      stats: {
+        totalUsers,
+        activeChallenges,
+        pendingVerifications,
+        totalSessions,
+      },
+      recentSignUps,
+      userGrowthData,
+    });
+  } catch (err) {
+    console.error("getDashboardStats error:", err.message);
     res.status(500).json({ message: "Server error" });
   }
 };

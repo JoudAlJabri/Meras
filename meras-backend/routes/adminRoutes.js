@@ -5,7 +5,9 @@ const adminController = require("../controllers/adminController");
 const protect = require("../middleware/authMiddleware");
 const requireRole = require("../middleware/roleMiddleware");
 
-// existing routes
+// dashboard
+router.get("/dashboard", protect, requireRole("admin"), adminController.getDashboardStats);
+// verifying routes
 router.get("/pending-guides", protect, requireRole("admin"), adminController.getPendingGuides);
 router.patch("/guides/:id/approve", protect, requireRole("admin"), adminController.approveGuide);
 router.patch("/guides/:id/reject", protect, requireRole("admin"), adminController.rejectGuide);
