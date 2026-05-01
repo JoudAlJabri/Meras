@@ -10,6 +10,7 @@ import {
 } from "react-icons/md";
 import { MdStar, MdStarBorder, MdClose } from "react-icons/md";
 import { useAuth } from "../../context/AuthContext";
+import { apiGetExplorerDashboard } from "../../api/auth";
 import learningGirl from "../../assets/Dashboard-pics/Learning-girl-1.png";
 import learningBoy from "../../assets/Dashboard-pics/Learning-boy-1.png";
 import CompletedChallenges from "./CompletedChallenges";
@@ -17,45 +18,30 @@ import { mockCompletedChallenges } from '../../data/mockData'
 
 const TEXT_PREVIEW_LIMIT = 150;
 
-
-
-
-
-const recentActivities = [
-  {
-    label: "Challenges",
-    detail: "Completed 'Build a Simple Calculator'",
-    color: "var(--meras-green)",
-    icon: MdExtension,
-  },
-  {
-    label: "Bookings",
-    detail: "Booked a mentorship session with Rana Abdullah",
-    color: "var(--meras-yellow)",
-    icon: MdCalendarToday,
-  },
-  {
-    label: "Finished",
-    detail: "Completed compass quiz",
-    color: "var(--meras-orange)",
-    icon: MdAutoAwesome,
-  },
-];
+const activityMeta = {
+  challenge: { color: "var(--meras-green)",  Icon: MdExtension    },
+  session:   { color: "var(--meras-yellow)", Icon: MdCalendarToday },
+};
 
 function ExplorerDashboard() {
   const navigate = useNavigate();
-  const { currentUser, login } = useAuth();
+  const { currentUser, getToken } = useAuth();
   const [selectedChallenge, setSelectedChallenge] = useState(null);
   const [expanded, setExpanded] = useState(false);
 
-  // Track whether the viewport is mobile-sized (≤768px).
-  // We use a state + resize listener so the layout re-renders when the
-  // user rotates their device or resizes the browser window.
+  const [dashboard, setDashboard] = useState(null);
+
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    apiGetExplorerDashboard(getToken())
+      .then(setDashboard)
+      .catch(err => console.error("Dashboard fetch error:", err.message));
   }, []);
 
   function openFeedback(challenge) {
@@ -67,13 +53,13 @@ function ExplorerDashboard() {
     setExpanded(false);
   }
 
-  // Activating this soon when we intergate the database for better usage
-  // const chosenImg = currentUser.gender === "female" ? learningGirl : learningBoy;
+  const firstName      = dashboard?.firstName || currentUser?.name?.split(" ")[0] || "";
+  const stats          = dashboard?.stats || { completedChallenges: 0, challengesInProgress: 0, sessionsBooked: 0 };
+  const inProgress     = dashboard?.challengesInProgress || [];
+  const recentActivity = dashboard?.recentActivity || [];
 
   return (
     <div style={styles.page}>
-      {/* On mobile: stack main column + sidebar vertically.
-          On desktop: side-by-side row layout. */}
       <div style={{ ...styles.mainLayout, flexDirection: isMobile ? "column" : "row" }}>
 
         {/* Left column */}
@@ -82,53 +68,66 @@ function ExplorerDashboard() {
           {/* Banner */}
           <div style={styles.banner}>
             <div style={styles.bannerContent}>
-
-              {/* Smaller heading font on mobile so it doesn't overflow the banner */}
-              <h1 style={{ ...styles.bannerName, fontSize: isMobile ? "32px" : "48px" }}>Hi, Lamees</h1>
+              <h1 style={{ ...styles.bannerName, fontSize: isMobile ? "32px" : "48px" }}>
+                Hi, {firstName}
+              </h1>
               <p style={styles.bannerText}>
                 Keep exploring your path and continue building your future.
               </p>
             </div>
-            {/* Hide the illustration on mobile — it overlaps the text at narrow widths */}
             {!isMobile && <img src={learningGirl} alt="illustration" style={styles.bannerImage} />}
           </div>
 
-          {/* Stat Cards — 2 columns on mobile, 3 on desktop.
-              3 equal columns at full width would be too narrow on a phone. */}
+          {/* Stat Cards */}
           <div style={{ ...styles.statsGrid, gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(3, 1fr)" }}>
             <div style={styles.statCard}>
               <div style={{ ...styles.statIcon, backgroundColor: "var(--meras-green)" }}>
                 <MdExtension style={styles.statIconInner} />
               </div>
               <p style={styles.statLabel}>Challenges completed</p>
-              <h2 style={styles.statNumber}>2</h2>
+              <h2 style={styles.statNumber}>{stats.completedChallenges}</h2>
             </div>
             <div style={styles.statCard}>
               <div style={{ ...styles.statIcon, backgroundColor: "var(--meras-yellow)" }}>
                 <MdHourglassEmpty style={styles.statIconInner} />
               </div>
               <p style={styles.statLabel}>Challenges in progress</p>
-              <h2 style={styles.statNumber}>1</h2>
+              <h2 style={styles.statNumber}>{stats.challengesInProgress}</h2>
             </div>
             <div style={styles.statCard}>
               <div style={{ ...styles.statIcon, backgroundColor: "var(--meras-gray)" }}>
                 <MdEventNote style={styles.statIconInner} />
               </div>
               <p style={styles.statLabel}>Sessions booked</p>
-              <h2 style={styles.statNumber}>3</h2>
+              <h2 style={styles.statNumber}>{stats.sessionsBooked}</h2>
             </div>
           </div>
 
-          {/* No challenges card */}
-          <div style={styles.continueCard}>
-            <div>
-              <h2 style={styles.continueTitle}>No challenges resumed to continue!</h2>
-              <p style={styles.continueText}>Explore and start challenges!</p>
+          {/* In-progress / explore card */}
+          {inProgress.length > 0 ? (
+            <div style={styles.continueCard}>
+              <div>
+                <h2 style={styles.continueTitle}>Continue where you left off</h2>
+                <p style={styles.continueText}>{inProgress[0].title}</p>
+              </div>
+              <button
+                style={styles.exploreButton}
+                onClick={() => navigate("/explorer/challenges")}
+              >
+                Continue →
+              </button>
             </div>
-            <button style={styles.exploreButton} onClick={() => navigate("/explorer/challengeCatalog")}>
-              Explore
-            </button>
-          </div>
+          ) : (
+            <div style={styles.continueCard}>
+              <div>
+                <h2 style={styles.continueTitle}>No challenges in progress!</h2>
+                <p style={styles.continueText}>Explore and start challenges!</p>
+              </div>
+              <button style={styles.exploreButton} onClick={() => navigate("/explorer/challengeCatalog")}>
+                Explore
+              </button>
+            </div>
+          )}
 
           <CompletedChallenges
             challenges={mockCompletedChallenges}
@@ -137,18 +136,19 @@ function ExplorerDashboard() {
 
         </div>
 
-        {/* Right sidebar — fixed 260px on desktop, full width on mobile */}
+        {/* Right sidebar */}
         <div style={{ width: isMobile ? "100%" : "260px", flexShrink: 0, display: "flex", flexDirection: "column", gap: "16px" }}>
 
           {/* Recent panel */}
           <div style={styles.recentPanel}>
             <h2 style={styles.recentTitle}>Recent</h2>
             <div style={styles.recentList}>
-              {recentActivities.map((item, index) => {
-                const Icon = item.icon;
+              {recentActivity.length > 0 ? recentActivity.map((item, index) => {
+                const meta = activityMeta[item.type] || { color: "var(--meras-gray)", Icon: MdAutoAwesome };
+                const Icon = meta.Icon;
                 return (
                   <div key={index} style={styles.recentItem}>
-                    <div style={{ ...styles.recentIcon, backgroundColor: item.color }}>
+                    <div style={{ ...styles.recentIcon, backgroundColor: meta.color }}>
                       <Icon style={styles.recentIconInner} />
                     </div>
                     <div>
@@ -157,7 +157,9 @@ function ExplorerDashboard() {
                     </div>
                   </div>
                 );
-              })}
+              }) : (
+                <p style={{ fontSize: "13px", color: "#9CA3AF", margin: 0 }}>No recent activity yet.</p>
+              )}
             </div>
           </div>
 
@@ -175,12 +177,12 @@ function ExplorerDashboard() {
         </div>
 
       </div>
-      {/* ── Feedback modal ─────────────────────────────────── */}
+
+      {/* Feedback modal */}
       {selectedChallenge && (
         <div style={m.overlay} onClick={closeFeedback}>
           <div style={m.panel} onClick={e => e.stopPropagation()}>
 
-            {/* Header */}
             <div style={m.header}>
               <div>
                 <h3 style={m.title}>{selectedChallenge.title}</h3>
@@ -193,7 +195,6 @@ function ExplorerDashboard() {
               </button>
             </div>
 
-            {/* Student's answer */}
             {selectedChallenge.submissionType === "text" && (() => {
               const full    = selectedChallenge.textAnswer ?? "";
               const isLong  = full.length > TEXT_PREVIEW_LIMIT;
@@ -239,7 +240,6 @@ function ExplorerDashboard() {
               );
             })()}
 
-            {/* Rating (read-only) */}
             <div style={m.section}>
               <p style={m.fieldLabel}>RATING</p>
               <div style={m.stars}>
@@ -253,7 +253,6 @@ function ExplorerDashboard() {
               </div>
             </div>
 
-            {/* Feedback (read-only) */}
             <div style={m.section}>
               <p style={m.fieldLabel}>FEEDBACK</p>
               <div style={m.feedbackBox}>
@@ -273,7 +272,6 @@ function ExplorerDashboard() {
   );
 }
 
-// Modal styles
 const m = {
   overlay: { position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.35)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200, padding: "24px" },
   panel: { backgroundColor: "#FFFFFF", borderRadius: "24px", padding: "32px", width: "100%", maxWidth: "540px", maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 50px rgba(0,0,0,0.13)", display: "flex", flexDirection: "column", gap: "20px" },
@@ -315,8 +313,6 @@ const styles = {
     flexDirection: "column",
     gap: "20px",
   },
-
-  // Banner
   banner: {
     backgroundColor: "#3DB87A",
     borderRadius: "24px",
@@ -330,12 +326,6 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: "15px",
-  },
-  bannerSubheading: {
-    margin: 0,
-    fontSize: "21px",
-    fontWeight: "600",
-    opacity: 0.9,
   },
   bannerName: {
     margin: 0,
@@ -358,8 +348,6 @@ const styles = {
     objectFit: "contain",
     marginBottom: "-43px",
   },
-
-  // Stat cards
   statsGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(3, 1fr)",
@@ -399,8 +387,6 @@ const styles = {
     fontWeight: "600",
     color: "#111827",
   },
-
-  // Continue
   continueCard: {
     backgroundColor: "var(--meras-yellow)",
     borderRadius: "20px",
@@ -431,8 +417,6 @@ const styles = {
     cursor: "pointer",
     whiteSpace: "nowrap",
   },
-
-  
   recentPanel: {
     backgroundColor: "#FFFFFF",
     border: "1px solid #E5E7EB",

@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Session = require("../models/Session");
 
 // POST /users/:id/quiz-results
 // Explorer only — save Compass Quiz results
@@ -144,4 +145,55 @@ const updateGuideSettings = async (req, res) => {
   }
 };
 
-module.exports = { saveQuizResults, getSavedChallenges, updateExplorerSettings, updateGuideSettings };
+// GET /users/me/dashboard — explorer dashboard summary
+const getDashboard = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id)
+      .populate("completedChallenges", "title")
+      .populate("challengesInProgress", "title major")
+      .populate("sessionsBooked");
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const firstName = user.name.split(" ")[0];
+
+    // Build recent activity from last completed challenge + last booked session
+    const recentActivity = [];
+
+    if (user.completedChallenges.length > 0) {
+      const last = user.completedChallenges[user.completedChallenges.length - 1];
+      recentActivity.push({
+        type: "challenge",
+        label: "Challenges",
+        detail: `Completed '${last.title}'`,
+      });
+    }
+
+    if (user.sessionsBooked.length > 0) {
+      const lastSession = user.sessionsBooked[user.sessionsBooked.length - 1];
+      const guide = await User.findOne({ email: lastSession.mentorEmail }).select("name");
+      recentActivity.push({
+        type: "session",
+        label: "Bookings",
+        detail: `Booked a session with ${guide?.name || lastSession.mentorEmail}`,
+      });
+    }
+
+    res.status(200).json({
+      firstName,
+      stats: {
+        completedChallenges: user.completedChallenges.length,
+        challengesInProgress: user.challengesInProgress.length,
+        sessionsBooked: user.sessionsBooked.length,
+        savedChallenges: user.savedChallenges.length,
+      },
+      challengesInProgress: user.challengesInProgress,
+      recentActivity,
+    });
+  } catch (err) {
+    console.error("getDashboard error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { saveQuizResults, getSavedChallenges, updateExplorerSettings, updateGuideSettings, getDashboard };

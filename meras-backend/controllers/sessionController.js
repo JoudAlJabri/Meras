@@ -1,4 +1,5 @@
 const Session = require("../models/Session");
+const User = require("../models/User");
 
 /*// Create booking
 exports.createSession = async (req, res) => {
@@ -53,9 +54,14 @@ const createSession = async (req, res) => {
 
     const booking = await Session.create({
       mentorEmail,
-      explorerEmail: req.user.email, // from token
+      explorerEmail: req.user.email,
       slot,
       topic,
+    });
+
+    // Track session on the explorer's profile
+    await User.findByIdAndUpdate(req.user.id, {
+      $push: { sessionsBooked: booking._id },
     });
 
     res.status(201).json({ booking });

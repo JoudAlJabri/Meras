@@ -107,7 +107,7 @@ function ChallengeDetail() {
   const dots = difficultyLevel[challenge.difficulty] || 1
 
   return (
-      <div style={{ backgroundColor: 'var(--meras-bg)', minHeight: '100vh' }}>
+      <div style={{ backgroundColor: 'var(--meras-bg)', minHeight: '100vh', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
 
         {/* ── BREADCRUMB ── */}
         <div className="container pt-4">

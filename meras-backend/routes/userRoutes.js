@@ -4,7 +4,7 @@ const path = require("path");
 const router = express.Router();
 const protect = require("../middleware/authMiddleware");
 const requireRole = require("../middleware/roleMiddleware");
-const { saveQuizResults, getSavedChallenges, updateExplorerSettings, updateGuideSettings } = require("../controllers/userController");
+const { saveQuizResults, getSavedChallenges, updateExplorerSettings, updateGuideSettings, getDashboard } = require("../controllers/userController");
 
 const profileStorage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "uploads/profiles/"),
@@ -31,5 +31,8 @@ router.patch("/me/settings", protect, requireRole("explorer"), uploadProfileImag
 
 // PATCH /users/me/guide-settings — guide updates their profile settings
 router.patch("/me/guide-settings", protect, requireRole("guide"), uploadProfileImage.single("profileImage"), updateGuideSettings);
+
+// GET /users/me/dashboard — explorer dashboard summary
+router.get("/me/dashboard", protect, requireRole("explorer"), getDashboard);
 
 module.exports = router;

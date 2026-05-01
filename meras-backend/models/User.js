@@ -107,8 +107,16 @@ const userSchema = new mongoose.Schema(
       { type: mongoose.Schema.Types.ObjectId, ref: "Challenge" },
     ],
 
+     challengesInProgress: [ 
+      { type: mongoose.Schema.Types.ObjectId, ref: "Challenge" },
+    ],
+
     savedChallenges: [ // the challnges the user save for later (still no front-end for that yet)
       { type: mongoose.Schema.Types.ObjectId, ref: "Challenge" },
+    ],
+
+    sessionsBooked: [ // for the sessions of the explorer booked
+      { type: mongoose.Schema.Types.ObjectId, ref: "Session" },
     ],
 
     // Email verification
