@@ -11,9 +11,6 @@ function ChallengeCatalog() {
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [selectedMajor, setSelectedMajor] = useState('All')
-  const [challenges, setChallenges] = useState([])
-
-  const majors = ['All', ...new Set(challenges.map(c => c.major))]
 
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
   useEffect(() => {
@@ -34,10 +31,7 @@ function ChallengeCatalog() {
   const filtered = selectedMajor === 'All'
     ? challenges
     : challenges.filter(c => c.major === selectedMajor)
-    ? challenges
-    : challenges.filter(c => c.major === selectedMajor)
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / CARDS_PER_PAGE))
   const totalPages = Math.max(1, Math.ceil(filtered.length / CARDS_PER_PAGE))
   const visible = filtered.slice((page - 1) * CARDS_PER_PAGE, page * CARDS_PER_PAGE)
 
