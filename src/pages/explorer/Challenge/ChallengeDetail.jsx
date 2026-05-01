@@ -53,9 +53,9 @@ function ChallengeDetail() {
   useEffect(() => {
   const fetchChallenge = async () => {
     try {
-      const res = await fetch(`http://localhost:5001/api/challenges/${id}`)
+      const res = await fetch(`/api/challenges/${id}`)
       const data = await res.json()
-      setChallenge(data)
+      setChallenge(data.challenge)
     } catch (error) {
       console.error("Error fetching challenge:", error)
     }

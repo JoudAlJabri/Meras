@@ -10,8 +10,8 @@ const {
   getSubmissionsByExplorer,
 } = require("../controllers/submissionController");
 
-const protect     = require("../middleware/authMiddleware");
-const requireRole = require("../middleware/roleMiddleware");
+const { protect }  = require("../middleware/authMiddleware");
+const requireRole  = require("../middleware/roleMiddleware");
 
 // ── MULTER SETUP ─────────────────────────────
 // Tells multer where to save uploaded files and what to name them
