@@ -9,7 +9,7 @@ export function AuthProvider({ children }) {
 
   // Restore session from stored token on app load
   useEffect(() => {
-    const token = localStorage.getItem('meras_token')
+    const token = localStorage.getItem("meras_token");
     if (!token) {
       setAuthLoading(false)
       return

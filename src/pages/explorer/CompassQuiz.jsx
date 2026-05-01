@@ -8,6 +8,7 @@ function CompassQuiz() {
   const navigate = useNavigate();
 
   const currentQuestion = questions[currentStep];
+  //const totalQuestions = questions.length;
   const totalQuestions = questions.length;
   const progressPercent = ((currentStep + 1) / totalQuestions) * 100;
 
