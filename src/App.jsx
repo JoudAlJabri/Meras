@@ -70,7 +70,7 @@ function App() {
               <ExplorerLayout><ChallengeCatalog /></ExplorerLayout>
             </ProtectedRoute>
           } />
-          <Route path="/explorer/challenges/:index" element={
+          <Route path="/explorer/challenges/:id" element={
             <ProtectedRoute allowedRoles={['explorer']}>
               <ExplorerLayout><ChallengeDetail /></ExplorerLayout>
             </ProtectedRoute>

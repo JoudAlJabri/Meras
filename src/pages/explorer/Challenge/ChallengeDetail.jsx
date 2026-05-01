@@ -1,7 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
-import { mockChallenges, mockMentors } from '../../../data/mockData'
-//import ExplorerLayout from '../../../layouts/ExplorerLayout'
+import { apiGetChallengeById } from '../../../api/challenges'
 import puzzleImg from '../../../assets/General-Graphics/2PersonPuzzle.png'
 import swe  from '../../../assets/Tech-Graphics/Software-Engineering.png'
 import cs   from '../../../assets/Tech-Graphics/Computer-Science.png'
@@ -45,21 +44,31 @@ const fallbackImages = [puzzleImg]
 
 
 function ChallengeDetail() {
-  const { index } = useParams()
+  const { id } = useParams()
   const navigate = useNavigate()
   const [saved, setSaved] = useState(false)
+  const [challenge, setChallenge] = useState(null)
+  const [loading, setLoading] = useState(true)
 
-  const challenge = mockChallenges[parseInt(index)] ?? null
+  useEffect(() => {
+    apiGetChallengeById(id)
+      .then(data => setChallenge(data.challenge))
+      .catch(err => console.error('Failed to load challenge:', err.message))
+      .finally(() => setLoading(false))
+  }, [id])
 
-  // Find the mentor
-  const mentor = null // temporary until mentors are linked
+  const mentor = null
+
+  if (loading) {
+    return <div className="text-center py-5" style={{ color: 'var(--meras-gray)' }}>Loading...</div>
+  }
 
   if (!challenge) {
     return (
-        <div className="text-center py-5">
-          <h3>Challenge not found</h3>
-          <Link to="/explorer/challenges">Back to Catalog</Link>
-        </div>
+      <div className="text-center py-5">
+        <h3>Challenge not found</h3>
+        <Link to="/explorer/challengeCatalog">Back to Catalog</Link>
+      </div>
     )
   }
 
@@ -96,7 +105,7 @@ function ChallengeDetail() {
 }
 
 
-  const heroColor = majorCardColors[challenge.major?.toLowerCase()] || majorColors['default']
+  const heroColor = majorCardColors[challenge.major?.toLowerCase()] || 'var(--meras-green)'
 
   // Difficulty dots
   const difficultyLevel = {
@@ -209,7 +218,7 @@ function ChallengeDetail() {
 
               {/* Created by */}
               <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', marginBottom: '1.5rem' }}>
-                Created by Rana Abdullah 
+                Created by {challenge.mentorName}
                 </p>
                { /* <span
                   style={{ color: 'white', fontWeight: '600', cursor: 'pointer', textDecoration: 'underline' }}
@@ -286,7 +295,7 @@ function ChallengeDetail() {
                 {/* Start button in hero */}
                 <button
                   className="btn ms-auto fw-semibold px-4 py-2"
-                  onClick={() => navigate(`/explorer/workspace/${index}`)}
+                  onClick={() => navigate(`/explorer/workspace/${id}`)}
                   style={{
                     backgroundColor: 'white',
                     color: heroColor,
@@ -555,7 +564,7 @@ function ChallengeDetail() {
                   {/* Start button */}
                   <button
                     className="btn w-100 fw-semibold py-2 mb-2 text-white"
-                    onClick={() => navigate(`/explorer/workspace/${index}`)}
+                    onClick={() => navigate(`/explorer/workspace/${id}`)}
                     style={{
                       backgroundColor: heroColor,
                       border: 'none',
@@ -656,7 +665,7 @@ function ChallengeDetail() {
               </button>
               <button
                 className="btn fw-semibold px-5 text-white"
-                onClick={() => navigate(`/explorer/workspace/${index}`)}
+                onClick={() => navigate(`/explorer/workspace/${id}`)}
                 style={{
                   backgroundColor: heroColor,
                   border: 'none',
