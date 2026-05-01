@@ -66,3 +66,25 @@ export const apiGetMe = async (token) => {
   if (!res.ok) throw new Error(data.message || 'Session expired')
   return data // { user }
 }
+
+export const apiUpdateExplorerSettings = async (token, formData) => {
+  const res = await fetch('/api/users/me/settings', {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  })
+  const data = await parseJSON(res)
+  if (!res.ok) throw new Error(data.message || 'Update failed')
+  return data // { user }
+}
+
+export const apiUpdateGuideSettings = async (token, formData) => {
+  const res = await fetch('/api/users/me/guide-settings', {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  })
+  const data = await parseJSON(res)
+  if (!res.ok) throw new Error(data.message || 'Update failed')
+  return data // { user }
+}

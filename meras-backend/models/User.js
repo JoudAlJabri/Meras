@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema(
     },
 
     // Shared
-    profilePhoto: { type: String },
+    profilePhoto: { type: String , default: ""},
 
     // Guide-specific (required at signup)
     university: {
