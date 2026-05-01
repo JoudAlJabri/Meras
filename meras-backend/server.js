@@ -23,10 +23,13 @@ app.get("/", (req, res) => {
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/challenges", require("./routes/challengeRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
-app.use("/submissions", submissionRoutes);
+app.use("/api/submissions", submissionRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use("/api/sessions", require("./routes/sessionRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
+const reviewRoutes = require("./routes/reviewRoutes");
+
+app.use("/api/reviews", reviewRoutes);
 
 const PORT = process.env.PORT || 5000;
 
