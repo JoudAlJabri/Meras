@@ -140,9 +140,28 @@ const getSubmissionsByExplorer = async (req, res) => {
   }
 };
 
+// Get a single submission by ID
+const getSubmissionById = async (req, res) => {
+  try {
+    const submission = await Submission.findById(req.params.id)
+      .populate("challengeId", "title description")
+      .populate("explorerId", "name email");
+
+    if (!submission) {
+      return res.status(404).json({ message: "Submission not found" });
+    }
+
+    res.status(200).json({ submission });
+  } catch (err) {
+    console.error("getSubmissionById error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   createSubmission,
   gradeSubmission,
   getSubmissionsByGuide,
   getSubmissionsByExplorer,
+  getSubmissionById,
 };

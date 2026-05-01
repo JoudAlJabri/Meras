@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-
 const { protect } = require("../middleware/authMiddleware");
 const requireRole = require("../middleware/roleMiddleware");
 
@@ -21,7 +20,6 @@ router.get("/", getChallenges);
 
 // /guide/:guideId must be before /:id to avoid conflict
 router.get("/guide/:guideId", protect, requireRole("guide"), getChallengesByGuide);
-
 router.get("/:id", getChallengeById);
 
 // Guide only — create

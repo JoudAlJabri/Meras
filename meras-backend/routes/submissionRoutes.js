@@ -8,35 +8,33 @@ const {
   gradeSubmission,
   getSubmissionsByGuide,
   getSubmissionsByExplorer,
+  getSubmissionById,
 } = require("../controllers/submissionController");
 
 const { protect }  = require("../middleware/authMiddleware");
 const requireRole  = require("../middleware/roleMiddleware");
 
-// ── MULTER SETUP ─────────────────────────────
-// Tells multer where to save uploaded files and what to name them
+// ── MULTER SETUP ──────────────────────────────
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/submissions/"); // save here
+    cb(null, "uploads/submissions/");
   },
   filename: (req, file, cb) => {
-    // filename = userId_timestamp_originalname  e.g. "abc123_1234567890_solution.pdf"
     cb(null, `${req.user.id}_${Date.now()}_${file.originalname}`);
   },
 });
-const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB max
+const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
 
-// ── ROUTES ───────────────────────────────────
-// POST /submissions — explorer submits work
+// ── ROUTES ────────────────────────────────────
+
 router.post(
   "/",
   protect,
   requireRole("explorer"),
-  upload.single("file"), // "file" must match the field name your React form uses
+  upload.single("file"),
   createSubmission
 );
 
-// PATCH /submissions/:id/grade — guide grades a submission
 router.patch(
   "/:id/grade",
   protect,
@@ -44,7 +42,6 @@ router.patch(
   gradeSubmission
 );
 
-// GET /submissions/guide/:guideId — guide's grading queue
 router.get(
   "/guide/:guideId",
   protect,
@@ -52,12 +49,17 @@ router.get(
   getSubmissionsByGuide
 );
 
-// GET /submissions/explorer/:explorerId — explorer's completed challenges
 router.get(
   "/explorer/:explorerId",
   protect,
   requireRole("explorer", "admin"),
   getSubmissionsByExplorer
+);
+
+router.get(
+  "/:id",
+  protect,
+  getSubmissionById
 );
 
 module.exports = router;

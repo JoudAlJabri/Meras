@@ -1,24 +1,39 @@
-const express = require("express");  // importing express
-const router = express.Router();  // using the router from express
+const express = require("express");
+const multer = require("multer");
+const path = require("path");
+const router = express.Router();
 
 const { register, login, verifyEmail, resendVerification, getMe } = require("../controllers/authController");
-const { protect } = require("../middleware/authMiddleware");  // to check if the users token is still valid
+const  protect  = require("../middleware/authMiddleware");
 
-// POST /auth/register  → anyone can hit this (no token needed)
-router.post("/register", register);
+// Multer for guide transcript uploads
+const transcriptStorage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, "uploads/transcripts/"),
+  filename: (req, file, cb) => cb(null, `${Date.now()}_${file.originalname}`),
+});
+const uploadTranscript = multer({
+  storage: transcriptStorage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowed = [".pdf", ".jpg", ".jpeg", ".png"];
+    const ext = path.extname(file.originalname).toLowerCase();
+    allowed.includes(ext) ? cb(null, true) : cb(new Error("Only PDF, JPG, PNG allowed"));
+  },
+});
 
-// POST /auth/login     → anyone can hit this (no token needed)
+// POST /auth/register
+router.post("/register", uploadTranscript.single("transcript"), register);
+
+// POST /auth/login
 router.post("/login", login);
 
- 
-// GET /auth/verify-email/:token → anyone can hit this
+// GET /auth/verify-email/:token
 router.get("/verify-email/:token", verifyEmail);
 
-// POST /auth/resend-verification → anyone can hit this
+// POST /auth/resend-verification
 router.post("/resend-verification", resendVerification);
 
-// GET /auth/me  → protected! must send a valid token
+// GET /auth/me — protected
 router.get("/me", protect, getMe);
- 
+
 module.exports = router;
- 

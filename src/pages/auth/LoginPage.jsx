@@ -1,70 +1,40 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { mockUsers } from '../../data/mockData'
-import BackButton from '../../components/BackButton'
+import { apiLogin } from '../../api/auth'
 
 
 function LoginPage() {
     const navigate = useNavigate();
-    const {login} = useAuth();
+    const { login } = useAuth();
 
-    // form state
-    const [formData , setFormData] = useState(
-        {
-            email: "",
-            password: "",
-            role: 'explorer' // default selected role
-        }
-    )
-
+    const [formData, setFormData] = useState({ email: '', password: '' })
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    //update from feilds as user types
     const handleChange = (e) => {
-        setFormData({...formData, [e.target.name]: e.target.value})
-        setError('') // clear error when user starts typing
-    }
-
-    //handle role badge click
-    const handleRoleSelect = (role) => {
-        setFormData({...formData, role})
+        setFormData({ ...formData, [e.target.name]: e.target.value })
         setError('')
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
+    setError('')
 
-    // Find user in mock data
-    const user = mockUsers.find(
-      u => u.email === formData.email &&
-           u.password === formData.password &&
-           u.role === formData.role
-    )
+    try {
+      const { token, user } = await apiLogin(formData.email, formData.password)
+      login(token, user)
 
-    if (!user) {
-      setError('Invalid email, password, or role. Please try again.')
+      if (user.role === 'explorer') navigate('/explorer/dashboard')
+      else if (user.role === 'guide') {
+        navigate(user.guideStatus === 'approved' ? '/guide/dashboard' : '/waiting-room')
+      } else if (user.role === 'admin') navigate('/admin')
+    } catch (err) {
+      setError(err.message)
+    } finally {
       setLoading(false)
-      return
     }
-
-    // log then in via AuthContext
-    login(user)
-
-    ///Redirect based on role
-    if (user.role === 'explorer') navigate('/explorer/dashboard')
-    if (user.role === 'guide') {
-      if (!user.isVerified) {
-        navigate('/waiting-room')
-      } else {
-        navigate('/guide/dashboard')
-      }
-    }
-    if (user.role === 'admin') navigate('/admin')
-
-    setLoading(false)
   }
 
   return (
@@ -93,42 +63,6 @@ function LoginPage() {
               <p style={{ color: 'var(--meras-gray)' }}>
                 Welcome back! Please enter your details.
               </p>
-              {/* Role Selector */}
-                <div className="mb-4">
-                  <label
-                    className="form-label fw-semibold"
-                    style={{ color: 'var(--meras-text)', fontSize: '14px' }}
-                  >
-                   Log in as
-                  </label>
-
-                  <div className="d-flex gap-2">
-                    {['explorer', 'guide', 'admin'].map((role) => (
-                      <button
-                        key={role}
-                        type="button"
-                        onClick={() => handleRoleSelect(role)}
-                        className="btn"
-                        style={{
-                          borderRadius: '999px',
-                          padding: '8px 16px',
-                          border: formData.role === role
-                            ? '1.5px solid var(--meras-green)'
-                            : '1.5px solid var(--meras-border)',
-                          backgroundColor: formData.role === role
-                            ? 'var(--meras-green)'
-                            : 'white',
-                          color: formData.role === role ? 'white' : 'var(--meras-text)',
-                          fontSize: '14px',
-                          fontWeight: '500'
-                        }}
-                      >
-                        {role.charAt(0).toUpperCase() + role.slice(1)}
-                      </button>
-                    ))}
-                  </div>
-              </div>
-
               {/* Error message */}
               {error && (
                 <div className="alert alert-danger py-2 px-3" style={{ fontSize: '14px', borderRadius: '10px' }}>
@@ -137,7 +71,7 @@ function LoginPage() {
               )}
 
               {/* Form */}
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} noValidate>
 
                 {/* Email */}
                 <div className="mb-3">
@@ -205,36 +139,6 @@ function LoginPage() {
                   {loading ? 'Signing in...' : 'Sign in'}
                 </button>
 
-                {/* Divider + Google button — only for non-guide roles */}
-                {formData.role !== 'guide' && (
-                  <>
-                    <div className="d-flex align-items-center gap-3 my-3">
-                      <hr className="flex-grow-1 m-0" />
-                      <span style={{ color: 'var(--meras-gray)', fontSize: '13px' }}>or</span>
-                      <hr className="flex-grow-1 m-0" />
-                    </div>
-
-                    <button
-                      type="button"
-                      className="btn w-100 fw-semibold py-2"
-                      style={{
-                        border: '1.5px solid var(--meras-border)',
-                        borderRadius: '10px',
-                        fontSize: '15px',
-                        color: 'var(--meras-text)',
-                        backgroundColor: 'white'
-                      }}
-                    >
-                      <img
-                        src="https://www.google.com/favicon.ico"
-                        alt="Google"
-                        width="18"
-                        className="me-2"
-                      />
-                      Sign in with Google
-                    </button>
-                  </>
-                )}
 
               </form>
 

@@ -1,26 +1,28 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { MdCameraAlt } from "react-icons/md";
-import { MAJORS } from '../../data/mockData'
-import { SKILLS } from '../../data/mockData'
-
+import { MAJORS, SKILLS } from '../../data/mockData';
+import { apiUpdateGuideSettings } from "../../api/auth";
 
 function GuideSettings() {
-  const { currentUser, login } = useAuth();
+  const { currentUser, login, getToken } = useAuth();
 
   const [firstName, setFirstName] = useState(currentUser?.name?.split(" ")[0] || "");
   const [lastName, setLastName]   = useState(currentUser?.name?.split(" ")[1] || "");
-  const [email, setEmail]         = useState(currentUser?.email || "");
   const [major, setMajor]         = useState(currentUser?.major || "");
   const [about, setAbout]         = useState(currentUser?.about || "");
   const [skills, setSkills]       = useState(currentUser?.skills || []);
   const [skillInput, setSkillInput] = useState("");
 
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword]         = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // Field pairs (First/Last, Email/Major, Password/Confirm) and the skills
-  // inline row (select + input + button) are too narrow side-by-side on mobile.
+  const [infoError, setInfoError]     = useState("");
+  const [infoSuccess, setInfoSuccess] = useState("");
+  const [pwError, setPwError]         = useState("");
+  const [pwSuccess, setPwSuccess]     = useState("");
+
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 600);
@@ -30,25 +32,51 @@ function GuideSettings() {
 
   const addSkill = (skill) => {
     const trimmed = skill.trim();
-    if (trimmed && !skills.includes(trimmed)) {
-      setSkills([...skills, trimmed]);
-    }
+    if (trimmed && !skills.includes(trimmed)) setSkills([...skills, trimmed]);
     setSkillInput("");
   };
 
-  const removeSkill = (skill) => {
-    setSkills(skills.filter(s => s !== skill));
+  const removeSkill = (skill) => setSkills(skills.filter(s => s !== skill));
+
+  const handleUpdateInfo = async () => {
+    setInfoError("");
+    setInfoSuccess("");
+    try {
+      const formData = new FormData();
+      if (firstName) formData.append("firstName", firstName);
+      if (lastName)  formData.append("lastName", lastName);
+      if (major)     formData.append("major", major);
+      if (about !== undefined) formData.append("about", about);
+      formData.append("skills", JSON.stringify(skills));
+
+      const data = await apiUpdateGuideSettings(getToken(), formData);
+      login(getToken(), data.user);
+      setInfoSuccess("Profile updated successfully.");
+    } catch (err) {
+      setInfoError(err.message);
+    }
   };
 
-  const handleUpdateInfo = () => {
-    login({ ...currentUser, name: `${firstName} ${lastName}`.trim(), email, major, about, skills });
-  };
+  const handleUpdatePassword = async () => {
+    setPwError("");
+    setPwSuccess("");
+    if (!newPassword || newPassword !== confirmPassword) {
+      setPwError("Passwords do not match.");
+      return;
+    }
+    try {
+      const formData = new FormData();
+      formData.append("currentPassword", currentPassword);
+      formData.append("newPassword", newPassword);
 
-  const handleUpdatePassword = () => {
-    if (!newPassword || newPassword !== confirmPassword) return;
-    // password update logic 
-    setNewPassword("");
-    setConfirmPassword("");
+      await apiUpdateGuideSettings(getToken(), formData);
+      setPwSuccess("Password updated successfully.");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      setPwError(err.message);
+    }
   };
 
   return (
@@ -61,14 +89,14 @@ function GuideSettings() {
       {/* Avatar */}
       <div style={styles.avatarWrapper}>
         <div style={styles.avatar}>
-          {currentUser?.photoURL
-            ? <img src={currentUser.photoURL} alt="avatar" style={styles.avatarImg} />
+          {currentUser?.profilePhoto
+            ? <img src={currentUser.profilePhoto} alt="avatar" style={styles.avatarImg} />
             : <MdCameraAlt size={22} color="#aaa" />
           }
         </div>
       </div>
 
-      {/* Name row — side-by-side on desktop, stacked on mobile */}
+      {/* Name row */}
       <div style={{ ...styles.row, flexDirection: isMobile ? "column" : "row" }}>
         <div style={styles.field}>
           <label style={styles.label}>First Name <span style={styles.req}>*</span></label>
@@ -84,13 +112,13 @@ function GuideSettings() {
       <div style={{ ...styles.row, flexDirection: isMobile ? "column" : "row" }}>
         <div style={styles.field}>
           <label style={styles.label}>Email</label>
-          <input style={styles.input} value={email} onChange={e => setEmail(e.target.value)} />
+          <input style={{ ...styles.input, ...styles.inputDisabled }} value={currentUser?.email || ""} readOnly />
         </div>
         <div style={styles.field}>
           <label style={styles.label}>Major</label>
           <select style={styles.input} value={major} onChange={e => setMajor(e.target.value)}>
             <option value="">Select</option>
-            {MAJORS.map(g => <option key={g} value={g}>{g}</option>)}
+            {MAJORS.map(m => <option key={m} value={m}>{m}</option>)}
           </select>
         </div>
       </div>
@@ -108,8 +136,7 @@ function GuideSettings() {
         <span style={{ fontSize: "12px", color: "#aaa", textAlign: "right" }}>{about.length}/500</span>
       </div>
 
-      {/* Skills — select + text input + Add button stack vertically on mobile
-          because three inline elements are too cramped on a narrow screen */}
+      {/* Skills */}
       <div style={{ ...styles.field, marginBottom: "20px" }}>
         <label style={styles.label}>Skills</label>
         <div style={{ display: "flex", gap: "8px", flexDirection: isMobile ? "column" : "row" }}>
@@ -130,16 +157,11 @@ function GuideSettings() {
             onChange={e => setSkillInput(e.target.value)}
             onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addSkill(skillInput); } }}
           />
-          <button
-            type="button"
-            style={{ ...styles.btnGreen, whiteSpace: "nowrap" }}
-            onClick={() => addSkill(skillInput)}
-          >
+          <button type="button" style={{ ...styles.btnGreen, whiteSpace: "nowrap" }} onClick={() => addSkill(skillInput)}>
             Add
           </button>
         </div>
 
-        {/* Selected skill tags */}
         {skills.length > 0 && (
           <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "12px", padding: "12px", border: "1px solid #E5E7EB", borderRadius: "6px", minHeight: "48px" }}>
             {skills.map(skill => (
@@ -166,11 +188,21 @@ function GuideSettings() {
         )}
       </div>
 
+      {infoError   && <p style={styles.errorMsg}>{infoError}</p>}
+      {infoSuccess && <p style={styles.successMsg}>{infoSuccess}</p>}
       <button style={styles.btnGreen} onClick={handleUpdateInfo}>Update Info</button>
 
       {/* Change Password */}
       <h2 style={{ ...styles.sectionHeading, marginTop: "36px" }}>Change Password</h2>
       <hr style={styles.divider} />
+
+      <div style={{ ...styles.row, flexDirection: isMobile ? "column" : "row" }}>
+        <div style={styles.field}>
+          <label style={styles.label}>Current Password</label>
+          <input style={styles.input} type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} />
+        </div>
+        <div style={styles.field} />
+      </div>
 
       <div style={{ ...styles.row, flexDirection: isMobile ? "column" : "row" }}>
         <div style={styles.field}>
@@ -183,6 +215,8 @@ function GuideSettings() {
         </div>
       </div>
 
+      {pwError   && <p style={styles.errorMsg}>{pwError}</p>}
+      {pwSuccess && <p style={styles.successMsg}>{pwSuccess}</p>}
       <button style={styles.btnGreen} onClick={handleUpdatePassword}>Update Password</button>
 
       {/* Delete Account */}
@@ -257,6 +291,11 @@ const styles = {
     outline: "none",
     backgroundColor: "#fff",
   },
+  inputDisabled: {
+    backgroundColor: "#F3F4F6",
+    color: "#9CA3AF",
+    cursor: "not-allowed",
+  },
   btnGreen: {
     backgroundColor: "var(--meras-green)",
     color: "#fff",
@@ -277,6 +316,16 @@ const styles = {
     fontWeight: "600",
     cursor: "pointer",
     marginTop: "16px",
+  },
+  errorMsg: {
+    color: "#e53e3e",
+    fontSize: "13px",
+    marginBottom: "10px",
+  },
+  successMsg: {
+    color: "#16a34a",
+    fontSize: "13px",
+    marginBottom: "10px",
   },
 };
 

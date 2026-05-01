@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
+import { apiRegisterExplorer } from '../../api/auth'
 
 function SignUpExplorer() {
   const navigate = useNavigate()
-  const { login } = useAuth()
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -16,6 +15,8 @@ function SignUpExplorer() {
     confirmPassword: ''
   })
   const [errors, setErrors] = useState({})
+  const [serverError, setServerError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -58,33 +59,32 @@ function SignUpExplorer() {
     return newErrors
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
-    // Run validation to check for errora
     const newErrors = validate()
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
       return
     }
 
-    // Create new user object
-    const newUser = {
-      id: Date.now(), // temporary id
-      name: `${formData.firstName} ${formData.lastName}`,
-      email: formData.email,
-      gender: formData.gender,
-      grade: formData.grade,
-      password: formData.password,
-      role: 'explorer',
-      recommendedMajors: []
+    setLoading(true)
+    setServerError('')
+
+    try {
+      await apiRegisterExplorer({
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        password: formData.password,
+        gender: formData.gender,
+        grade: formData.grade,
+      })
+      navigate('/verify-email', { state: { email: formData.email } })
+    } catch (err) {
+      setServerError(err.message)
+    } finally {
+      setLoading(false)
     }
-
-    // Log them in immediately after signup
-    login(newUser)
-
-    // Redirect to compass quiz
-    navigate("/verify-email" )
   }
 
   return (
@@ -143,8 +143,15 @@ function SignUpExplorer() {
                 </Link>
               </div>
 
+              {/* Server error */}
+              {serverError && (
+                <div className="alert alert-danger py-2 px-3 mb-3" style={{ fontSize: '14px', borderRadius: '10px' }}>
+                  {serverError}
+                </div>
+              )}
+
               {/* Form */}
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} noValidate>
 
                 {/* First Name + Last Name — side-by-side on sm+ (≥576px), stacked on mobile */}
                 <div className="row g-3 mb-3">
@@ -261,8 +268,8 @@ function SignUpExplorer() {
                       }}
                     >
                       <option value="" disabled>Select gender</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
                     </select>
                     {errors.gender && (
                       <div style={{ color: '#dc3545', fontSize: '12px', marginTop: '4px' }}>
@@ -292,8 +299,8 @@ function SignUpExplorer() {
                       }}
                     >
                       <option value="" disabled>Select grade</option>
-                      {[ 10, 11, 12].map(g => (
-                        <option key={g} value={g}>Grade {g}</option>
+                      {[10, 11, 12].map(g => (
+                        <option key={g} value={`Grade ${g}`}>Grade {g}</option>
                       ))}
                     </select>
                     {errors.grade && (
@@ -372,6 +379,7 @@ function SignUpExplorer() {
                 {/* Submit */}
                 <button
                   type="submit"
+                  disabled={loading}
                   className="btn w-100 text-white fw-semibold py-2"
                   style={{
                     backgroundColor: 'var(--meras-green)',
@@ -380,7 +388,7 @@ function SignUpExplorer() {
                     fontSize: '16px'
                   }}
                 >
-                  Create account
+                  {loading ? 'Creating account...' : 'Create account'}
                 </button>
 
                 {/* Divider */}

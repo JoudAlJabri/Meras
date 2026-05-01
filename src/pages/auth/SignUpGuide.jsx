@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { useAuth } from "../../context/AuthContext"
-import { mockUsers } from '../../data/mockData'
+import { apiRegisterGuide } from '../../api/auth'
 
 function SignUpGuide() {
     const UNIVERSITIES = [
@@ -42,7 +41,9 @@ const MAJORS = [
   'Other'
 ]
     const navigate = useNavigate()
-    const {login} = useAuth()
+
+    const [serverError, setServerError] = useState('')
+    const [loading, setLoading] = useState(false)
 
     const [formData, setFormData] = useState({
     firstName: '',
@@ -153,31 +154,37 @@ const MAJORS = [
     return newErrors
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     const newErrors = validate()
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
-      // Scroll to top to show errors
       window.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }
-    const newGuide = {
-      id: Date.now(),
-      name: `${formData.firstName} ${formData.lastName}`,
-      email: formData.email,
-      password: formData.password,
-      role: 'guide',
-      university: formData.university,
-      major: formData.major,
-      isVerified: false,
-      status: 'pending'
+
+    setLoading(true)
+    setServerError('')
+
+    try {
+      const data = new FormData()
+      data.append('name', `${formData.firstName} ${formData.lastName}`)
+      data.append('email', formData.email)
+      data.append('password', formData.password)
+      data.append('university', formData.university)
+      data.append('major', formData.major)
+      data.append('role', 'guide')
+      if (formData.document) data.append('transcript', formData.document)
+
+      await apiRegisterGuide(data)
+      navigate('/verify-email', { state: { email: formData.email } })
+    } catch (err) {
+      setServerError(err.message)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } finally {
+      setLoading(false)
     }
-
-    login(newGuide)
-
-    navigate('/verify-email')
 }
 
 // content
@@ -237,6 +244,13 @@ return (
                 </button>
               </div>
 
+              {/* Server error */}
+              {serverError && (
+                <div className="alert alert-danger py-2 px-3 mb-3" style={{ fontSize: '14px', borderRadius: '10px' }}>
+                  {serverError}
+                </div>
+              )}
+
               {/* University email notice */}
               <div
                 className="d-flex align-items-start gap-2 p-3 mb-4"
@@ -255,7 +269,7 @@ return (
               </div>
 
               {/* Form */}
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} noValidate>
 
                 {/* First Name + Last Name */}
                 {/* col-sm-6: side-by-side on sm+ (≥576px), full-width stacked below that */}
@@ -556,6 +570,7 @@ return (
                 {/* Submit */}
                 <button
                   type="submit"
+                  disabled={loading}
                   className="btn w-100 text-white fw-semibold py-2"
                   style={{
                     backgroundColor: 'var(--meras-green)',
@@ -564,7 +579,7 @@ return (
                     fontSize: '16px'
                   }}
                 >
-                  Create account
+                  {loading ? 'Creating account...' : 'Create account'}
                 </button>
 
          

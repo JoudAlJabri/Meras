@@ -22,8 +22,14 @@ const userSchema = new mongoose.Schema(
       default: "explorer",
     },
 
-    // Shared
-    profilePhoto: { type: String },
+// Shared
+profilePhoto: { type: String, default: "" },
+
+status: {
+  type: String,
+  enum: ["Active", "Suspended"],
+  default: "Active",
+},
 
     // Guide-specific (required at signup)
     university: {
@@ -95,6 +101,7 @@ const userSchema = new mongoose.Schema(
       },
       type: String,
       enum: ["Grade 10" , "Grade 11" , "Grade 12"],
+    
     },
 
     // Explorer-specific (filles later)
@@ -107,8 +114,16 @@ const userSchema = new mongoose.Schema(
       { type: mongoose.Schema.Types.ObjectId, ref: "Challenge" },
     ],
 
+     challengesInProgress: [ 
+      { type: mongoose.Schema.Types.ObjectId, ref: "Challenge" },
+    ],
+
     savedChallenges: [ // the challnges the user save for later (still no front-end for that yet)
       { type: mongoose.Schema.Types.ObjectId, ref: "Challenge" },
+    ],
+
+    sessionsBooked: [ // for the sessions of the explorer booked
+      { type: mongoose.Schema.Types.ObjectId, ref: "Session" },
     ],
 
     // Email verification

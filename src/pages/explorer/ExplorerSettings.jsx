@@ -1,20 +1,26 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { MdCameraAlt } from "react-icons/md";
+import { apiUpdateExplorerSettings } from "../../api/auth";
+
+const GRADES = ["Grade 10", "Grade 11", "Grade 12"];
 
 function ExplorerSettings() {
-  const { currentUser, login } = useAuth();
+  const { currentUser, login, getToken } = useAuth();
 
   const [firstName, setFirstName] = useState(currentUser?.name?.split(" ")[0] || "");
   const [lastName, setLastName]   = useState(currentUser?.name?.split(" ")[1] || "");
-  const [email, setEmail]         = useState(currentUser?.email || "");
   const [grade, setGrade]         = useState(currentUser?.grade || "");
 
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword]         = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // On mobile the two-column field rows (First/Last, Email/Grade, Password/Confirm)
-  // are too narrow — stack them vertically instead.
+  const [infoError, setInfoError]     = useState("");
+  const [infoSuccess, setInfoSuccess] = useState("");
+  const [pwError, setPwError]         = useState("");
+  const [pwSuccess, setPwSuccess]     = useState("");
+
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 600);
@@ -22,15 +28,43 @@ function ExplorerSettings() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleUpdateInfo = () => {
-    login({ ...currentUser, name: `${firstName} ${lastName}`.trim(), email, grade });
+  const handleUpdateInfo = async () => {
+    setInfoError("");
+    setInfoSuccess("");
+    try {
+      const formData = new FormData();
+      if (firstName) formData.append("firstName", firstName);
+      if (lastName)  formData.append("lastName", lastName);
+      if (grade)     formData.append("grade", grade);
+
+      const data = await apiUpdateExplorerSettings(getToken(), formData);
+      login(getToken(), data.user);
+      setInfoSuccess("Profile updated successfully.");
+    } catch (err) {
+      setInfoError(err.message);
+    }
   };
 
-  const handleUpdatePassword = () => {
-    if (!newPassword || newPassword !== confirmPassword) return;
-    // password update logic goes here
-    setNewPassword("");
-    setConfirmPassword("");
+  const handleUpdatePassword = async () => {
+    setPwError("");
+    setPwSuccess("");
+    if (!newPassword || newPassword !== confirmPassword) {
+      setPwError("Passwords do not match.");
+      return;
+    }
+    try {
+      const formData = new FormData();
+      formData.append("currentPassword", currentPassword);
+      formData.append("newPassword", newPassword);
+
+      await apiUpdateExplorerSettings(getToken(), formData);
+      setPwSuccess("Password updated successfully.");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      setPwError(err.message);
+    }
   };
 
   return (
@@ -43,14 +77,14 @@ function ExplorerSettings() {
       {/* Avatar */}
       <div style={styles.avatarWrapper}>
         <div style={styles.avatar}>
-          {currentUser?.photoURL
-            ? <img src={currentUser.photoURL} alt="avatar" style={styles.avatarImg} />
+          {currentUser?.profilePhoto
+            ? <img src={currentUser.profilePhoto} alt="avatar" style={styles.avatarImg} />
             : <MdCameraAlt size={22} color="#aaa" />
           }
         </div>
       </div>
 
-      {/* Name row — side-by-side on desktop, stacked on mobile */}
+      {/* Name row */}
       <div style={{ ...styles.row, flexDirection: isMobile ? "column" : "row" }}>
         <div style={styles.field}>
           <label style={styles.label}>First Name <span style={styles.req}>*</span></label>
@@ -66,22 +100,32 @@ function ExplorerSettings() {
       <div style={{ ...styles.row, flexDirection: isMobile ? "column" : "row" }}>
         <div style={styles.field}>
           <label style={styles.label}>Email</label>
-          <input style={styles.input} value={email} onChange={e => setEmail(e.target.value)} />
+          <input style={{ ...styles.input, ...styles.inputDisabled }} value={currentUser?.email || ""} readOnly />
         </div>
         <div style={styles.field}>
           <label style={styles.label}>Grade</label>
           <select style={styles.input} value={grade} onChange={e => setGrade(e.target.value)}>
             <option value="">Select</option>
-            {[9,10,11,12].map(g => <option key={g} value={g}>{g}</option>)}
+            {GRADES.map(g => <option key={g} value={g}>{g}</option>)}
           </select>
         </div>
       </div>
 
+      {infoError   && <p style={styles.errorMsg}>{infoError}</p>}
+      {infoSuccess && <p style={styles.successMsg}>{infoSuccess}</p>}
       <button style={styles.btnGreen} onClick={handleUpdateInfo}>Update Info</button>
 
       {/* Change Password */}
       <h2 style={{ ...styles.sectionHeading, marginTop: "36px" }}>Change Password</h2>
       <hr style={styles.divider} />
+
+      <div style={{ ...styles.row, flexDirection: isMobile ? "column" : "row" }}>
+        <div style={styles.field}>
+          <label style={styles.label}>Current Password</label>
+          <input style={styles.input} type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} />
+        </div>
+        <div style={styles.field} />
+      </div>
 
       <div style={{ ...styles.row, flexDirection: isMobile ? "column" : "row" }}>
         <div style={styles.field}>
@@ -94,6 +138,8 @@ function ExplorerSettings() {
         </div>
       </div>
 
+      {pwError   && <p style={styles.errorMsg}>{pwError}</p>}
+      {pwSuccess && <p style={styles.successMsg}>{pwSuccess}</p>}
       <button style={styles.btnGreen} onClick={handleUpdatePassword}>Update Password</button>
 
       {/* Delete Account */}
@@ -168,6 +214,11 @@ const styles = {
     outline: "none",
     backgroundColor: "#fff",
   },
+  inputDisabled: {
+    backgroundColor: "#F3F4F6",
+    color: "#9CA3AF",
+    cursor: "not-allowed",
+  },
   btnGreen: {
     backgroundColor: "var(--meras-green)",
     color: "#fff",
@@ -188,6 +239,16 @@ const styles = {
     fontWeight: "600",
     cursor: "pointer",
     marginTop: "16px",
+  },
+  errorMsg: {
+    color: "#e53e3e",
+    fontSize: "13px",
+    marginBottom: "10px",
+  },
+  successMsg: {
+    color: "#16a34a",
+    fontSize: "13px",
+    marginBottom: "10px",
   },
 };
 
