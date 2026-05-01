@@ -1,71 +1,86 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import AdminLayout from '../../layouts/AdminLayout'
-import { mockPendingApplications } from '../../data/mockData'
+import { useAuth } from '../../context/AuthContext'
+import { apiGetPendingGuides, apiApproveGuide, apiRejectGuide } from '../../api/admin'
 
 export default function PendingVerifications() {
-  const [applications, setApplications] = useState(mockPendingApplications)
+  const { getToken } = useAuth()
+  const token = getToken()
+
+  const [applications, setApplications] = useState([])
+  const [loading, setLoading] = useState(true)
   const [selectedApplication, setSelectedApplication] = useState(null)
   const [actionMessage, setActionMessage] = useState('')
   const [messageType, setMessageType] = useState('success')
 
-  const currentUser = {
-    name: 'Dana Alsawad',
-    role: 'admin',
-  }
-
-  const isAdmin = currentUser.role === 'admin'
+  // ── fetch pending guides ──
+  useEffect(() => {
+    const fetchGuides = async () => {
+      try {
+        const data = await apiGetPendingGuides(token)
+        setApplications(data)
+      } catch (err) {
+        showMessage(err.message, 'error')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchGuides()
+  }, [token])
 
   const showMessage = (message, type = 'success') => {
     setActionMessage(message)
     setMessageType(type)
-
-    setTimeout(() => {
-      setActionMessage('')
-    }, 3000)
+    setTimeout(() => setActionMessage(''), 3000)
   }
 
-  const handleApprove = (id) => {
-    const app = applications.find((a) => a.id === id)
+  // ── approve ──
+  const handleApprove = async (id) => {
+    const app = applications.find((a) => a._id === id)
 
-    if (!app?.universityId || !app?.transcript) {
-      showMessage(
-        'Cannot approve application until both University ID and Transcript are uploaded.',
-        'error'
-      )
+    if (!app?.transcript) {
+      showMessage('Cannot approve — transcript not uploaded.', 'error')
       return
     }
 
-    setApplications((prev) =>
-      prev.map((a) =>
-        a.id === id ? { ...a, status: 'Verified' } : a
+    try {
+      await apiApproveGuide(token, id)
+      setApplications((prev) =>
+        prev.map((a) => a._id === id ? { ...a, guideStatus: 'approved' } : a)
       )
-    )
-
-    showMessage(`${app.name} was verified successfully.`)
-    setSelectedApplication(null)
+      showMessage(`${app.name} was verified successfully.`)
+      setSelectedApplication(null)
+    } catch (err) {
+      showMessage(err.message, 'error')
+    }
   }
 
-  const handleReject = (id) => {
-    const app = applications.find((a) => a.id === id)
+  // ── reject ──
+  const handleReject = async (id) => {
+    const app = applications.find((a) => a._id === id)
 
-    setApplications((prev) =>
-      prev.map((a) =>
-        a.id === id ? { ...a, status: 'Rejected' } : a
+    try {
+      await apiRejectGuide(token, id)
+      setApplications((prev) =>
+        prev.map((a) => a._id === id ? { ...a, guideStatus: 'rejected' } : a)
       )
-    )
-
-    showMessage(`${app.name} was rejected successfully.`)
-    setSelectedApplication(null)
+      showMessage(`${app.name} was rejected successfully.`)
+      setSelectedApplication(null)
+    } catch (err) {
+      showMessage(err.message, 'error')
+    }
   }
 
   const getBadgeStyle = (status) => {
-    if (status === 'Verified') {
-      return { backgroundColor: '#dcfce7', color: '#166534' }
-    }
-    if (status === 'Rejected') {
-      return { backgroundColor: '#fee2e2', color: '#991b1b' }
-    }
+    if (status === 'approved') return { backgroundColor: '#dcfce7', color: '#166534' }
+    if (status === 'rejected') return { backgroundColor: '#fee2e2', color: '#991b1b' }
     return { backgroundColor: '#fef3c7', color: '#92400e' }
+  }
+
+  const getBadgeLabel = (status) => {
+    if (status === 'approved') return 'Verified'
+    if (status === 'rejected') return 'Rejected'
+    return 'Pending'
   }
 
   const cardStyle = {
@@ -87,68 +102,68 @@ export default function PendingVerifications() {
   return (
     <AdminLayout>
       <div>
-        <h1 style={{ marginBottom: '8px', color: '#111827' }}>
-          Pending Verifications
-        </h1>
-
+        <h1 style={{ marginBottom: '8px', color: '#111827' }}>Pending Verifications</h1>
         <p style={{ marginBottom: '24px', color: '#6b7280' }}>
           Review guide applications and approve or reject them.
         </p>
 
         {actionMessage && (
-          <div
-            style={{
-              backgroundColor: messageType === 'error' ? '#fee2e2' : '#ecfdf5',
-              color: messageType === 'error' ? '#991b1b' : '#065f46',
-              padding: '12px 16px',
-              borderRadius: '10px',
-              marginBottom: '16px',
-              fontWeight: '600',
-              border: messageType === 'error'
-                ? '1px solid #ef4444'
-                : '1px solid #10b981',
-            }}
-          >
+          <div style={{
+            backgroundColor: messageType === 'error' ? '#fee2e2' : '#ecfdf5',
+            color: messageType === 'error' ? '#991b1b' : '#065f46',
+            padding: '12px 16px',
+            borderRadius: '10px',
+            marginBottom: '16px',
+            fontWeight: '600',
+            border: messageType === 'error' ? '1px solid #ef4444' : '1px solid #10b981',
+          }}>
             {actionMessage}
           </div>
         )}
 
         <div style={cardStyle}>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ backgroundColor: '#f9fafb' }}>
-                  <th style={{ padding: '12px' }}>Name</th>
-                  <th style={{ padding: '12px' }}>University</th>
-                  <th style={{ padding: '12px' }}>Major</th>
-                  <th style={{ padding: '12px' }}>Submitted Date</th>
-                  <th style={{ padding: '12px' }}>Status</th>
-                  <th style={{ padding: '12px' }}>Actions</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {applications.map((app) => (
-                  <tr key={app.id}>
-                    <td style={{ padding: '12px' }}>{app.name}</td>
-                    <td style={{ padding: '12px' }}>{app.university}</td>
-                    <td style={{ padding: '12px' }}>{app.major}</td>
-                    <td style={{ padding: '12px' }}>{app.submittedDate}</td>
-                    <td style={{ padding: '12px' }}>
-                      <span
-                        style={{
-                          ...getBadgeStyle(app.status),
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
+              Loading applications...
+            </div>
+          ) : applications.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
+              No pending applications.
+            </div>
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ backgroundColor: '#f9fafb' }}>
+                    <th style={{ padding: '12px' }}>Name</th>
+                    <th style={{ padding: '12px' }}>University</th>
+                    <th style={{ padding: '12px' }}>Major</th>
+                    <th style={{ padding: '12px' }}>Submitted Date</th>
+                    <th style={{ padding: '12px' }}>Status</th>
+                    <th style={{ padding: '12px' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {applications.map((app) => (
+                    <tr key={app._id}>
+                      <td style={{ padding: '12px' }}>{app.name}</td>
+                      <td style={{ padding: '12px' }}>{app.university}</td>
+                      <td style={{ padding: '12px' }}>{app.major}</td>
+                      <td style={{ padding: '12px' }}>
+                        {new Date(app.createdAt).toLocaleDateString()}
+                      </td>
+                      <td style={{ padding: '12px' }}>
+                        <span style={{
+                          ...getBadgeStyle(app.guideStatus),
                           padding: '6px 10px',
                           borderRadius: '999px',
                           fontWeight: '600',
-                        }}
-                      >
-                        {app.status}
-                      </span>
-                    </td>
-
-                    <td style={{ padding: '12px' }}>
-                      {isAdmin ? (
+                          fontSize: '13px',
+                        }}>
+                          {getBadgeLabel(app.guideStatus)}
+                        </span>
+                      </td>
+                      <td style={{ padding: '12px' }}>
                         <button
                           onClick={() => setSelectedApplication(app)}
                           style={{
@@ -162,179 +177,101 @@ export default function PendingVerifications() {
                         >
                           View Details
                         </button>
-                      ) : (
-                        <span style={{ color: '#9ca3af' }}>
-                          Admin Only
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
+        {/* Detail Modal */}
         {selectedApplication && (
-  <div
-    style={{
-      position: 'fixed',
-      inset: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 999,
-      padding: '20px',
-    }}
-  >
-    <div
-      style={{
-        backgroundColor: 'white',
-        width: '100%',
-        maxWidth: '600px',
-        borderRadius: '16px',
-        padding: '24px',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
-        maxHeight: '90vh',
-        overflowY: 'auto',
-      }}
-    >
-      {/* HEADER */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '20px',
-        }}
-      >
-        <h2 style={{ margin: 0, color: '#111827' }}>
-          Application Details
-        </h2>
+          <div style={{
+            position: 'fixed', inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 999, padding: '20px',
+          }}>
+            <div style={{
+              backgroundColor: 'white', width: '100%', maxWidth: '600px',
+              borderRadius: '16px', padding: '24px',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+              maxHeight: '90vh', overflowY: 'auto',
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <h2 style={{ margin: 0, color: '#111827' }}>Application Details</h2>
+                <button
+                  onClick={() => setSelectedApplication(null)}
+                  style={{ background: 'transparent', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#6b7280' }}
+                >×</button>
+              </div>
 
-        <button
-          onClick={() => setSelectedApplication(null)}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            fontSize: '20px',
-            cursor: 'pointer',
-            color: '#6b7280',
-          }}
-        >
-          ×
-        </button>
-      </div>
+              <div style={{ display: 'grid', gap: '12px', marginBottom: '20px' }}>
+                <p><strong>Name:</strong> {selectedApplication.name}</p>
+                <p><strong>Email:</strong> {selectedApplication.email}</p>
+                <p><strong>University:</strong> {selectedApplication.university}</p>
+                <p><strong>Major:</strong> {selectedApplication.major}</p>
+                <p><strong>Submitted Date:</strong> {new Date(selectedApplication.createdAt).toLocaleDateString()}</p>
+                <p>
+                  <strong>Status:</strong>{' '}
+                  <span style={{
+                    ...getBadgeStyle(selectedApplication.guideStatus),
+                    padding: '6px 10px', borderRadius: '999px',
+                    fontSize: '13px', fontWeight: '600',
+                  }}>
+                    {getBadgeLabel(selectedApplication.guideStatus)}
+                  </span>
+                </p>
+              </div>
 
-      {/* INFO */}
-      <div style={{ display: 'grid', gap: '12px', marginBottom: '20px' }}>
-        <p><strong>Name:</strong> {selectedApplication.name}</p>
-        <p><strong>Email:</strong> {selectedApplication.email}</p>
-        <p><strong>University:</strong> {selectedApplication.university}</p>
-        <p><strong>Major:</strong> {selectedApplication.major}</p>
-        <p><strong>Submitted Date:</strong> {selectedApplication.submittedDate}</p>
+              {/* Documents */}
+              <div style={{
+                border: '1px solid #e5e7eb', borderRadius: '12px',
+                padding: '16px', backgroundColor: '#f9fafb', marginBottom: '20px',
+              }}>
+                <p style={{ marginTop: 0, fontWeight: '600', color: '#111827' }}>
+                  Uploaded Documents
+                </p>
 
-        <p>
-          <strong>Status:</strong>{' '}
-          <span
-            style={{
-              ...getBadgeStyle(selectedApplication.status),
-              padding: '6px 10px',
-              borderRadius: '999px',
-              fontSize: '13px',
-              fontWeight: '600',
-            }}
-          >
-            {selectedApplication.status}
-          </span>
-        </p>
-      </div>
+                <div style={{ backgroundColor: 'white', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px', marginBottom: '12px' }}>
+                  <p style={{ margin: '0 0 6px 0', fontWeight: '600' }}>Transcript</p>
+                  {selectedApplication.transcript ? (
+                    <a
+                      href={`http://localhost:5001${selectedApplication.transcript}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ color: '#2E5C4E', fontWeight: '600' }}
+                    >
+                      View Transcript
+                    </a>
+                  ) : (
+                    <p style={{ margin: 0, color: '#6b7280' }}>Not uploaded</p>
+                  )}
+                </div>
+              </div>
 
-      {/* DOCUMENTS */}
-      <div
-        style={{
-          border: '1px solid #e5e7eb',
-          borderRadius: '12px',
-          padding: '16px',
-          backgroundColor: '#f9fafb',
-          marginBottom: '20px',
-        }}
-      >
-        <p style={{ marginTop: 0, fontWeight: '600', color: '#111827' }}>
-          Uploaded Documents
-        </p>
-
-        {/* University ID */}
-        <div
-          style={{
-            backgroundColor: 'white',
-            border: '1px solid #e5e7eb',
-            borderRadius: '10px',
-            padding: '12px',
-            marginBottom: '12px',
-          }}
-        >
-          <p style={{ margin: '0 0 6px 0', fontWeight: '600' }}>
-            University ID
-          </p>
-          <p style={{ margin: 0, color: '#6b7280' }}>
-            {selectedApplication.universityId || 'Not uploaded'}
-          </p>
-        </div>
-
-        {/* Transcript */}
-        <div
-          style={{
-            backgroundColor: 'white',
-            border: '1px solid #e5e7eb',
-            borderRadius: '10px',
-            padding: '12px',
-          }}
-        >
-          <p style={{ margin: '0 0 6px 0', fontWeight: '600' }}>
-            Transcript
-          </p>
-          <p style={{ margin: 0, color: '#6b7280' }}>
-            {selectedApplication.transcript || 'Not uploaded'}
-          </p>
-        </div>
-      </div>
-
-      {/* ACTIONS */}
-      <div
-        style={{
-          display: 'flex',
-          gap: '12px',
-          justifyContent: 'flex-end',
-          flexWrap: 'wrap',
-        }}
-      >
-        <button
-          onClick={() => handleApprove(selectedApplication.id)}
-          style={{
-            ...actionButtonStyle,
-            backgroundColor: '#16a34a',
-            color: 'white',
-          }}
-        >
-          Approve
-        </button>
-
-        <button
-          onClick={() => handleReject(selectedApplication.id)}
-          style={{
-            ...actionButtonStyle,
-            backgroundColor: '#dc2626',
-            color: 'white',
-          }}
-        >
-          Reject
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+              {/* Actions — only show if still pending */}
+              {selectedApplication.guideStatus === 'pending' && (
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => handleApprove(selectedApplication._id)}
+                    style={{ ...actionButtonStyle, backgroundColor: '#16a34a', color: 'white' }}
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => handleReject(selectedApplication._id)}
+                    style={{ ...actionButtonStyle, backgroundColor: '#dc2626', color: 'white' }}
+                  >
+                    Reject
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </AdminLayout>
   )
