@@ -179,20 +179,25 @@ function AdminLayout({ children }) {
           </h2>
         </div>
 
-        <span
-          style={{
-            backgroundColor: 'rgba(255,255,255,0.12)',
-            color: 'white',
-            padding: isMobile ? '6px 10px' : '7px 14px',
-            borderRadius: '999px',
-            fontSize: isMobile ? '12px' : '14px',
-            fontWeight: '600',
-            flexShrink: 0,
-            border: '1px solid rgba(255,255,255,0.08)',
-          }}
-        >
-          Admin
-        </span>
+      <button
+        onClick={() => {
+          localStorage.removeItem('meras_token')
+          window.location.href = '/'
+        }}
+        style={{
+          backgroundColor: 'rgba(255,255,255,0.12)',
+          color: 'white',
+          padding: isMobile ? '6px 10px' : '7px 14px',
+          borderRadius: '999px',
+          fontSize: isMobile ? '12px' : '14px',
+          fontWeight: '600',
+          flexShrink: 0,
+          border: '1px solid rgba(255,255,255,0.08)',
+          cursor: 'pointer',
+        }}
+      >
+        Admin · Logout
+      </button>
       </header>
 
       <div

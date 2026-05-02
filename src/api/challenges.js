@@ -5,7 +5,7 @@
 // ── helper: attach JWT token to protected requests ────────────────────────────
 const getAuthHeaders = () => ({
   "Content-Type": "application/json",
-  Authorization: `Bearer ${localStorage.getItem("token")}`,
+  Authorization: `Bearer ${localStorage.getItem("meras_token")}`,
 });
 
 // ── GET /api/challenges ───────────────────────────────────────────────────────
