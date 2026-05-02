@@ -11,7 +11,7 @@ function SubmissionConfirmation() {
 
   useEffect(() => {
     apiGetChallengeById(id)
-      .then(data => setChallenge(data.challenge))
+      .then(challenge => setChallenge(challenge))
       .catch(err => console.error('Failed to load challenge:', err.message))
   }, [id])
 

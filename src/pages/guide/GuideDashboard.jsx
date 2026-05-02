@@ -20,6 +20,7 @@ function GuideDashboard() {
 
   const [guideChallenges, setGuideChallenges] = useState([])
   const [pendingSubmissions, setPendingSubmissions] = useState([])
+  const [recentActivity, setRecentActivity] = useState([])
   const [loading, setLoading] = useState(true)
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 

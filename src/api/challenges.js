@@ -119,6 +119,18 @@ export const unsaveChallenge = async (id) => {
   return data;
 };
 
+// ── POST /api/challenges/:id/start ───────────────────────────────────────────
+// Explorer only — adds to challengesInProgress
+export const apiStartChallenge = async (id) => {
+  const res = await fetch(`/api/challenges/${id}/start`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to start challenge");
+  return data;
+};
+
 export const apiGetChallenges    = getChallenges;
 export const apiGetChallengeById = getChallengeById;
 export const apiCreateChallenge  = createChallenge;

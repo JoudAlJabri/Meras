@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ReactSketchCanvas } from 'react-sketch-canvas'
 import { apiCreateSubmission } from '../../../api/submissions'
+import { apiStartChallenge } from '../../../api/challenges'
 
 
 
@@ -24,6 +25,7 @@ useEffect(() => {
       const res = await fetch(`/api/challenges/${id}`)
       const data = await res.json()
       setChallenge(data.challenge)
+      apiStartChallenge(id).catch(() => {}) // mark in-progress, ignore errors silently
     } catch (error) {
       console.error("Error fetching challenge:", error)
     } finally {

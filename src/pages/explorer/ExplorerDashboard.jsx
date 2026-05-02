@@ -112,7 +112,7 @@ function ExplorerDashboard() {
               </div>
               <button
                 style={styles.exploreButton}
-                onClick={() => navigate("/explorer/challenges")}
+                onClick={() => navigate(`/explorer/workspace/${inProgress[0]._id}`)}
               >
                 Continue →
               </button>

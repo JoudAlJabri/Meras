@@ -169,6 +169,19 @@ const deleteChallenge = async (req, res) => {
   }
 };
 
+// POST /challenges/:id/start — explorer opens the workspace
+const startChallenge = async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.user.id, {
+      $addToSet: { challengesInProgress: req.params.id },
+    });
+    res.status(200).json({ message: "Challenge started" });
+  } catch (err) {
+    console.error("startChallenge error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 // POST /challenges/:id/complete — explorer marks a challenge as done
 
 const completeChallenge = async (req, res) => {
@@ -224,6 +237,7 @@ module.exports = {
   createChallenge,
   updateChallenge,
   deleteChallenge,
+  startChallenge,
   completeChallenge,
   saveChallenge,
   unsaveChallenge,

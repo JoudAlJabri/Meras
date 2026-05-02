@@ -10,6 +10,7 @@ const {
   createChallenge,
   updateChallenge,
   deleteChallenge,
+  startChallenge,
   completeChallenge,
   saveChallenge,
   unsaveChallenge,
@@ -31,7 +32,8 @@ router.put("/:id", protect, requireRole("guide"), updateChallenge);
 // Guide or admin — delete
 router.delete("/:id", protect, requireRole("guide", "admin"), deleteChallenge);
 
-// Explorer only — complete / save / unsave
+// Explorer only — start / complete / save / unsave
+router.post("/:id/start", protect, requireRole("explorer"), startChallenge);
 router.post("/:id/complete", protect, requireRole("explorer"), completeChallenge);
 router.post("/:id/save", protect, requireRole("explorer"), saveChallenge);
 router.delete("/:id/save", protect, requireRole("explorer"), unsaveChallenge);
