@@ -4,6 +4,21 @@ Meras is a web-based mentorship platform that connects high school students (**E
 
 ---
 
+## 🎬 How to Use Meras
+https://drive.google.com/drive/folders/1_4-dq46EUWHUmpY_kcrXZMSn0T-nVlbQ
+
+---
+
+## 🔑 Demo Credentials
+
+| Role | Email | Password |
+|------|-------|----------|
+| Explorer | harbilamees86@gmail.com | Ll11223344 |
+| Guide | s202242700@kfupm.edu.sa | 12345678 |
+| Admin | admin@gmail.com | admin123 |
+
+---
+
 ## 👥 Team
 
 | Name | Role |
