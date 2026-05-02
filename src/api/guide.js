@@ -12,6 +12,7 @@ const getAuthHeaders = () => ({
 })
 
 // SESSIONS 
+// ─── SESSIONS ────────────────────────────────────────────────────────────────
 
 // GET /api/sessions/mine — guide views their booked sessions
 export const apiGetGuideSessions = async () => {
@@ -56,6 +57,7 @@ export const apiGetAvailability = async (guideId) => {
 }
 
 // SUBMISSIONS 
+// ─── SUBMISSIONS ──────────────────────────────────────────────────────────────
 
 // GET /api/submissions/guide/:guideId — guide views their grading queue
 export const apiGetGuideSubmissions = async (guideId) => {
@@ -77,7 +79,8 @@ export const apiGradeSubmission = async (submissionId, { stars, feedback }) => {
   return data // { submission }
 }
 
-// REVIEWS 
+
+// ─── REVIEWS ──────────────────────────────────────────────────────────────────
 
 // POST /api/reviews — explorer submits a review for a mentor
 export const apiCreateReview = async ({ mentorId, bookingId, stars, text }) => {
@@ -99,7 +102,8 @@ export const apiGetReviewsByMentor = async (mentorId) => {
   return data // [ ...reviews ]
 }
 
-// MENTOR DIRECTORY 
+
+// ─── MENTOR DIRECTORY ─────────────────────────────────────────────────────────
 
 // GET /api/users/mentors?major=&university= — public, all approved guides
 export const apiGetMentors = async ({ major, university } = {}) => {
