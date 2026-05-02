@@ -27,6 +27,8 @@ router.delete("/announcements/:id", protect, requireRole("admin"), adminControll
 router.get("/flagged-content",              protect, requireRole("admin"), adminController.getFlaggedContent);
 router.patch("/flagged-content/:id/dismiss", protect, requireRole("admin"), adminController.dismissFlag);
 router.patch("/flagged-content/:id/remove",  protect, requireRole("admin"), adminController.removeContent);
+// explorer submits a report — any logged-in user
+router.post("/flagged-content", protect, adminController.createFlaggedContent);
 module.exports = router;
 
 // taxonomy routes
