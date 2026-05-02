@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { MdStar, MdStarBorder, MdClose, MdVideoCall } from "react-icons/md";
-import {mockSubmissions} from "../../data/mockData"
+import { useAuth } from "../../context/AuthContext";
+import { apiGetSubmissionsByGuide, apiGradeSubmission } from "../../api/submissions";
 
+const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-const TODAY = new Date(2026, 3, 9);
 function buildWeek(anchor) {
   const day = anchor.getDay();
   const monday = new Date(anchor);
@@ -14,38 +15,31 @@ function buildWeek(anchor) {
     return d;
   });
 }
-const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const mockSessions = [
-  { id: 1, date: new Date(2026, 3, 9),  student: "Sara Mohammed",  topic: "REST API architecture review",       time: "10:00 – 10:45 AM" },
-  { id: 2, date: new Date(2026, 3, 9),  student: "Nour Al-Rashid", topic: "Choosing the right chart type",      time: "2:00 – 2:45 PM"  },
-  { id: 3, date: new Date(2026, 3, 11), student: "Layla Hassan",   topic: "Figma component structure feedback", time: "11:00 – 11:45 AM" },
-  { id: 4, date: new Date(2026, 3, 13), student: "Yasser Khalid",  topic: "Career path in cloud engineering",   time: "3:30 – 4:15 PM"  },
-];
+
 function isSameDay(a, b) {
   return a.getFullYear() === b.getFullYear() &&
     a.getMonth() === b.getMonth() &&
     a.getDate() === b.getDate();
 }
 
-
 function FilePreview({ sub }) {
   return (
     <div style={s.submissionBox}>
-      <p style={s.submissionFile}>📎 {sub.file}</p>
-      {sub.note && <p style={s.submissionNote}>"{sub.note}"</p>}
+      {sub.fileUrl
+        ? <a href={`http://localhost:5001${sub.fileUrl}`} target="_blank" rel="noreferrer" style={{ color: '#3DB87A', fontWeight: '600', fontSize: '14px' }}>
+            📎 View Uploaded File
+          </a>
+        : <p style={s.submissionFile}>📎 No file available</p>
+      }
     </div>
   );
 }
 
-// 2. TEXT submission – collapsible text area.
-// Collapsed: shows ~150 chars + "Expand" pill.
-// Expanded:  shows full text (with newlines preserved) + "See less" pill.
 const TEXT_PREVIEW_LIMIT = 150;
 function TextPreview({ sub, expanded, onToggle }) {
-  const full     = sub.textAnswer ?? "";
-  const isLong   = full.length > TEXT_PREVIEW_LIMIT;
-  const preview  = isLong && !expanded ? full.slice(0, TEXT_PREVIEW_LIMIT) + "…" : full;
-
+  const full    = sub.textAnswer ?? "";
+  const isLong  = full.length > TEXT_PREVIEW_LIMIT;
+  const preview = isLong && !expanded ? full.slice(0, TEXT_PREVIEW_LIMIT) + "…" : full;
   return (
     <div style={s.submissionBox}>
       <p style={s.answerLabel}>Text Answer</p>
@@ -61,29 +55,12 @@ function TextPreview({ sub, expanded, onToggle }) {
   );
 }
 
-// 3. CANVAS submission – shows the drawing as an <img>.
-// Collapsed: fixed-height container, image cropped, "Expand" pill.
-// Expanded:  full image shown, "See less" pill.
-//
-// How this works end-to-end (explained for the dev):
-// • The student draws on an HTML5 <canvas> element in the Explorer workspace.
-// • When they submit, the app calls `canvas.toDataURL("image/png")`, which
-//   serialises every pixel into a base64-encoded PNG string (a long data: URL).
-// • That string is stored in the database as `submission.canvasImage`.
-// • Here, we just render it with <img src={sub.canvasImage}> — the browser
-//   decodes it identically to any other PNG. No file upload, no CDN needed.
-// • The mock below uses an inline SVG data-URI so we get a realistic preview
-//   without needing a real file.
 function CanvasPreview({ sub, expanded, onToggle }) {
   return (
     <div style={s.submissionBox}>
       <p style={s.answerLabel}>Canvas Drawing</p>
       <div style={{ ...s.canvasWrap, maxHeight: expanded ? "none" : "140px" }}>
-        <img
-          src={sub.canvasImage}
-          alt="Student canvas submission"
-          style={s.canvasImg}
-        />
+        <img src={`http://localhost:5001${sub.canvasUrl}`} alt="Canvas submission" style={s.canvasImg} />
       </div>
       <div style={s.expandRow}>
         <button style={s.expandPill} onClick={onToggle}>
@@ -94,65 +71,107 @@ function CanvasPreview({ sub, expanded, onToggle }) {
   );
 }
 
+const majorColors = {
+  'software engineering': '#3DB87A',
+  'computer science': '#3DB87A',
+  'data science': '#F59E0B',
+  'mechanical engineering': '#6B7280',
+  'electrical engineering': '#3B82F6',
+  'business administration': '#F59E0B',
+}
+
+function getMajorColor(major) {
+  return majorColors[major?.toLowerCase()] || '#3DB87A'
+}
+
 function GradingView() {
-  const [selectedSubmission, setSelectedSubmission] = useState(null);
-  const [ratings, setRatings]       = useState({});
-  const [feedbacks, setFeedbacks]   = useState({});
-  const [hovered, setHovered]       = useState(0);
-  const [submitted, setSubmitted]   = useState({});
-  const [expandedAnswer, setExpandedAnswer] = useState(false);
+  const { currentUser, getToken } = useAuth()
+  const token = getToken()
 
-  const [week]         = useState(() => buildWeek(TODAY));
-  const [selectedDay, setSelectedDay] = useState(TODAY);
+  const [submissions, setSubmissions] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  // The week strip (7 day buttons in a flex row) overflows on narrow phones.
-  // Submission rows also need their right-side button to move below on mobile.
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
+  const [selectedSubmission, setSelectedSubmission] = useState(null)
+  const [ratings, setRatings]     = useState({})
+  const [feedbacks, setFeedbacks] = useState({})
+  const [hovered, setHovered]     = useState(0)
+  const [grading, setGrading]     = useState(false)
+  const [expandedAnswer, setExpandedAnswer] = useState(false)
+
+  const TODAY = new Date()
+  const [week]       = useState(() => buildWeek(TODAY))
+  const [selectedDay, setSelectedDay] = useState(TODAY)
+
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 600)
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 600);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-  const sessionsForDay = mockSessions.filter(s => isSameDay(s.date, selectedDay));
+    const handleResize = () => setIsMobile(window.innerWidth <= 600)
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
 
-  const currentRating   = selectedSubmission ? (ratings[selectedSubmission.id]   ?? 0) : 0;
-  const currentFeedback = selectedSubmission ? (feedbacks[selectedSubmission.id] ?? "") : "";
-  const canSubmit = currentRating > 0 && currentFeedback.trim().length > 0;
+  // ── fetch real submissions ──
+  useEffect(() => {
+    if (!currentUser?._id) return
+    const fetchSubmissions = async () => {
+      try {
+        const data = await apiGetSubmissionsByGuide(token, currentUser._id)
+        setSubmissions(data.submissions || [])
+      } catch (err) {
+        console.error('fetchSubmissions error:', err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchSubmissions()
+  }, [currentUser, token])
+
+  const pendingSubmissions = submissions.filter(s => s.status === 'pending')
+
+  const currentRating   = selectedSubmission ? (ratings[selectedSubmission._id]   ?? 0) : 0
+  const currentFeedback = selectedSubmission ? (feedbacks[selectedSubmission._id] ?? "") : ""
+  const canSubmit = currentRating > 0 && currentFeedback.trim().length > 0
 
   function openPanel(sub) {
-    setSelectedSubmission(sub);
-    setExpandedAnswer(false); // always start collapsed
+    setSelectedSubmission(sub)
+    setExpandedAnswer(false)
   }
 
   function closePanel() {
-    setSelectedSubmission(null);
-    setExpandedAnswer(false);
+    setSelectedSubmission(null)
+    setExpandedAnswer(false)
   }
 
-  function handleSubmitGrade() {
-    if (!canSubmit) return;
-    setSubmitted(prev => ({ ...prev, [selectedSubmission.id]: true }));
-    closePanel();
+  // ── grade submission ──
+  async function handleSubmitGrade() {
+    if (!canSubmit) return
+    setGrading(true)
+    try {
+      await apiGradeSubmission(token, selectedSubmission._id, {
+        stars: currentRating,
+        feedback: currentFeedback,
+      })
+      // update local state — move from pending to graded
+      setSubmissions(prev =>
+        prev.map(s =>
+          s._id === selectedSubmission._id
+            ? { ...s, status: 'graded', stars: currentRating, feedback: currentFeedback }
+            : s
+        )
+      )
+      closePanel()
+    } catch (err) {
+      alert(err.message)
+    } finally {
+      setGrading(false)
+    }
   }
 
-  function isJoinable(session) {
-    const now = new Date();
-    const [hStr] = session.time.split(":");
-    const sessionHour = parseInt(hStr, 10) + (session.time.includes("PM") && parseInt(hStr) !== 12 ? 12 : 0);
-    const diff = sessionHour - now.getHours();
-    return isSameDay(session.date, now) && diff <= 0 && diff > -1;
-  }
-
-  // Pick the right preview component based on submissionType
   function renderSubmissionPreview(sub) {
     switch (sub.submissionType) {
-      case "text":
-        return <TextPreview sub={sub} expanded={expandedAnswer} onToggle={() => setExpandedAnswer(e => !e)} />;
-      case "canvas":
-        return <CanvasPreview sub={sub} expanded={expandedAnswer} onToggle={() => setExpandedAnswer(e => !e)} />;
+      case "text":   return <TextPreview   sub={sub} expanded={expandedAnswer} onToggle={() => setExpandedAnswer(e => !e)} />
+      case "canvas": return <CanvasPreview sub={sub} expanded={expandedAnswer} onToggle={() => setExpandedAnswer(e => !e)} />
       case "file":
-      default:
-        return <FilePreview sub={sub} />;
+      default:       return <FilePreview   sub={sub} />
     }
   }
 
@@ -162,92 +181,78 @@ function GradingView() {
       {/* Pending Submissions */}
       <section style={s.section}>
         <h2 style={s.sectionTitle}>Pending Submissions</h2>
-        <p style={s.sectionSub}>{mockSubmissions.filter(sub => !submitted[sub.id]).length} awaiting your review</p>
+        <p style={s.sectionSub}>{pendingSubmissions.length} awaiting your review</p>
 
-        <div style={s.submissionList}>
-          {mockSubmissions.map(sub => {
-            const isDone = submitted[sub.id];
-            return (
-              /* On mobile: stack info + grade button vertically so the button
-                 doesn't get squished beside the text */
-              <div key={sub.id} style={{ ...s.submissionRow, borderLeftColor: sub.majorColor, opacity: isDone ? 0.5 : 1, flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center" }}>
+        {loading ? (
+          <p style={{ color: '#9CA3AF', fontSize: '14px' }}>Loading submissions...</p>
+        ) : pendingSubmissions.length === 0 ? (
+          <p style={{ color: '#9CA3AF', fontSize: '14px' }}>No pending submissions.</p>
+        ) : (
+          <div style={s.submissionList}>
+            {pendingSubmissions.map(sub => (
+              <div
+                key={sub._id}
+                style={{
+                  ...s.submissionRow,
+                  borderLeftColor: getMajorColor(sub.challengeId?.major),
+                  flexDirection: isMobile ? "column" : "row",
+                  alignItems: isMobile ? "flex-start" : "center",
+                }}
+              >
                 <div style={s.subInfo}>
-                  <p style={s.subStudent}>{sub.student}</p>
-                  <p style={s.subChallenge}>{sub.challenge}</p>
-                  <p style={s.subMeta}>{sub.major} · Submitted {sub.submittedAt}</p>
+                  <p style={s.subStudent}>{sub.explorerId?.name || 'Explorer'}</p>
+                  <p style={s.subChallenge}>{sub.challengeId?.title || 'Challenge'}</p>
+                  <p style={s.subMeta}>
+                    {sub.challengeId?.major} · Submitted {new Date(sub.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </p>
                 </div>
                 <div style={s.subRight}>
-                  {isDone
-                    ? <span style={s.gradedBadge}>Graded</span>
-                    : <button style={s.gradeBtn} onClick={() => openPanel(sub)}>Grade</button>
-                  }
+                  <button style={s.gradeBtn} onClick={() => openPanel(sub)}>Grade</button>
                 </div>
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
 
-      {/*  Upcoming Sessions */}
+      {/* Upcoming Sessions — still placeholder until sessions API is connected */}
       <section style={s.section}>
         <h2 style={s.sectionTitle}>Upcoming Sessions</h2>
         <p style={s.sectionSub}>Select a day to see booked sessions</p>
 
-        {/* Week strip — 7 buttons in a row. On very narrow phones they'd overflow,
-            so we allow wrapping into a 2-row grid. */}
         <div style={{ ...s.weekStrip, flexWrap: isMobile ? "wrap" : "nowrap" }}>
           {week.map((day, i) => {
-            const isToday     = isSameDay(day, TODAY);
-            const isSelected  = isSameDay(day, selectedDay);
-            const hasSessions = mockSessions.some(se => isSameDay(se.date, day));
+            const isToday    = isSameDay(day, TODAY)
+            const isSelected = isSameDay(day, selectedDay)
             return (
               <button key={i} style={{ ...s.dayBtn, ...(isSelected ? s.dayBtnActive : {}) }} onClick={() => setSelectedDay(day)}>
-                <span style={{ ...s.dayLabel,  color: isSelected ? "#fff" : "var(--color-text-secondary)" }}>{DAY_LABELS[i]}</span>
-                <span style={{ ...s.dayNumber, color: isSelected ? "#fff" : "var(--color-text-primary)", fontWeight: isToday ? 700 : 500 }}>{day.getDate()}</span>
-                {hasSessions && <span style={{ ...s.dot, backgroundColor: isSelected ? "#fff" : "var(--color-primary)" }} />}
+                <span style={{ ...s.dayLabel,  color: isSelected ? "#fff" : "#6B7280" }}>{DAY_LABELS[i]}</span>
+                <span style={{ ...s.dayNumber, color: isSelected ? "#fff" : "#111827", fontWeight: isToday ? 700 : 500 }}>{day.getDate()}</span>
               </button>
-            );
+            )
           })}
         </div>
 
-        {sessionsForDay.length === 0
-          ? <div style={s.emptyState}><p style={s.emptyText}>No sessions scheduled for this day.</p></div>
-          : (
-            <div style={s.sessionList}>
-              {sessionsForDay.map(session => {
-                const joinable = isJoinable(session);
-                return (
-                  <div key={session.id} style={s.sessionCard}>
-                    <div style={s.sessionIconWrap}><MdVideoCall size={22} color="var(--color-primary)" /></div>
-                    <div style={s.sessionInfo}>
-                      <p style={s.sessionStudent}>{session.student}</p>
-                      <p style={s.sessionTopic}>{session.topic}</p>
-                      <p style={s.sessionTime}>{session.time}</p>
-                    </div>
-                    <button style={{ ...s.joinBtn, ...(joinable ? s.joinBtnActive : {}) }} disabled={!joinable}>Join</button>
-                  </div>
-                );
-              })}
-            </div>
-          )
-        }
+        <div style={s.emptyState}>
+          <p style={s.emptyText}>No sessions scheduled for this day.</p>
+        </div>
       </section>
 
-      {/*  Grading panel (modal)*/}
+      {/* Grading Panel */}
       {selectedSubmission && (
         <div style={s.overlay} onClick={closePanel}>
-          {/* Reduce panel padding on mobile so content isn't cramped */}
           <div style={{ ...s.panel, padding: isMobile ? "20px 16px" : "32px" }} onClick={e => e.stopPropagation()}>
 
             <div style={s.panelHeader}>
               <div>
-                <h3 style={s.panelTitle}>{selectedSubmission.challenge}</h3>
-                <p style={s.panelSub}>by {selectedSubmission.student} · {selectedSubmission.submittedAt}</p>
+                <h3 style={s.panelTitle}>{selectedSubmission.challengeId?.title}</h3>
+                <p style={s.panelSub}>
+                  by {selectedSubmission.explorerId?.name} · {new Date(selectedSubmission.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                </p>
               </div>
               <button style={s.closeBtn} onClick={closePanel}><MdClose size={20} /></button>
             </div>
 
-            {/* Submission preview — switches on type */}
             {renderSubmissionPreview(selectedSubmission)}
 
             {/* Rating */}
@@ -255,18 +260,18 @@ function GradingView() {
               <p style={s.fieldLabel}>Rating</p>
               <div style={s.stars}>
                 {[1, 2, 3, 4, 5].map(star => {
-                  const filled = star <= (hovered || currentRating);
+                  const filled = star <= (hovered || currentRating)
                   return (
                     <span
                       key={star}
                       style={s.star}
                       onMouseEnter={() => setHovered(star)}
                       onMouseLeave={() => setHovered(0)}
-                      onClick={() => setRatings(prev => ({ ...prev, [selectedSubmission.id]: star }))}
+                      onClick={() => setRatings(prev => ({ ...prev, [selectedSubmission._id]: star }))}
                     >
                       {filled ? <MdStar size={32} color="#F59E0B" /> : <MdStarBorder size={32} color="#D1D5DB" />}
                     </span>
-                  );
+                  )
                 })}
                 {currentRating > 0 && <span style={s.ratingLabel}>{currentRating} / 5</span>}
               </div>
@@ -279,7 +284,7 @@ function GradingView() {
                 style={s.textarea}
                 placeholder="Write your feedback for the student…"
                 value={currentFeedback}
-                onChange={e => setFeedbacks(prev => ({ ...prev, [selectedSubmission.id]: e.target.value }))}
+                onChange={e => setFeedbacks(prev => ({ ...prev, [selectedSubmission._id]: e.target.value }))}
                 rows={4}
               />
             </div>
@@ -288,31 +293,26 @@ function GradingView() {
               <button style={s.cancelBtn} onClick={closePanel}>Cancel</button>
               <button
                 style={{ ...s.submitBtn, opacity: canSubmit ? 1 : 0.45, cursor: canSubmit ? "pointer" : "not-allowed" }}
-                disabled={!canSubmit}
+                disabled={!canSubmit || grading}
                 onClick={handleSubmitGrade}
               >
-                Submit
+                {grading ? 'Submitting...' : 'Submit'}
               </button>
             </div>
-
           </div>
         </div>
       )}
-
     </div>
-  );
+  )
 }
 
-// styles
 const s = {
   page: { padding: "8px", fontFamily: "Plus Jakarta Sans, sans-serif", display: "flex", flexDirection: "column", gap: "28px" },
-
   section: { backgroundColor: "#FFFFFF", borderRadius: "20px", padding: "28px 28px 24px", border: "1px solid #E5E7EB", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" },
   sectionTitle: { margin: "0 0 4px 0", fontSize: "20px", fontWeight: "700", color: "#111827" },
   sectionSub: { margin: "0 0 20px 0", fontSize: "14px", color: "#6B7280" },
-
   submissionList: { display: "flex", flexDirection: "column", gap: "12px" },
-  submissionRow: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderRadius: "14px", borderLeft: "4px solid", backgroundColor: "#F9FAFB", gap: "16px", transition: "box-shadow 0.15s ease" },
+  submissionRow: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderRadius: "14px", borderLeft: "4px solid", backgroundColor: "#F9FAFB", gap: "16px" },
   subInfo: { display: "flex", flexDirection: "column", gap: "3px" },
   subStudent: { margin: 0, fontSize: "15px", fontWeight: "600", color: "#111827" },
   subChallenge: { margin: 0, fontSize: "14px", color: "#374151" },
@@ -320,63 +320,39 @@ const s = {
   subRight: { flexShrink: 0 },
   gradeBtn: { backgroundColor: "var(--meras-green)", color: "#FFFFFF", border: "none", borderRadius: "999px", padding: "9px 22px", fontSize: "14px", fontWeight: "600", cursor: "pointer" },
   gradedBadge: { display: "inline-block", backgroundColor: "#D1FAE5", color: "#065F46", borderRadius: "999px", padding: "6px 16px", fontSize: "13px", fontWeight: "600" },
-
   weekStrip: { display: "flex", gap: "8px", marginBottom: "20px" },
-  dayBtn: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", padding: "10px 4px", borderRadius: "14px", border: "1px solid #E5E7EB", backgroundColor: "#F9FAFB", cursor: "pointer", transition: "all 0.15s ease", minWidth: 0 },
+  dayBtn: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", padding: "10px 4px", borderRadius: "14px", border: "1px solid #E5E7EB", backgroundColor: "#F9FAFB", cursor: "pointer", minWidth: 0 },
   dayBtnActive: { backgroundColor: "#3DB87A", border: "1px solid #3DB87A" },
   dayLabel: { fontSize: "11px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.05em" },
   dayNumber: { fontSize: "18px" },
   dot: { width: "5px", height: "5px", borderRadius: "50%" },
-
-  sessionList: { display: "flex", flexDirection: "column", gap: "12px" },
-  sessionCard: { display: "flex", alignItems: "center", gap: "16px", padding: "16px 20px", borderRadius: "14px", border: "1px solid #E5E7EB", backgroundColor: "#F9FAFB" },
-  sessionIconWrap: { width: "44px", height: "44px", borderRadius: "12px", backgroundColor: "#D4F2E4", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
-  sessionInfo: { flex: 1, display: "flex", flexDirection: "column", gap: "2px" },
-  sessionStudent: { margin: 0, fontSize: "15px", fontWeight: "600", color: "#111827" },
-  sessionTopic: { margin: 0, fontSize: "13px", color: "#374151" },
-  sessionTime: { margin: 0, fontSize: "12px", color: "#9CA3AF" },
-  joinBtn: { flexShrink: 0, backgroundColor: "#E5E7EB", color: "#9CA3AF", border: "none", borderRadius: "999px", padding: "9px 22px", fontSize: "14px", fontWeight: "600", cursor: "not-allowed" },
-  joinBtnActive: { backgroundColor: "#3DB87A", color: "#FFFFFF", cursor: "pointer" },
   emptyState: { textAlign: "center", padding: "32px 0" },
   emptyText: { margin: 0, fontSize: "14px", color: "#9CA3AF" },
-
   overlay: { position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.35)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200, padding: "24px" },
   panel: { backgroundColor: "#FFFFFF", borderRadius: "24px", padding: "32px", width: "100%", maxWidth: "540px", maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 50px rgba(0,0,0,0.13)", display: "flex", flexDirection: "column", gap: "20px" },
   panelHeader: { display: "flex", justifyContent: "space-between", alignItems: "flex-start" },
   panelTitle: { margin: "0 0 4px 0", fontSize: "20px", fontWeight: "700", color: "#111827" },
   panelSub: { margin: 0, fontSize: "13px", color: "#6B7280" },
   closeBtn: { background: "none", border: "none", cursor: "pointer", color: "#9CA3AF", padding: "4px", display: "flex", alignItems: "center" },
-
-  // Shared submission box wrapper
   submissionBox: { backgroundColor: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: "14px", padding: "16px 18px", display: "flex", flexDirection: "column", gap: "10px" },
-  // File type
   submissionFile: { margin: 0, fontSize: "14px", fontWeight: "600", color: "#111827" },
   submissionNote: { margin: 0, fontSize: "13px", color: "#6B7280", fontStyle: "italic", lineHeight: "1.5" },
-  // Text type
   answerLabel: { margin: 0, fontSize: "13px", fontWeight: "700", color: "#111827" },
   answerText: { margin: 0, fontSize: "13px", color: "#374151", lineHeight: "1.65" },
-  // Expand / See less pill button (amber, matches design)
   expandRow: { display: "flex", justifyContent: "flex-end" },
   expandPill: { backgroundColor: "#F5B800", color: "#111827", border: "none", borderRadius: "999px", padding: "4px 16px", fontSize: "13px", fontWeight: "600", cursor: "pointer" },
-  // Canvas type
   canvasWrap: { overflow: "hidden", borderRadius: "8px", transition: "max-height 0.25s ease" },
   canvasImg: { width: "100%", height: "auto", display: "block", borderRadius: "8px" },
-
-  // Rating
   ratingSection: { display: "flex", flexDirection: "column", gap: "8px" },
   fieldLabel: { margin: 0, fontSize: "13px", fontWeight: "600", color: "#374151", textTransform: "uppercase", letterSpacing: "0.06em" },
   stars: { display: "flex", alignItems: "center", gap: "4px" },
   star: { cursor: "pointer", display: "flex", alignItems: "center" },
   ratingLabel: { marginLeft: "8px", fontSize: "14px", fontWeight: "600", color: "#F59E0B" },
-
-  // Feedback
   feedbackSection: { display: "flex", flexDirection: "column", gap: "8px" },
   textarea: { width: "100%", padding: "12px 14px", borderRadius: "12px", border: "1px solid #D1D5DB", fontSize: "14px", color: "#111827", resize: "vertical", outline: "none", fontFamily: "Plus Jakarta Sans, sans-serif", lineHeight: "1.5", boxSizing: "border-box" },
-
-  // Actions
   panelActions: { display: "flex", justifyContent: "flex-end", gap: "12px" },
   cancelBtn: { backgroundColor: "#F3F4F6", color: "#374151", border: "none", borderRadius: "999px", padding: "11px 24px", fontSize: "14px", fontWeight: "600", cursor: "pointer" },
   submitBtn: { backgroundColor: "#3DB87A", color: "#FFFFFF", border: "none", borderRadius: "999px", padding: "11px 28px", fontSize: "14px", fontWeight: "600", transition: "opacity 0.15s ease" },
-};
+}
 
-export default GradingView;
+export default GradingView

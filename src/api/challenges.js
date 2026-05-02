@@ -1,99 +1,120 @@
-const BASE = '/api/challenges'
+// src/api/challenges.js
+// Uses fetch — same pattern as src/api/auth.js
+// Vite proxy forwards /api/... → http://localhost:5001/api/...
 
-const parseJSON = async (res) => {
-  try {
-    return await res.json()
-  } catch {
-    throw new Error('Could not reach the server. Make sure the backend is running.')
-  }
-}
-
+// ── helper: attach JWT token to protected requests ────────────────────────────
 const getAuthHeaders = () => ({
-  'Content-Type': 'application/json',
-  Authorization: `Bearer ${localStorage.getItem('meras_token')}`,
-})
+  "Content-Type": "application/json",
+  Authorization: `Bearer ${localStorage.getItem("meras_token")}`,
+});
 
-// GET /api/challenges?major=...&difficulty=...  — public
-export const apiGetChallenges = async ({ major, difficulty } = {}) => {
-  const params = new URLSearchParams()
-  if (major && major !== 'All') params.append('major', major)
-  if (difficulty)               params.append('difficulty', difficulty)
-  const query = params.toString() ? `?${params.toString()}` : ''
+// ── GET /api/challenges ───────────────────────────────────────────────────────
+// Public — no token needed
+// Optional filters: { major, difficulty }
+export const getChallenges = async (filters = {}) => {
+  const params = new URLSearchParams();
+  if (filters.major)      params.append("major", filters.major);
+  if (filters.difficulty) params.append("difficulty", filters.difficulty);
 
-  const res = await fetch(`${BASE}${query}`)
-  const data = await parseJSON(res)
-  if (!res.ok) throw new Error(data.message || 'Failed to load challenges')
-  return data // { challenges }
-}
+  const queryString = params.toString();
+  const url = queryString ? `/api/challenges?${queryString}` : `/api/challenges`;
 
-// GET /api/challenges/:id  — public
-export const apiGetChallengeById = async (id) => {
-  const res = await fetch(`${BASE}/${id}`)
-  const data = await parseJSON(res)
-  if (!res.ok) throw new Error(data.message || 'Challenge not found')
-  return data // { challenge }
-}
+  const res = await fetch(url);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to fetch challenges");
+  return data.challenges;
+};
 
-// GET /api/challenges/guide/:guideId  — guide only
-export const apiGetChallengesByGuide = async (guideId) => {
-  const res = await fetch(`${BASE}/guide/${guideId}`, { headers: getAuthHeaders() })
-  const data = await parseJSON(res)
-  if (!res.ok) throw new Error(data.message || 'Failed to fetch guide challenges')
-  return data // { challenges }
-}
+// ── GET /api/challenges/:id ───────────────────────────────────────────────────
+// Public — no token needed
+export const getChallengeById = async (id) => {
+  const res = await fetch(`/api/challenges/${id}`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Challenge not found");
+  return data.challenge;
+};
 
-// POST /api/challenges  — guide only
-export const apiCreateChallenge = async (challengeData) => {
-  const res = await fetch(BASE, {
-    method: 'POST',
+// ── GET /api/challenges/guide/:guideId ───────────────────────────────────────
+// Guide/admin only — needs token
+export const getChallengesByGuide = async (guideId) => {
+  const res = await fetch(`/api/challenges/guide/${guideId}`, {
+    headers: getAuthHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to fetch guide challenges");
+  return data.challenges;
+};
+
+// ── POST /api/challenges ──────────────────────────────────────────────────────
+// Guide only — needs token
+export const createChallenge = async (challengeData) => {
+  const res = await fetch("/api/challenges", {
+    method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify(challengeData),
-  })
-  const data = await parseJSON(res)
-  if (!res.ok) throw new Error(data.message || 'Failed to create challenge')
-  return data // { challenge }
-}
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to create challenge");
+  return data.challenge;
+};
 
-// PUT /api/challenges/:id  — guide only
-export const apiUpdateChallenge = async (id, updates) => {
-  const res = await fetch(`${BASE}/${id}`, {
-    method: 'PUT',
+// ── PUT /api/challenges/:id ───────────────────────────────────────────────────
+// Guide only — needs token
+export const updateChallenge = async (id, updates) => {
+  const res = await fetch(`/api/challenges/${id}`, {
+    method: "PUT",
     headers: getAuthHeaders(),
     body: JSON.stringify(updates),
-  })
-  const data = await parseJSON(res)
-  if (!res.ok) throw new Error(data.message || 'Failed to update challenge')
-  return data // { challenge }
-}
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to update challenge");
+  return data.challenge;
+};
 
-// DELETE /api/challenges/:id  — guide or admin
-export const apiDeleteChallenge = async (id) => {
-  const res = await fetch(`${BASE}/${id}`, { method: 'DELETE', headers: getAuthHeaders() })
-  const data = await parseJSON(res)
-  if (!res.ok) throw new Error(data.message || 'Failed to delete challenge')
-  return data
-}
+// ── DELETE /api/challenges/:id ────────────────────────────────────────────────
+// Guide (own) or admin — needs token
+export const deleteChallenge = async (id) => {
+  const res = await fetch(`/api/challenges/${id}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to delete challenge");
+  return data;
+};
 
-// POST /api/challenges/:id/complete  — explorer only
-export const apiCompleteChallenge = async (id) => {
-  const res = await fetch(`${BASE}/${id}/complete`, { method: 'POST', headers: getAuthHeaders() })
-  const data = await parseJSON(res)
-  if (!res.ok) throw new Error(data.message || 'Failed to mark complete')
-  return data
-}
+// ── POST /api/challenges/:id/complete ────────────────────────────────────────
+// Explorer only — needs token
+export const completeChallenge = async (id) => {
+  const res = await fetch(`/api/challenges/${id}/complete`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to mark complete");
+  return data;
+};
 
-// POST /api/challenges/:id/save  — explorer only
-export const apiSaveChallenge = async (id) => {
-  const res = await fetch(`${BASE}/${id}/save`, { method: 'POST', headers: getAuthHeaders() })
-  const data = await parseJSON(res)
-  if (!res.ok) throw new Error(data.message || 'Failed to save challenge')
-  return data
-}
+// ── POST /api/challenges/:id/save ────────────────────────────────────────────
+// Explorer only — needs token
+export const saveChallenge = async (id) => {
+  const res = await fetch(`/api/challenges/${id}/save`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to save challenge");
+  return data;
+};
 
-// DELETE /api/challenges/:id/save  — explorer only
-export const apiUnsaveChallenge = async (id) => {
-  const res = await fetch(`${BASE}/${id}/save`, { method: 'DELETE', headers: getAuthHeaders() })
-  const data = await parseJSON(res)
-  if (!res.ok) throw new Error(data.message || 'Failed to unsave challenge')
-  return data
-}
+// ── DELETE /api/challenges/:id/save ──────────────────────────────────────────
+// Explorer only — needs token
+export const unsaveChallenge = async (id) => {
+  const res = await fetch(`/api/challenges/${id}/save`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to unsave challenge");
+  return data;
+};
