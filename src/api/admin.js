@@ -13,7 +13,7 @@ const authHeaders = (token) => ({
   'Content-Type': 'application/json',
 })
 
-// ── DASHBOARD ──────────────────────────────────────────
+// DASHBOARD 
 export const apiGetDashboardStats = async (token) => {
   const res = await fetch(`${BASE}/dashboard`, {
     headers: authHeaders(token),
@@ -23,7 +23,7 @@ export const apiGetDashboardStats = async (token) => {
   return data // { stats, recentSignUps, userGrowthData }
 }
 
-// ── USERS ──────────────────────────────────────────────
+// USERS
 export const apiGetUsers = async (token, { search = '', role = 'All', status = 'All' } = {}) => {
   const params = new URLSearchParams()
   if (search) params.append('search', search)
@@ -67,7 +67,7 @@ export const apiDeleteUser = async (token, id) => {
   return data // { message }
 }
 
-// ── GUIDE VERIFICATION ─────────────────────────────────
+// GUIDE VERIFICATION 
 export const apiGetPendingGuides = async (token) => {
   const res = await fetch(`${BASE}/pending-guides`, {
     headers: authHeaders(token),
@@ -97,7 +97,7 @@ export const apiRejectGuide = async (token, id) => {
   return data // { message, guide }
 }
 
-// ── ANNOUNCEMENTS ──────────────────────────────────────
+// ANNOUNCEMENTS
 export const apiGetAnnouncements = async (token) => {
   const res = await fetch(`${BASE}/announcements`, {
     headers: authHeaders(token),
@@ -128,7 +128,7 @@ export const apiDeleteAnnouncement = async (token, id) => {
   return data // { message }
 }
 
-// ── FLAGGED CONTENT ────────────────────────────────────
+// FLAGGED CONTENT
 export const apiGetFlaggedContent = async (token) => {
   const res = await fetch(`${BASE}/flagged-content`, {
     headers: authHeaders(token),
@@ -159,7 +159,7 @@ export const apiRemoveContent = async (token, id, removalAuditReason) => {
   return data // { message, item }
 }
 
-// ── TAXONOMY ───────────────────────────────────────────
+//  TAXONOMY 
 export const apiGetTaxonomy = async (token) => {
   const res = await fetch(`${BASE}/taxonomy`, {
     headers: authHeaders(token),
@@ -211,7 +211,7 @@ export const apiDeleteMajor = async (token, name) => {
   return data // { message, majors }
 }
 
-// ── EARNINGS ───────────────────────────────────────────
+//  EARNINGS 
 export const apiGetEarnings = async (token) => {
   const res = await fetch(`${BASE}/earnings`, {
     headers: authHeaders(token),
@@ -221,7 +221,7 @@ export const apiGetEarnings = async (token) => {
   return data // { totalIncome, totalSessions, earnings }
 }
 
-// ── OFFICE HOURS ───────────────────────────────────────
+// OFFICE HOURS 
 export const apiGetOfficeHours = async (token) => {
   const res = await fetch(`${BASE}/office-hours`, {
     headers: authHeaders(token),
