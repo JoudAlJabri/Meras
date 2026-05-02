@@ -3,6 +3,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://meras1-five.vercel.app/api/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
