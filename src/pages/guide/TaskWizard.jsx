@@ -1,7 +1,8 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Guide.css";
-import { mockChallenges, MAJORS } from "../../data/mockData";
+import { MAJORS } from "../../data/mockData";
+import { apiCreateChallenge } from "../../api/challenges";
 
 import taskWizardPic    from "../../assets/TaskWizardImgs/TASKWIZARDPIC.png";
 import celebrationPic   from "../../assets/General-Graphics/TaskSubmittedCelebration.png";
@@ -39,10 +40,11 @@ function TaskWizard() {
   const navigate  = useNavigate();
   const fileRef   = useRef(null);
 
-  const [step, setStep]         = useState(1);
-  const [form, setForm]         = useState({ ...EMPTY_FORM });
-  const [errors, setErrors]     = useState({});
-  const [isDragging, setDrag]   = useState(false);
+  const [step, setStep]           = useState(1);
+  const [form, setForm]           = useState({ ...EMPTY_FORM });
+  const [errors, setErrors]       = useState({});
+  const [isDragging, setDrag]     = useState(false);
+  const [isPublishing, setPublishing] = useState(false);
 
   // Per-section bullet inputs (not part of form state to keep resets simple)
   const [learnInput, setLearnInput] = useState("");
@@ -130,26 +132,33 @@ function TaskWizard() {
   const removeFile = (i) =>
     upd({ downloadableFiles: form.downloadableFiles.filter((_, idx) => idx !== i) });
 
-  // publish 
-  const handlePublish = () => {
+  const DIFFICULTY_MAP = { Easy: "Beginner", Medium: "Intermediate", Hard: "Advanced" };
+
+  // publish
+  const handlePublish = async () => {
     if (!validate3()) return;
-    mockChallenges.push({
-      title:            form.title,
-      major:            form.major,
-      mentorName:       "Rana Abdullah",
-      mentorId:         "guide_current",
-      tags:             form.tags,
-      description:      form.description,
-      difficulty:       form.difficulty,
-      timeEstimate:     parseInt(form.timeEstimate),
-      whatYouWillLearn: form.whatYouWillLearn,
-      whatYouWillDo:    form.whatYouWillDo,
-      whatYouWillNeed:  form.whatYouWillNeed,
-      instructions:     form.instructions,
-      referenceLinks:   form.referenceLinks.map((url) => ({ title: url, url })),
-      downloadableFiles: form.downloadableFiles.map((f) => ({ fileName: f.name, fileUrl: "#" })),
-    });
-    setStep(4);
+    setPublishing(true);
+    try {
+      await apiCreateChallenge({
+        title:             form.title,
+        major:             form.major,
+        difficulty:        DIFFICULTY_MAP[form.difficulty],
+        timeEstimate:      parseInt(form.timeEstimate),
+        description:       form.description,
+        tags:              form.tags,
+        whatYouWillLearn:  form.whatYouWillLearn,
+        whatYouWillDo:     form.whatYouWillDo,
+        whatYouWillNeed:   form.whatYouWillNeed,
+        instructions:      form.instructions,
+        referenceLinks:    form.referenceLinks.map((url) => ({ title: url, url })),
+        downloadableFiles: form.downloadableFiles.map((f) => ({ fileName: f.name, fileUrl: "#" })),
+      });
+      setStep(4);
+    } catch (err) {
+      setErrors({ submit: err.message });
+    } finally {
+      setPublishing(false);
+    }
   };
 
   const resetWizard = () => {
@@ -476,9 +485,12 @@ function TaskWizard() {
             </div>
           </div>
 
+          {errors.submit && <p className="form-error mt-4">{errors.submit}</p>}
           <div className="tw-footer mt-8">
             <button className="btn btn-secondary" onClick={() => setStep(2)}>Back</button>
-            <button className="btn btn-amber btn-lg" onClick={handlePublish}>Publish!</button>
+            <button className="btn btn-amber btn-lg" onClick={handlePublish} disabled={isPublishing}>
+              {isPublishing ? "Publishing..." : "Publish!"}
+            </button>
           </div>
         </div>
       )}

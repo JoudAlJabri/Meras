@@ -78,6 +78,15 @@ export const apiUpdateExplorerSettings = async (token, formData) => {
   return data // { user }
 }
 
+export const apiGetGuideDashboard = async (token) => {
+  const res = await fetch('/api/users/me/guide-dashboard', {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  const data = await parseJSON(res)
+  if (!res.ok) throw new Error(data.message || 'Failed to load dashboard')
+  return data // { firstName, stats, myChallenges, recentActivity }
+}
+
 export const apiGetExplorerDashboard = async (token) => {
   const res = await fetch('/api/users/me/dashboard', {
     headers: { Authorization: `Bearer ${token}` },

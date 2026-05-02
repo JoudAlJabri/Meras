@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Session = require("../models/Session");
 const Challenge = require("../models/Challenge");
+const Submission = require("../models/Submission");
 
 // POST /users/:id/quiz-results
 // Explorer only — save Compass Quiz results
@@ -263,12 +264,72 @@ const updateAvailability = async (req, res) => {
   }
 };
 
+// GET /users/me/guide-dashboard — guide dashboard summary
+const getGuideDashboard = async (req, res) => {
+  try {
+    const guideId = req.user.id;
+    const guideEmail = req.user.email;
+
+    const firstName = req.user.name.split(" ")[0];
+
+    // All challenges published by this guide
+    const myChallenges = await Challenge.find({ mentorId: guideId }).sort({ createdAt: -1 });
+
+    // Submissions waiting for this guide's review
+    const pendingReviews = await Submission.countDocuments({ guideId, status: "pending" });
+
+    // Sessions booked with this guide that haven't happened yet
+    const upcomingSessions = await Session.countDocuments({
+      mentorEmail: guideEmail,
+      slot: { $gt: new Date() },
+      status: { $nin: ["cancelled"] },
+    });
+
+    // Recent activity
+    const recentActivity = [];
+
+    const lastChallenge = await Challenge.findOne({ mentorId: guideId }).sort({ createdAt: -1 });
+    if (lastChallenge) {
+      recentActivity.push({
+        type: "challenge",
+        label: "Challenges",
+        detail: `Published '${lastChallenge.title}'`,
+      });
+    }
+
+    const lastSession = await Session.findOne({ mentorEmail: guideEmail }).sort({ createdAt: -1 });
+    if (lastSession) {
+      const explorer = await User.findOne({ email: lastSession.explorerEmail }).select("name");
+      recentActivity.push({
+        type: "session",
+        label: "Bookings",
+        detail: `New session booked by ${explorer?.name || lastSession.explorerEmail}`,
+      });
+    }
+
+    res.status(200).json({
+      firstName,
+      stats: {
+        yourChallenges: myChallenges.length,
+        pendingReviews,
+        upcomingSessions,
+      },
+      myChallenges,
+      recentActivity,
+    });
+  } catch (err) {
+    console.error("getGuideDashboard error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   saveQuizResults,
   getSavedChallenges,
   updateExplorerSettings,
   updateGuideSettings,
   getDashboard,
+  getGuideDashboard,
   getMentors,
   getMentorById,
   updateAvailability,
