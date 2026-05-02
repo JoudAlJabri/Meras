@@ -219,7 +219,7 @@ const getMentorById = async (req, res) => {
     const mentor = await User.findOne({
       _id: req.params.id,
       role: "guide",
-      status: "active",
+      status: "Active",
       guideStatus: "approved",
     }).select("-password");
 
