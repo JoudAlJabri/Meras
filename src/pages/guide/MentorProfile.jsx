@@ -134,8 +134,10 @@ function MentorProfile({ bookingPath = '/guide/booking' }) {
           <div className="mp-stats-row">
             <span className="mp-stat"><span className="mp-star">★</span> {mentor.rating}</span>
             <span className="mp-stat-divider" />
-            <span className="mp-stat">{mentor.totalSessions} sessions</span>
-            <span className="mp-stat-divider" />
+            {mentor.totalSessions != null && <>
+              <span className="mp-stat">{mentor.totalSessions} sessions</span>
+              <span className="mp-stat-divider" />
+            </>}
           </div>
         </div>
 
@@ -201,9 +203,9 @@ function MentorProfile({ bookingPath = '/guide/booking' }) {
               { stars: 4, text: 'Explained concepts clearly and patiently.', author: 'Khalid H.' },
             ]).map((r, i) => (
               <div key={i} className="mp-review-item">
-                <div className="mp-review-stars">{'★'.repeat(r.stars)}{'☆'.repeat(5 - r.stars)}</div>
-                <div className="mp-review-text">"{r.text}"</div>
-                <div className="mp-review-author">— {r.author}</div>
+                <div className="mp-review-stars">{'★'.repeat(r.rating ?? r.stars)}{'☆'.repeat(5 - (r.rating ?? r.stars))}</div>
+                <div className="mp-review-text">"{r.comment ?? r.text}"</div>
+                <div className="mp-review-author">— {r.author ?? 'Explorer'}</div>
               </div>
             ))}
           </div>
