@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './Guide.css'
 import clocking from "../../assets/General-Graphics/girlHoldingClock.png"
+import { useAuth } from '../../context/AuthContext'
+import { apiUpdateAvailability, apiGetAvailability } from '../../api/guide'
 
 const TIME_SLOTS = [
   '8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM',
@@ -36,12 +38,29 @@ function dateKey(date) {
 
 function AvailableTimes() {
   const navigate  = useNavigate()
+  const { currentUser } = useAuth()
   const today     = new Date(); today.setHours(0,0,0,0)
   const thisWeek  = getWeekStart(today)
 
   const [weekStart, setWeekStart]   = useState(thisWeek)
   const [selected, setSelected]     = useState({}) // { 'YYYY-MM-DD': Set<time> }
   const [saved, setSaved]           = useState(false)
+  const [saving, setSaving]         = useState(false)
+  const [error, setError]           = useState(null)
+
+  // Load existing availability on mount
+  useEffect(() => {
+    if (!currentUser?._id) return
+    apiGetAvailability(currentUser._id)
+      .then(({ availability }) => {
+        const initial = {}
+        availability.forEach(({ date, slots }) => {
+          initial[date] = new Set(slots)
+        })
+        setSelected(initial)
+      })
+      .catch(() => {}) // silently ignore if none saved yet
+  }, [currentUser])
 
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
   const weekEnd  = addDays(weekStart, 6)
@@ -78,9 +97,21 @@ function AvailableTimes() {
     return Object.values(selected).reduce((acc, set) => acc + set.size, 0)
   }
 
-  function handleSave() {
-    // In a real app this would call an API
-    setSaved(true)
+  async function handleSave() {
+    if (!currentUser?._id) return
+    setSaving(true)
+    setError(null)
+    try {
+      const availability = Object.entries(selected)
+        .filter(([_, set]) => set.size > 0)
+        .map(([date, set]) => ({ date, slots: [...set] }))
+      await apiUpdateAvailability(currentUser._id, availability)
+      setSaved(true)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -158,13 +189,14 @@ function AvailableTimes() {
         <span className="at-footer-count">
           {totalSelected()} slot{totalSelected() !== 1 ? 's' : ''} selected this week
         </span>
+        {error && <span style={{ color: 'red', fontSize: '13px' }}>{error}</span>}
         <button
           className="at-save-btn"
-          disabled={totalSelected() === 0}
+          disabled={totalSelected() === 0 || saving}
           style={totalSelected() > 0 ? { backgroundColor: 'var(--meras-green)', color: 'white', opacity: 1 } : {}}
           onClick={handleSave}
         >
-          {saved ? '✓ Saved!' : 'Save Availability'}
+          {saving ? 'Saving…' : saved ? '✓ Saved!' : 'Save Availability'}
         </button>
       </div>
 
