@@ -118,3 +118,5 @@ export const unsaveChallenge = async (id) => {
   if (!res.ok) throw new Error(data.message || "Failed to unsave challenge");
   return data;
 };
+
+export const apiGetChallenges = getChallenges;
