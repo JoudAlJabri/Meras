@@ -121,7 +121,7 @@ const styles = {
     display: "flex",
     minHeight: "100vh",
     backgroundColor: "#F0F2F0",
-    fontFamily: "Arial, sans-serif",
+    fontFamily: "'Plus Jakarta Sans', sans-serif"
   },
   sidebar: {
     backgroundColor: "var(--meras-green-dark)",

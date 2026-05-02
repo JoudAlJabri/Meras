@@ -11,6 +11,7 @@ const {
   updateExplorerSettings,
   updateGuideSettings,
   getDashboard,
+  getGuideDashboard,
   getMentors,
   getMentorById,
   updateAvailability,
@@ -44,6 +45,9 @@ router.patch("/me/guide-settings", protect, requireRole("guide"), uploadProfileI
 
 // GET /api/users/me/dashboard — explorer dashboard summary
 router.get("/me/dashboard", protect, requireRole("explorer"), getDashboard);
+
+// GET /api/users/me/guide-dashboard — guide dashboard summary
+router.get("/me/guide-dashboard", protect, requireRole("guide"), getGuideDashboard);
 
 // GET /api/mentors — public, all approved guides with ?major= and ?university= filters
 router.get("/mentors", getMentors);
