@@ -11,6 +11,11 @@ router.post(
   sessionController.createSession
 );
 
-router.get("/", sessionController.getSessions);
+// must be before /:id to avoid route conflict
+router.get("/mine", protect, sessionController.getMySessions);
+
+router.get("/", protect, sessionController.getSessions);
+
+router.patch("/:id/status", protect, requireRole("guide"), sessionController.updateSessionStatus);
 
 module.exports = router;

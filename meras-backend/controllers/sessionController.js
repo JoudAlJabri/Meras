@@ -71,4 +71,47 @@ const createSession = async (req, res) => {
   }
 };
 
-module.exports = { createSession, getSessions };
+// GET /sessions/mine — guide or explorer gets their own sessions
+const getMySessions = async (req, res) => {
+  try {
+    const query =
+      req.user.role === "guide"
+        ? { mentorEmail: req.user.email }
+        : { explorerEmail: req.user.email };
+
+    const sessions = await Session.find(query).sort({ slot: 1 });
+    res.status(200).json({ sessions });
+  } catch (err) {
+    console.error("getMySessions error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// PATCH /sessions/:id/status — guide updates session status
+const updateSessionStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const allowed = ["confirmed", "completed", "cancelled"];
+
+    if (!allowed.includes(status)) {
+      return res.status(400).json({ message: `Status must be one of: ${allowed.join(", ")}` });
+    }
+
+    const session = await Session.findById(req.params.id);
+    if (!session) return res.status(404).json({ message: "Session not found" });
+
+    if (session.mentorEmail !== req.user.email) {
+      return res.status(403).json({ message: "Not authorized to update this session" });
+    }
+
+    session.status = status;
+    await session.save();
+
+    res.status(200).json({ session });
+  } catch (err) {
+    console.error("updateSessionStatus error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { createSession, getSessions, getMySessions, updateSessionStatus };
