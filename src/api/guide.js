@@ -12,7 +12,6 @@ const getAuthHeaders = () => ({
 })
 
 // SESSIONS 
-// ─── SESSIONS ────────────────────────────────────────────────────────────────
 
 // POST /api/sessions — explorer books a session with a guide
 export const apiBookSession = async ({ mentorEmail, slot, topic }) => {
@@ -88,8 +87,7 @@ export const apiGetAvailability = async (guideId) => {
 }
 
 // SUBMISSIONS 
-// ─── SUBMISSIONS ──────────────────────────────────────────────────────────────
-
+// ─── SUBMISSIONS 
 // GET /api/submissions/guide/:guideId — guide views their grading queue
 export const apiGetGuideSubmissions = async (guideId) => {
   const res = await fetch(`/api/submissions/guide/${guideId}`, { headers: getAuthHeaders() })
@@ -111,8 +109,7 @@ export const apiGradeSubmission = async (submissionId, { stars, feedback }) => {
 }
 
 
-// ─── REVIEWS ──────────────────────────────────────────────────────────────────
-
+//  REVIEWS 
 // POST /api/reviews — explorer submits a review for a mentor
 export const apiCreateReview = async ({ mentorId, bookingId, stars, text }) => {
   const res = await fetch('/api/reviews', {
@@ -134,7 +131,7 @@ export const apiGetReviewsByMentor = async (mentorId) => {
 }
 
 
-// ─── MENTOR DIRECTORY ─────────────────────────────────────────────────────────
+// MENTOR DIRECTORY
 
 // GET /api/users/mentors?major=&university= — public, all approved guides
 export const apiGetMentors = async ({ major, university } = {}) => {

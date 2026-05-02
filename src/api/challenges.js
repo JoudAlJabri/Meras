@@ -2,13 +2,12 @@
 // Uses fetch — same pattern as src/api/auth.js
 // Vite proxy forwards /api/... → http://localhost:5001/api/...
 
-// ── helper: attach JWT token to protected requests ────────────────────────────
 const getAuthHeaders = () => ({
   "Content-Type": "application/json",
   Authorization: `Bearer ${localStorage.getItem("meras_token")}`,
 });
 
-// ── GET /api/challenges ───────────────────────────────────────────────────────
+//  GET /api/challenges
 // Public — no token needed
 // Optional filters: { major, difficulty }
 export const getChallenges = async (filters = {}) => {
@@ -25,7 +24,7 @@ export const getChallenges = async (filters = {}) => {
   return data.challenges;
 };
 
-// ── GET /api/challenges/:id ───────────────────────────────────────────────────
+// GET /api/challenges/:id 
 // Public — no token needed
 export const getChallengeById = async (id) => {
   const res = await fetch(`/api/challenges/${id}`);
@@ -34,7 +33,7 @@ export const getChallengeById = async (id) => {
   return data.challenge;
 };
 
-// ── GET /api/challenges/guide/:guideId ───────────────────────────────────────
+// GET /api/challenges/guide/:guideId
 // Guide/admin only — needs token
 export const getChallengesByGuide = async (guideId) => {
   const res = await fetch(`/api/challenges/guide/${guideId}`, {
@@ -45,8 +44,7 @@ export const getChallengesByGuide = async (guideId) => {
   return data.challenges;
 };
 
-// ── POST /api/challenges ──────────────────────────────────────────────────────
-// Guide only — needs token
+// POST /api/challenges 
 export const createChallenge = async (challengeData) => {
   const res = await fetch("/api/challenges", {
     method: "POST",
@@ -58,7 +56,7 @@ export const createChallenge = async (challengeData) => {
   return data.challenge;
 };
 
-// ── PUT /api/challenges/:id ───────────────────────────────────────────────────
+//  PUT /api/challenges/:id
 // Guide only — needs token
 export const updateChallenge = async (id, updates) => {
   const res = await fetch(`/api/challenges/${id}`, {
@@ -71,7 +69,7 @@ export const updateChallenge = async (id, updates) => {
   return data.challenge;
 };
 
-// ── DELETE /api/challenges/:id ────────────────────────────────────────────────
+// DELETE /api/challenges/:id 
 // Guide (own) or admin — needs token
 export const deleteChallenge = async (id) => {
   const res = await fetch(`/api/challenges/${id}`, {
@@ -83,7 +81,7 @@ export const deleteChallenge = async (id) => {
   return data;
 };
 
-// ── POST /api/challenges/:id/complete ────────────────────────────────────────
+// POST /api/challenges/:id/complete 
 // Explorer only — needs token
 export const completeChallenge = async (id) => {
   const res = await fetch(`/api/challenges/${id}/complete`, {
@@ -95,7 +93,7 @@ export const completeChallenge = async (id) => {
   return data;
 };
 
-// ── POST /api/challenges/:id/save ────────────────────────────────────────────
+// ── POST /api/challenges/:id/save
 // Explorer only — needs token
 export const saveChallenge = async (id) => {
   const res = await fetch(`/api/challenges/${id}/save`, {
@@ -107,7 +105,7 @@ export const saveChallenge = async (id) => {
   return data;
 };
 
-// ── DELETE /api/challenges/:id/save ──────────────────────────────────────────
+// ── DELETE /api/challenges/:id/save 
 // Explorer only — needs token
 export const unsaveChallenge = async (id) => {
   const res = await fetch(`/api/challenges/${id}/save`, {
@@ -119,7 +117,7 @@ export const unsaveChallenge = async (id) => {
   return data;
 };
 
-// ── GET /api/users/me/saved-challenges ───────────────────────────────────────
+// ── GET /api/users/me/saved-challenges
 // Explorer only — fetch their saved challenges
 export const apiGetSavedChallenges = async () => {
   const res = await fetch("/api/users/me/saved-challenges", {
@@ -130,7 +128,7 @@ export const apiGetSavedChallenges = async () => {
   return data.savedChallenges;
 };
 
-// ── POST /api/challenges/:id/start ───────────────────────────────────────────
+// ── POST /api/challenges/:id/start 
 // Explorer only — adds to challengesInProgress
 export const apiStartChallenge = async (id) => {
   const res = await fetch(`/api/challenges/${id}/start`, {
