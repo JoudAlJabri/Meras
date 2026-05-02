@@ -173,7 +173,7 @@ function MentorDirectory({ profilePath = '/guide/profile' }) {
                   rating={mentor.rating}
                   totalSessions={mentor.totalSessions}
                   tags={mentor.skills ?? []}
-                  onViewProfile={() => navigate(`/guide/profile/${mentor._id}`)}
+                  onViewProfile={() => navigate(profilePath, { state: mentor })}
                 />
               </div>
             ))}

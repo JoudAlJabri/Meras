@@ -197,7 +197,7 @@ function BookingPage() {
               <button
                 className="bk-modal-home"
                 style={{ backgroundColor: cardColor, color: textColor }}
-                onClick={() => navigate('/guide/mentors')}
+                onClick={() => navigate(-2)}
               >
                 Back to Directory
               </button>

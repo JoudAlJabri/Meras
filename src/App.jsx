@@ -1,4 +1,3 @@
-
 import './App.css'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom' // using react's React Router library
 import { AuthProvider } from './context/AuthContext'
@@ -136,6 +135,7 @@ function App() {
             <Route path="dashboard" element={<GuideDashboard />} />
             <Route path="mentors" element={<MentorDirectory />} />
             <Route path="profile" element={<MentorProfile />} />
+            <Route path="profile/:id" element={<MentorProfile />} />
             <Route path="booking" element={<BookingPage />} />
             <Route path="tasks" element={<TaskWizard />} />
             <Route path="grading" element={<GradingView />} />
