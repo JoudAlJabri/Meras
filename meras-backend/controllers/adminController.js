@@ -240,6 +240,7 @@ exports.dismissFlag = async (req, res) => {
   }
 };
 
+
 // PATCH /api/admin/flagged-content/:id/remove
 exports.removeContent = async (req, res) => {
   try {
@@ -255,6 +256,11 @@ exports.removeContent = async (req, res) => {
       return res.status(404).json({ message: "Flagged content not found" });
     }
 
+    // actually delete the content from its collection
+    if (item.contentType === "challenge" && item.contentId) {
+      await Challenge.findByIdAndDelete(item.contentId);
+    }
+
     item.status = "Deleted";
     item.removalAuditReason = removalAuditReason.trim();
     await item.save();
@@ -265,6 +271,32 @@ exports.removeContent = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+// POST /api/admin/flagged-content — explorer submits a report
+exports.createFlaggedContent = async (req, res) => {
+  try {
+    const { content, reason, contentType, contentId } = req.body;
+
+    if (!content || !reason) {
+      return res.status(400).json({ message: "Content and reason are required" });
+    }
+
+    const item = await FlaggedContent.create({
+      content,
+      reason,
+      contentType: contentType || "challenge",
+      contentId,
+      reportedBy: req.user.id,
+      status: "Pending",
+    });
+
+    res.status(201).json({ message: "Report submitted successfully", item });
+  } catch (err) {
+    console.error("createFlaggedContent error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
 
 
 // GET /api/admin/dashboard

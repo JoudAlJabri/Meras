@@ -1,10 +1,20 @@
 import { useEffect, useState } from 'react'
 import AdminLayout from '../../layouts/AdminLayout'
-import { UNIVERSITIES, MAJORS } from '../../data/mockData'
+import { useAuth } from '../../context/AuthContext'
+import {
+  apiGetTaxonomy,
+  apiAddUniversity,
+  apiDeleteUniversity,
+  apiAddMajor,
+  apiDeleteMajor,
+} from '../../api/admin'
 
 export default function TaxonomyManagement() {
-  const [universities, setUniversities] = useState(UNIVERSITIES)
-  const [majors, setMajors] = useState(MAJORS)
+  const { getToken } = useAuth()
+  const token = getToken()
+
+  const [universities, setUniversities] = useState([])
+  const [majors, setMajors] = useState([])
 
   const [newUniversity, setNewUniversity] = useState('')
   const [newMajor, setNewMajor] = useState('')
@@ -14,69 +24,77 @@ export default function TaxonomyManagement() {
   const [majorMessageType, setMajorMessageType] = useState('')
 
   useEffect(() => {
+    apiGetTaxonomy(token)
+      .then((data) => {
+        setUniversities(data.universities)
+        setMajors(data.majors)
+      })
+      .catch((err) => console.error(err))
+  }, [token])
+
+  useEffect(() => {
     if (!universityMessage) return
-
-    const timer = setTimeout(() => {
-      setUniversityMessage('')
-    }, 3000)
-
+    const timer = setTimeout(() => setUniversityMessage(''), 3000)
     return () => clearTimeout(timer)
   }, [universityMessage])
 
   useEffect(() => {
     if (!majorMessage) return
-
-    const timer = setTimeout(() => {
-      setMajorMessage('')
-    }, 3000)
-
+    const timer = setTimeout(() => setMajorMessage(''), 3000)
     return () => clearTimeout(timer)
   }, [majorMessage])
 
-  const addUniversity = () => {
+  const addUniversity = async () => {
     if (!newUniversity.trim()) return
-
-    const universityToAdd = newUniversity.trim()
-    setUniversities([...universities, universityToAdd])
-    setUniversityMessage(`${universityToAdd} has been added`)
-    setNewUniversity('')
+    try {
+      const data = await apiAddUniversity(token, newUniversity.trim())
+      setUniversities(data.universities)
+      setUniversityMessage(`${newUniversity.trim()} has been added`)
+      setNewUniversity('')
+    } catch (err) {
+      setUniversityMessage(err.message)
+    }
   }
 
-  const deleteUniversity = (index) => {
-    const deletedUniversity = universities[index]
-    setUniversities(universities.filter((_, i) => i !== index))
-    setUniversityMessage(`${deletedUniversity} has been deleted`)
+  const deleteUniversity = async (name) => {
+    try {
+      const data = await apiDeleteUniversity(token, name)
+      setUniversities(data.universities)
+      setUniversityMessage(`${name} has been deleted`)
+    } catch (err) {
+      setUniversityMessage(err.message)
+    }
   }
 
-  const addMajor = () => {
+  const addMajor = async () => {
     const majorToAdd = newMajor.trim()
-  
     if (!majorToAdd) {
       setMajorMessage('Please enter a major name')
       setMajorMessageType('error')
       return
     }
-  
-    const majorExists = majors.some(
-      (major) => major.toLowerCase() === majorToAdd.toLowerCase()
-    )
-  
-    if (majorExists) {
-      setMajorMessage('This major already exists in the database')
+    try {
+      const data = await apiAddMajor(token, majorToAdd)
+      setMajors(data.majors)
+      setMajorMessage('New major added to system catalog')
+      setMajorMessageType('success')
+      setNewMajor('')
+    } catch (err) {
+      setMajorMessage(err.message)
       setMajorMessageType('error')
-      return
     }
-  
-    setMajors([...majors, majorToAdd])
-    setMajorMessage('New major added to system catalog')
-    setMajorMessageType('success')
-    setNewMajor('')
   }
 
-  const deleteMajor = (index) => {
-    const deletedMajor = majors[index]
-    setMajors(majors.filter((_, i) => i !== index))
-    setMajorMessage(`${deletedMajor} has been deleted`)
+  const deleteMajor = async (name) => {
+    try {
+      const data = await apiDeleteMajor(token, name)
+      setMajors(data.majors)
+      setMajorMessage(`${name} has been deleted`)
+      setMajorMessageType('success')
+    } catch (err) {
+      setMajorMessage(err.message)
+      setMajorMessageType('error')
+    }
   }
 
   const cardStyle = {
@@ -161,6 +179,7 @@ export default function TaxonomyManagement() {
                 placeholder="Add new university"
                 value={newUniversity}
                 onChange={(e) => setNewUniversity(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && addUniversity()}
                 style={inputStyle}
               />
               <button onClick={addUniversity} style={addButtonStyle}>
@@ -181,23 +200,19 @@ export default function TaxonomyManagement() {
                   </tr>
                 </thead>
                 <tbody>
-                  {universities.map((university, index) => (
+                  {universities.map((university) => (
                     <tr
-                      key={index}
+                      key={university}
                       style={{ transition: 'background 0.2s' }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#f9fafb'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent'
-                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f9fafb' }}
+                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent' }}
                     >
                       <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
                         {university}
                       </td>
                       <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
                         <button
-                          onClick={() => deleteUniversity(index)}
+                          onClick={() => deleteUniversity(university)}
                           style={deleteButtonStyle}
                         >
                           Delete
@@ -217,26 +232,21 @@ export default function TaxonomyManagement() {
             </h2>
 
             {majorMessage && (
-                <div
-                  style={{
-                    backgroundColor:
-                      majorMessageType === 'error' ? '#fef2f2' : '#ecfdf5',
-                    color:
-                      majorMessageType === 'error' ? '#991b1b' : '#065f46',
-                    padding: '10px 14px',
-                    borderRadius: '10px',
-                    marginBottom: '12px',
-                    fontWeight: '600',
-                    border:
-                      majorMessageType === 'error'
-                        ? '1px solid #ef4444'
-                        : '1px solid #10b981',
-                    fontSize: '14px',
-                  }}
-                >
-                  {majorMessage}
-                </div>
-              )}
+              <div
+                style={{
+                  backgroundColor: majorMessageType === 'error' ? '#fef2f2' : '#ecfdf5',
+                  color: majorMessageType === 'error' ? '#991b1b' : '#065f46',
+                  padding: '10px 14px',
+                  borderRadius: '10px',
+                  marginBottom: '12px',
+                  fontWeight: '600',
+                  border: majorMessageType === 'error' ? '1px solid #ef4444' : '1px solid #10b981',
+                  fontSize: '14px',
+                }}
+              >
+                {majorMessage}
+              </div>
+            )}
 
             <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
               <input
@@ -244,6 +254,7 @@ export default function TaxonomyManagement() {
                 placeholder="Add new major"
                 value={newMajor}
                 onChange={(e) => setNewMajor(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && addMajor()}
                 style={inputStyle}
               />
               <button onClick={addMajor} style={addButtonStyle}>
@@ -264,23 +275,19 @@ export default function TaxonomyManagement() {
                   </tr>
                 </thead>
                 <tbody>
-                  {majors.map((major, index) => (
+                  {majors.map((major) => (
                     <tr
-                      key={index}
+                      key={major}
                       style={{ transition: 'background 0.2s' }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#f9fafb'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent'
-                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f9fafb' }}
+                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent' }}
                     >
                       <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
                         {major}
                       </td>
                       <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
                         <button
-                          onClick={() => deleteMajor(index)}
+                          onClick={() => deleteMajor(major)}
                           style={deleteButtonStyle}
                         >
                           Delete
