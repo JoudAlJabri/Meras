@@ -21,7 +21,7 @@ function ChallengeCatalog() {
 
   useEffect(() => {
     apiGetChallenges()
-      .then(data => setChallenges(data.challenges))
+      .then(data => setChallenges(data.challenges ?? []))
       .catch(err => console.error('Failed to load challenges:', err.message))
       .finally(() => setLoading(false))
   }, [])
