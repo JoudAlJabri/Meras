@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { MdStar, MdStarBorder, MdClose, MdVideoCall } from "react-icons/md";
-import {mockSubmissions} from "../../data/mockData"
+import { useAuth } from "../../context/AuthContext";
+import { apiGetGuideSubmissions, apiGradeSubmission, apiGetGuideSessions } from "../../api/guide";
 
-
-const TODAY = new Date(2026, 3, 9);
+const TODAY = new Date();
 function buildWeek(anchor) {
   const day = anchor.getDay();
   const monday = new Date(anchor);
@@ -15,12 +15,6 @@ function buildWeek(anchor) {
   });
 }
 const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const mockSessions = [
-  { id: 1, date: new Date(2026, 3, 9),  student: "Sara Mohammed",  topic: "REST API architecture review",       time: "10:00 – 10:45 AM" },
-  { id: 2, date: new Date(2026, 3, 9),  student: "Nour Al-Rashid", topic: "Choosing the right chart type",      time: "2:00 – 2:45 PM"  },
-  { id: 3, date: new Date(2026, 3, 11), student: "Layla Hassan",   topic: "Figma component structure feedback", time: "11:00 – 11:45 AM" },
-  { id: 4, date: new Date(2026, 3, 13), student: "Yasser Khalid",  topic: "Career path in cloud engineering",   time: "3:30 – 4:15 PM"  },
-];
 function isSameDay(a, b) {
   return a.getFullYear() === b.getFullYear() &&
     a.getMonth() === b.getMonth() &&
@@ -95,6 +89,10 @@ function CanvasPreview({ sub, expanded, onToggle }) {
 }
 
 function GradingView() {
+  const { currentUser } = useAuth();
+  const [submissions, setSubmissions] = useState([]);
+  const [sessions, setSessions]       = useState([]);
+
   const [selectedSubmission, setSelectedSubmission] = useState(null);
   const [ratings, setRatings]       = useState({});
   const [feedbacks, setFeedbacks]   = useState({});
@@ -105,6 +103,39 @@ function GradingView() {
   const [week]         = useState(() => buildWeek(TODAY));
   const [selectedDay, setSelectedDay] = useState(TODAY);
 
+  useEffect(() => {
+    if (!currentUser?._id) return;
+
+    apiGetGuideSubmissions(currentUser._id)
+      .then(({ submissions: raw }) => {
+        setSubmissions(raw.map(s => ({
+          id: s._id,
+          student: s.explorerId?.name || s.explorerId?.email || 'Unknown',
+          challenge: s.challengeId?.title || 'Unknown challenge',
+          majorColor: '#3DB87A',
+          submittedAt: new Date(s.createdAt).toLocaleDateString(),
+          submissionType: s.submissionType,
+          file: s.fileUrl,
+          textAnswer: s.textAnswer,
+          canvasImage: s.canvasUrl ? `http://localhost:5001${s.canvasUrl}` : '',
+          status: s.status,
+        })));
+      })
+      .catch(console.error);
+
+    apiGetGuideSessions()
+      .then(({ sessions: raw }) => {
+        setSessions(raw.map(s => ({
+          id: s._id,
+          date: new Date(s.slot),
+          student: s.explorerEmail,
+          topic: s.topic,
+          time: new Date(s.slot).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
+        })));
+      })
+      .catch(console.error);
+  }, [currentUser]);
+
   // The week strip (7 day buttons in a flex row) overflows on narrow phones.
   // Submission rows also need their right-side button to move below on mobile.
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
@@ -113,7 +144,7 @@ function GradingView() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-  const sessionsForDay = mockSessions.filter(s => isSameDay(s.date, selectedDay));
+  const sessionsForDay = sessions.filter(s => isSameDay(s.date, selectedDay));
 
   const currentRating   = selectedSubmission ? (ratings[selectedSubmission.id]   ?? 0) : 0;
   const currentFeedback = selectedSubmission ? (feedbacks[selectedSubmission.id] ?? "") : "";
@@ -129,10 +160,18 @@ function GradingView() {
     setExpandedAnswer(false);
   }
 
-  function handleSubmitGrade() {
+  async function handleSubmitGrade() {
     if (!canSubmit) return;
-    setSubmitted(prev => ({ ...prev, [selectedSubmission.id]: true }));
-    closePanel();
+    try {
+      await apiGradeSubmission(selectedSubmission.id, {
+        stars: currentRating,
+        feedback: currentFeedback,
+      });
+      setSubmitted(prev => ({ ...prev, [selectedSubmission.id]: true }));
+      closePanel();
+    } catch (err) {
+      console.error('Grade submission failed:', err.message);
+    }
   }
 
   function isJoinable(session) {
@@ -162,10 +201,10 @@ function GradingView() {
       {/* Pending Submissions */}
       <section style={s.section}>
         <h2 style={s.sectionTitle}>Pending Submissions</h2>
-        <p style={s.sectionSub}>{mockSubmissions.filter(sub => !submitted[sub.id]).length} awaiting your review</p>
+        <p style={s.sectionSub}>{submissions.filter(sub => !submitted[sub.id]).length} awaiting your review</p>
 
         <div style={s.submissionList}>
-          {mockSubmissions.map(sub => {
+          {submissions.map(sub => {
             const isDone = submitted[sub.id];
             return (
               /* On mobile: stack info + grade button vertically so the button
@@ -199,7 +238,7 @@ function GradingView() {
           {week.map((day, i) => {
             const isToday     = isSameDay(day, TODAY);
             const isSelected  = isSameDay(day, selectedDay);
-            const hasSessions = mockSessions.some(se => isSameDay(se.date, day));
+            const hasSessions = sessions.some(se => isSameDay(se.date, day));
             return (
               <button key={i} style={{ ...s.dayBtn, ...(isSelected ? s.dayBtnActive : {}) }} onClick={() => setSelectedDay(day)}>
                 <span style={{ ...s.dayLabel,  color: isSelected ? "#fff" : "var(--color-text-secondary)" }}>{DAY_LABELS[i]}</span>
