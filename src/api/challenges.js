@@ -119,6 +119,17 @@ export const unsaveChallenge = async (id) => {
   return data;
 };
 
+// ── GET /api/users/me/saved-challenges ───────────────────────────────────────
+// Explorer only — fetch their saved challenges
+export const apiGetSavedChallenges = async () => {
+  const res = await fetch("/api/users/me/saved-challenges", {
+    headers: getAuthHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to load saved challenges");
+  return data.savedChallenges;
+};
+
 // ── POST /api/challenges/:id/start ───────────────────────────────────────────
 // Explorer only — adds to challengesInProgress
 export const apiStartChallenge = async (id) => {

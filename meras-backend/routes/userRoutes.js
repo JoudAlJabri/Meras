@@ -15,6 +15,7 @@ const {
   getMentors,
   getMentorById,
   updateAvailability,
+  getAvailability,
 } = require("../controllers/userController");
 
 const profileStorage = multer.diskStorage({
@@ -54,6 +55,9 @@ router.get("/mentors", getMentors);
 
 // GET /api/mentors/:id — public, single mentor profile + their challenges
 router.get("/mentors/:id", getMentorById);
+
+// GET /api/users/:id/availability — public, fetch a guide's available slots
+router.get("/:id/availability", getAvailability);
 
 // PUT /api/users/:id/availability — guide saves their weekly availability
 router.put("/:id/availability", protect, requireRole("guide"), updateAvailability);

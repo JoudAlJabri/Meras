@@ -131,6 +131,7 @@ function GradingView() {
           student: s.explorerEmail,
           topic: s.topic,
           time: new Date(s.slot).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
+          meetingLink: s.meetingLink || '',
         })));
       })
       .catch(console.error);
@@ -175,11 +176,7 @@ function GradingView() {
   }
 
   function isJoinable(session) {
-    const now = new Date();
-    const [hStr] = session.time.split(":");
-    const sessionHour = parseInt(hStr, 10) + (session.time.includes("PM") && parseInt(hStr) !== 12 ? 12 : 0);
-    const diff = sessionHour - now.getHours();
-    return isSameDay(session.date, now) && diff <= 0 && diff > -1;
+    return !!session.meetingLink;
   }
 
   // Pick the right preview component based on submissionType
@@ -201,11 +198,11 @@ function GradingView() {
       {/* Pending Submissions */}
       <section style={s.section}>
         <h2 style={s.sectionTitle}>Pending Submissions</h2>
-        <p style={s.sectionSub}>{submissions.filter(sub => !submitted[sub.id]).length} awaiting your review</p>
+        <p style={s.sectionSub}>{submissions.filter(sub => !submitted[sub.id] && sub.status !== "graded").length} awaiting your review</p>
 
         <div style={s.submissionList}>
           {submissions.map(sub => {
-            const isDone = submitted[sub.id];
+            const isDone = submitted[sub.id] || sub.status === "graded";
             return (
               /* On mobile: stack info + grade button vertically so the button
                  doesn't get squished beside the text */
@@ -263,7 +260,13 @@ function GradingView() {
                       <p style={s.sessionTopic}>{session.topic}</p>
                       <p style={s.sessionTime}>{session.time}</p>
                     </div>
-                    <button style={{ ...s.joinBtn, ...(joinable ? s.joinBtnActive : {}) }} disabled={!joinable}>Join</button>
+                    <button
+                      style={{ ...s.joinBtn, ...(joinable ? s.joinBtnActive : {}) }}
+                      disabled={!joinable}
+                      onClick={() => joinable && window.open(session.meetingLink, '_blank', 'noopener,noreferrer')}
+                    >
+                      Join
+                    </button>
                   </div>
                 );
               })}

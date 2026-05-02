@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
+import { saveChallenge, unsaveChallenge, apiGetSavedChallenges } from '../../../api/challenges'
 import puzzleImg from '../../../assets/General-Graphics/2PersonPuzzle.png'
 import swe  from '../../../assets/Tech-Graphics/Software-Engineering.png'
 import cs   from '../../../assets/Tech-Graphics/Computer-Science.png'
@@ -47,6 +48,7 @@ function ChallengeDetail() {
 
   const [challenge, setChallenge] = useState(null)
   const [saved, setSaved] = useState(false)
+  const [saveLoading, setSaveLoading] = useState(false)
   const [showReportModal, setShowReportModal] = useState(false)
   const [reportReason, setReportReason] = useState('')
   const [reportSubmitted, setReportSubmitted] = useState(false)
@@ -62,8 +64,37 @@ function ChallengeDetail() {
         console.error('Error fetching challenge:', error)
       }
     }
+
+    const checkIfSaved = async () => {
+      try {
+        const saved = await apiGetSavedChallenges()
+        setSaved(saved.some(c => c._id === id))
+      } catch {
+        // not logged in or failed — leave as false
+      }
+    }
+
     fetchChallenge()
+    checkIfSaved()
   }, [id])
+
+  const handleSaveToggle = async () => {
+    if (saveLoading) return
+    setSaveLoading(true)
+    try {
+      if (saved) {
+        await unsaveChallenge(id)
+        setSaved(false)
+      } else {
+        await saveChallenge(id)
+        setSaved(true)
+      }
+    } catch (err) {
+      console.error('Save toggle failed:', err.message)
+    } finally {
+      setSaveLoading(false)
+    }
+  }
 
   const mentor = null
 
@@ -352,7 +383,7 @@ function ChallengeDetail() {
                   <button className="btn w-100 fw-semibold py-2 mb-2 text-white" onClick={() => navigate(`/explorer/workspace/${id}`)} style={{ backgroundColor: heroColor, border: 'none', borderRadius: '10px', fontSize: '16px' }}>
                     Start Challenge →
                   </button>
-                  <button className="btn w-100 fw-semibold py-2" onClick={() => setSaved(!saved)} style={{ backgroundColor: saved ? '#e8f5ef' : 'white', border: `1.5px solid ${saved ? heroColor : 'var(--meras-border)'}`, borderRadius: '10px', fontSize: '14px', color: saved ? heroColor : 'var(--meras-gray)' }}>
+                  <button className="btn w-100 fw-semibold py-2" onClick={handleSaveToggle} disabled={saveLoading} style={{ backgroundColor: saved ? '#e8f5ef' : 'white', border: `1.5px solid ${saved ? heroColor : 'var(--meras-border)'}`, borderRadius: '10px', fontSize: '14px', color: saved ? heroColor : 'var(--meras-gray)' }}>
                     {saved ? '✓ Saved' : '🔖 Save for Later'}
                   </button>
                 </div>

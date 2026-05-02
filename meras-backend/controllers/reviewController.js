@@ -5,14 +5,14 @@ exports.createReview = async (req, res) => {
     try {
       const { mentorId, bookingId, stars, text } = req.body;
 
-      if (!mentorId || !bookingId || !stars) {
-        return res.status(400).json({ message: "mentorId, bookingId, and stars are required" });
+      if (!mentorId || !stars) {
+        return res.status(400).json({ message: "mentorId and stars are required" });
       }
 
-      // prevent duplicate review
-      const existingReview = await Review.findOne({ bookingId });
+      // prevent an explorer from rating the same mentor twice
+      const existingReview = await Review.findOne({ mentorId, explorerId: req.user.id });
       if (existingReview) {
-        return res.status(400).json({ message: "Review already submitted for this booking" });
+        return res.status(400).json({ message: "You have already rated this mentor" });
       }
 
       const review = new Review({

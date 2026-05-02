@@ -9,12 +9,13 @@ import {
   MdArticle,
 } from "react-icons/md";
 import { MdStar, MdStarBorder, MdClose } from "react-icons/md";
+import { FaBookmark } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 import { apiGetExplorerDashboard } from "../../api/auth";
+import { apiGetExplorerSessions, apiCancelSession } from "../../api/guide";
 import learningGirl from "../../assets/Dashboard-pics/Learning-girl-1.png";
 import learningBoy from "../../assets/Dashboard-pics/Learning-boy-1.png";
 import CompletedChallenges from "./CompletedChallenges";
-import { mockCompletedChallenges } from '../../data/mockData'
 
 const TEXT_PREVIEW_LIMIT = 150;
 
@@ -30,6 +31,9 @@ function ExplorerDashboard() {
   const [expanded, setExpanded] = useState(false);
 
   const [dashboard, setDashboard] = useState(null);
+  const [sessions, setSessions]   = useState([]);
+  const [cancelling, setCancelling] = useState(null);  // sessionId being confirmed
+  const [cancelError, setCancelError] = useState(null);
 
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   useEffect(() => {
@@ -42,7 +46,27 @@ function ExplorerDashboard() {
     apiGetExplorerDashboard(getToken())
       .then(setDashboard)
       .catch(err => console.error("Dashboard fetch error:", err.message));
+
+    apiGetExplorerSessions()
+      .then(({ sessions: raw }) => {
+        const upcoming = raw.filter(s =>
+          s.status !== "cancelled" && s.status !== "completed" && new Date(s.slot) > new Date()
+        );
+        setSessions(upcoming);
+      })
+      .catch(() => {});
   }, []);
+
+  async function handleCancel(sessionId) {
+    setCancelError(null);
+    try {
+      await apiCancelSession(sessionId);
+      setSessions(prev => prev.filter(s => s._id !== sessionId));
+      setCancelling(null);
+    } catch (err) {
+      setCancelError(err.message);
+    }
+  }
 
   function openFeedback(challenge) {
     setSelectedChallenge(challenge);
@@ -53,10 +77,11 @@ function ExplorerDashboard() {
     setExpanded(false);
   }
 
-  const firstName      = dashboard?.firstName || currentUser?.name?.split(" ")[0] || "";
-  const stats          = dashboard?.stats || { completedChallenges: 0, challengesInProgress: 0, sessionsBooked: 0 };
-  const inProgress     = dashboard?.challengesInProgress || [];
-  const recentActivity = dashboard?.recentActivity || [];
+  const firstName         = dashboard?.firstName || currentUser?.name?.split(" ")[0] || "";
+  const stats             = dashboard?.stats || { completedChallenges: 0, challengesInProgress: 0, sessionsBooked: 0 };
+  const inProgress        = dashboard?.challengesInProgress || [];
+  const completedChallenges = dashboard?.completedChallenges || [];
+  const recentActivity    = dashboard?.recentActivity || [];
 
   return (
     <div style={styles.page}>
@@ -130,7 +155,7 @@ function ExplorerDashboard() {
           )}
 
           <CompletedChallenges
-            challenges={mockCompletedChallenges}
+            challenges={completedChallenges}
             onViewFeedback={openFeedback}
           />
 
@@ -166,12 +191,50 @@ function ExplorerDashboard() {
           {/* Saved Challenges card */}
           <div style={styles.savedCard}>
             <div style={styles.savedIconWrap}>
-              <MdArticle style={{ fontSize: "28px", color: "#6B7280" }} />
+              <FaBookmark style={{ fontSize: "28px", color: "#3DB87A" }} />
             </div>
             <h2 style={styles.savedTitle}>Saved Challenges</h2>
             <button style={styles.savedButton} onClick={() => navigate("/explorer/savedChallenges")}>
               View →
             </button>
+          </div>
+
+          {/* Upcoming Sessions card */}
+          <div style={styles.sessionsCard}>
+            <h2 style={styles.savedTitle}>Upcoming Sessions</h2>
+            {sessions.length === 0 ? (
+              <p style={{ fontSize: "13px", color: "#9CA3AF", margin: 0 }}>No upcoming sessions.</p>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                {sessions.map(s => {
+                  const slotDate = new Date(s.slot);
+                  const dateStr  = slotDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+                  const timeStr  = slotDate.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+                  const isConfirming = cancelling === s._id;
+                  return (
+                    <div key={s._id} style={styles.sessionRow}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={styles.sessionGuide}>{s.guideName}</p>
+                        <p style={styles.sessionMeta}>{dateStr} · {timeStr}</p>
+                        <p style={styles.sessionTopic}>{s.topic}</p>
+                      </div>
+                      {isConfirming ? (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "4px", alignItems: "flex-end" }}>
+                          <span style={styles.confirmText}>Cancel?</span>
+                          <div style={{ display: "flex", gap: "4px" }}>
+                            <button style={styles.confirmYes} onClick={() => handleCancel(s._id)}>Yes</button>
+                            <button style={styles.confirmNo}  onClick={() => { setCancelling(null); setCancelError(null); }}>No</button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button style={styles.cancelBtn} onClick={() => setCancelling(s._id)}>Cancel</button>
+                      )}
+                    </div>
+                  );
+                })}
+                {cancelError && <p style={{ fontSize: "12px", color: "#EF4444", margin: 0 }}>{cancelError}</p>}
+              </div>
+            )}
           </div>
 
         </div>
@@ -454,11 +517,84 @@ const styles = {
     color: "#FFFFFF",
     border: "none",
     borderRadius: "999px",
-    padding: "12px 0",
+    padding: "5px 0",
     fontSize: "15px",
     fontWeight: "600",
     cursor: "pointer",
     width: "100%",
+  },
+  sessionsCard: {
+    backgroundColor: "#FFFFFF",
+    border: "1px solid #E5E7EB",
+    borderRadius: "16px",
+    padding: "20px",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+    display: "flex",
+    flexDirection: "column",
+    gap: "14px",
+  },
+  sessionRow: {
+    display: "flex",
+    alignItems: "flex-start",
+    gap: "10px",
+    paddingBottom: "10px",
+    borderBottom: "1px solid #F3F4F6",
+  },
+  sessionGuide: {
+    margin: 0,
+    fontSize: "13px",
+    fontWeight: "700",
+    color: "#111827",
+  },
+  sessionMeta: {
+    margin: "2px 0 0",
+    fontSize: "11px",
+    color: "#6B7280",
+  },
+  sessionTopic: {
+    margin: "2px 0 0",
+    fontSize: "11px",
+    color: "#9CA3AF",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    maxWidth: "140px",
+  },
+  cancelBtn: {
+    flexShrink: 0,
+    backgroundColor: "#FEE2E2",
+    color: "#DC2626",
+    border: "none",
+    borderRadius: "999px",
+    padding: "5px 10px",
+    fontSize: "11px",
+    fontWeight: "600",
+    cursor: "pointer",
+  },
+  confirmText: {
+    fontSize: "11px",
+    fontWeight: "600",
+    color: "#374151",
+  },
+  confirmYes: {
+    backgroundColor: "#DC2626",
+    color: "#FFFFFF",
+    border: "none",
+    borderRadius: "999px",
+    padding: "4px 10px",
+    fontSize: "11px",
+    fontWeight: "600",
+    cursor: "pointer",
+  },
+  confirmNo: {
+    backgroundColor: "#F3F4F6",
+    color: "#374151",
+    border: "none",
+    borderRadius: "999px",
+    padding: "4px 10px",
+    fontSize: "11px",
+    fontWeight: "600",
+    cursor: "pointer",
   },
   recentTitle: {
     margin: "0 0 16px 0",

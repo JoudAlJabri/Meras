@@ -1,8 +1,16 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { useAuth } from '../context/AuthContext'
 
 function AdminLayout({ children }) {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { logout } = useAuth()
+
+  function handleLogout() {
+    logout()
+    navigate('/')
+  }
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
   const [menuOpen, setMenuOpen] = useState(false)
   const [hoveredPath, setHoveredPath] = useState('')
@@ -112,6 +120,26 @@ function AdminLayout({ children }) {
       </div>
 
       {navLinks}
+
+      <button
+        onClick={handleLogout}
+        style={{
+          marginTop: '24px',
+          width: '100%',
+          padding: '12px 16px',
+          borderRadius: '12px',
+          border: '1px solid rgba(255,255,255,0.15)',
+          backgroundColor: 'rgba(239,68,68,0.15)',
+          color: 'white',
+          fontWeight: '600',
+          fontSize: '14px',
+          cursor: 'pointer',
+          textAlign: 'left',
+          letterSpacing: '0.2px',
+        }}
+      >
+        Logout
+      </button>
     </>
   )
 
@@ -180,10 +208,7 @@ function AdminLayout({ children }) {
         </div>
 
       <button
-        onClick={() => {
-          localStorage.removeItem('meras_token')
-          window.location.href = '/'
-        }}
+        onClick={handleLogout}
         style={{
           backgroundColor: 'rgba(255,255,255,0.12)',
           color: 'white',

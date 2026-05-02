@@ -9,6 +9,7 @@ import {
   MdMenu,
   MdClose,
   MdAccountCircle,
+  MdLogout,
 } from "react-icons/md";
 
 const navItems = [
@@ -47,9 +48,16 @@ return (
 
 function ExplorerLayout({ children }) {
   const location = useLocation();
-  const { currentUser } = useAuth();
+  const navigate = useNavigate();
+  const { currentUser, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [avatarHovered, setAvatarHovered] = useState(false);
+  const [logoutHovered, setLogoutHovered] = useState(false);
+
+  function handleLogout() {
+    logout();
+    navigate("/");
+  }
 
 
   return (
@@ -105,6 +113,26 @@ function ExplorerLayout({ children }) {
             />
           ))}
         </nav>
+
+        <button
+          style={{
+            ...styles.link,
+            marginTop: "auto",
+            padding: sidebarOpen ? "12px 14px" : "12px",
+            justifyContent: sidebarOpen ? "flex-start" : "center",
+            backgroundColor: logoutHovered ? "rgba(239,68,68,0.25)" : "transparent",
+            border: "none",
+            cursor: "pointer",
+            width: "100%",
+          }}
+          onClick={handleLogout}
+          onMouseEnter={() => setLogoutHovered(true)}
+          onMouseLeave={() => setLogoutHovered(false)}
+          title={!sidebarOpen ? "Logout" : undefined}
+        >
+          <MdLogout style={styles.icon} />
+          {sidebarOpen && <span>Logout</span>}
+        </button>
       </aside>
 
       {/* Main content */}

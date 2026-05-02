@@ -11,6 +11,8 @@ router.post(
   sessionController.createSession
 );
 
+router.patch("/:id/cancel", protect, requireRole("explorer"), sessionController.cancelSession);
+
 // must be before /:id to avoid route conflict
 router.get("/mine", protect, sessionController.getMySessions);
 

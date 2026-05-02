@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { apiLogin } from '../../api/auth'
+import MerasLogo from "../../assets/Meras-Logos/Meras-logo2.svg";
 
 
 function LoginPage() {
@@ -157,43 +158,21 @@ function LoginPage() {
           </div>
 
           {/* ── RIGHT SIDE — Image Placeholder ── */}
-          <div
-            className="col-lg-6 d-none d-lg-flex align-items-center justify-content-center"
-            style={{
-              backgroundColor: '#e8f5ef',
-              minHeight: '100vh',
-              position: 'relative'
-            }}
-          >
-        
-            {/* Placeholder content */}
-            <div className="text-center p-5" style={{ position: 'relative', zIndex: 1 }}>
-
-              {/* Image placeholder box */}
-              <div
-                className="d-flex align-items-center justify-content-center mx-auto mb-4"
-                style={{
-                  width: '280px',
-                  height: '280px',
-                  borderRadius: '20px',
-                  backgroundColor: 'white',
-                  border: '2px dashed var(--meras-green)',
-                  opacity: 0.8
-                }}
-              >
-                <div className="text-center">
-                  <div style={{ fontSize: '48px' }}>🖼️</div>
-                  <p style={{ color: 'var(--meras-green)', fontSize: '14px', marginTop: '8px' }}>
+       <div
+                  className="col-lg-6 d-none d-lg-flex align-items-center justify-content-center"
+                  style={{
                     
-                  </p>
+                    minHeight: '100vh',
+                    position: 'relative'
+                  }}
+                >
+      
+                  <div className="text-center p-4" style={{ position: 'relative', zIndex: 1 }}>
+                    <img src={MerasLogo}></img>
+                    {/* Image placeholder */}
+                  
+                  </div>
                 </div>
-              </div>
-
-              {/* Text below image */}
-              
-
-            </div>
-          </div>
 
         </div>
       </div>

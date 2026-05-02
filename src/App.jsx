@@ -16,6 +16,7 @@ import ExplorerDashboard from './pages/explorer/ExplorerDashboard'
 import TaskWorkspace from './pages/explorer/Challenge/TaskWorkspace'
 import ChallengeCatalog from './pages/explorer/Challenge/ChallengeCatalog'
 import ChallengeDetail from './pages/explorer/Challenge/ChallengeDetail'
+import SavedChallenges from './pages/explorer/Challenge/SavedChallenges'
 import CompassQuiz from './pages/explorer/CompassQuiz'
 import QuizResults from './pages/explorer/QuizResults'
 
@@ -67,6 +68,11 @@ function App() {
           <Route path="/explorer/challengeCatalog" element={
             <ProtectedRoute allowedRoles={['explorer']}>
               <ExplorerLayout><ChallengeCatalog /></ExplorerLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/explorer/savedChallenges" element={
+            <ProtectedRoute allowedRoles={['explorer']}>
+              <ExplorerLayout><SavedChallenges /></ExplorerLayout>
             </ProtectedRoute>
           } />
           <Route path="/explorer/challenges/:id" element={

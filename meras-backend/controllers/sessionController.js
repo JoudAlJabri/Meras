@@ -59,6 +59,10 @@ const createSession = async (req, res) => {
       topic,
     });
 
+    // Generate a Jitsi Meet room URL tied to this session's ID
+    booking.meetingLink = `https://meet.jit.si/meras-session-${booking._id}`;
+    await booking.save();
+
     // Track session on the explorer's profile
     await User.findByIdAndUpdate(req.user.id, {
       $push: { sessionsBooked: booking._id },
@@ -80,9 +84,54 @@ const getMySessions = async (req, res) => {
         : { explorerEmail: req.user.email };
 
     const sessions = await Session.find(query).sort({ slot: 1 });
-    res.status(200).json({ sessions });
+
+    // Attach the other party's name to each session
+    const enriched = await Promise.all(
+      sessions.map(async (s) => {
+        const plain = s.toObject();
+        if (req.user.role === "explorer") {
+          const guide = await User.findOne({ email: s.mentorEmail }).select("name");
+          plain.guideName = guide?.name || s.mentorEmail;
+        } else {
+          const explorer = await User.findOne({ email: s.explorerEmail }).select("name");
+          plain.explorerName = explorer?.name || s.explorerEmail;
+        }
+        return plain;
+      })
+    );
+
+    res.status(200).json({ sessions: enriched });
   } catch (err) {
     console.error("getMySessions error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// PATCH /sessions/:id/cancel — explorer cancels their own session (> 1 hour before slot)
+const cancelSession = async (req, res) => {
+  try {
+    const session = await Session.findById(req.params.id);
+    if (!session) return res.status(404).json({ message: "Session not found" });
+
+    if (session.explorerEmail !== req.user.email) {
+      return res.status(403).json({ message: "Not authorized to cancel this session" });
+    }
+
+    if (session.status === "cancelled") {
+      return res.status(400).json({ message: "Session is already cancelled" });
+    }
+
+    const oneHourFromNow = new Date(Date.now() + 60 * 60 * 1000);
+    if (new Date(session.slot) <= oneHourFromNow) {
+      return res.status(400).json({ message: "Cannot cancel within 1 hour of the session" });
+    }
+
+    session.status = "cancelled";
+    await session.save();
+
+    res.status(200).json({ session });
+  } catch (err) {
+    console.error("cancelSession error:", err.message);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -114,4 +163,4 @@ const updateSessionStatus = async (req, res) => {
   }
 };
 
-module.exports = { createSession, getSessions, getMySessions, updateSessionStatus };
+module.exports = { createSession, getSessions, getMySessions, updateSessionStatus, cancelSession };

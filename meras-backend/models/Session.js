@@ -23,6 +23,8 @@ const sessionSchema = new mongoose.Schema(
       enum: ["pending", "confirmed", "completed", "cancelled"],
       default: "pending",
     },
+    meetingLink: { type: String, default: "" },
+    emailSent:   { type: Boolean, default: false },
   },
   { timestamps: true }
 );

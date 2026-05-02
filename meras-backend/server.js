@@ -3,12 +3,14 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const submissionRoutes = require("./routes/submissionRoutes");
+const { startSessionReminderJob } = require("./jobs/sessionReminder");
 
 dotenv.config();
 
 const app = express();
 
 connectDB();
+startSessionReminderJob();
 
 // ── MIDDLEWARE ──
 

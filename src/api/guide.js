@@ -14,6 +14,37 @@ const getAuthHeaders = () => ({
 // SESSIONS 
 // ─── SESSIONS ────────────────────────────────────────────────────────────────
 
+// POST /api/sessions — explorer books a session with a guide
+export const apiBookSession = async ({ mentorEmail, slot, topic }) => {
+  const res = await fetch('/api/sessions', {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ mentorEmail, slot, topic }),
+  })
+  const data = await parseJSON(res)
+  if (!res.ok) throw new Error(data.message || 'Failed to book session')
+  return data // { booking }
+}
+
+// GET /api/sessions/mine — explorer views their booked sessions (with guideName)
+export const apiGetExplorerSessions = async () => {
+  const res = await fetch('/api/sessions/mine', { headers: getAuthHeaders() })
+  const data = await parseJSON(res)
+  if (!res.ok) throw new Error(data.message || 'Failed to load sessions')
+  return data // { sessions }
+}
+
+// PATCH /api/sessions/:id/cancel — explorer cancels their session
+export const apiCancelSession = async (sessionId) => {
+  const res = await fetch(`/api/sessions/${sessionId}/cancel`, {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+  })
+  const data = await parseJSON(res)
+  if (!res.ok) throw new Error(data.message || 'Failed to cancel session')
+  return data // { session }
+}
+
 // GET /api/sessions/mine — guide views their booked sessions
 export const apiGetGuideSessions = async () => {
   const res = await fetch('/api/sessions/mine', { headers: getAuthHeaders() })

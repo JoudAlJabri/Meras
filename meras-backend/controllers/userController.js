@@ -146,7 +146,6 @@ const updateGuideSettings = async (req, res) => {
 const getDashboard = async (req, res) => {
   try {
     const user = await User.findById(req.user.id)
-      .populate("completedChallenges", "title")
       .populate("challengesInProgress", "title major")
       .populate("sessionsBooked");
 
@@ -154,10 +153,32 @@ const getDashboard = async (req, res) => {
 
     const firstName = user.name.split(" ")[0];
 
+    // Fetch all submissions for this explorer with challenge + guide info
+    const submissions = await Submission.find({ explorerId: req.user.id })
+      .populate("challengeId", "title major description")
+      .populate("guideId", "name")
+      .sort({ createdAt: -1 });
+
+    const completedChallenges = submissions.map(sub => ({
+      _id: sub._id,
+      title: sub.challengeId?.title || "",
+      major: sub.challengeId?.major || "",
+      description: sub.challengeId?.description || "",
+      submissionType: sub.submissionType,
+      textAnswer: sub.textAnswer,
+      file: sub.fileUrl,
+      canvasImage: sub.canvasUrl ? `http://localhost:5001${sub.canvasUrl}` : "",
+      rating: sub.stars,
+      feedbackText: sub.feedback,
+      gradedBy: sub.guideId?.name || "",
+      gradedAt: sub.status === "graded" ? new Date(sub.updatedAt).toLocaleDateString() : null,
+      status: sub.status,
+    }));
+
     const recentActivity = [];
 
-    if (user.completedChallenges.length > 0) {
-      const last = user.completedChallenges[user.completedChallenges.length - 1];
+    if (completedChallenges.length > 0) {
+      const last = completedChallenges[completedChallenges.length - 1];
       recentActivity.push({
         type: "challenge",
         label: "Challenges",
@@ -178,12 +199,13 @@ const getDashboard = async (req, res) => {
     res.status(200).json({
       firstName,
       stats: {
-        completedChallenges: user.completedChallenges.length,
+        completedChallenges: completedChallenges.length,
         challengesInProgress: user.challengesInProgress.length,
         sessionsBooked: user.sessionsBooked.length,
         savedChallenges: user.savedChallenges.length,
       },
       challengesInProgress: user.challengesInProgress,
+      completedChallenges,
       recentActivity,
     });
   } catch (err) {
@@ -323,6 +345,18 @@ const getGuideDashboard = async (req, res) => {
   }
 };
 
+// GET /api/users/:id/availability — public, fetch a guide's available slots
+const getAvailability = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("availability");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.status(200).json({ availability: user.availability || [] });
+  } catch (err) {
+    console.error("getAvailability error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   saveQuizResults,
   getSavedChallenges,
@@ -333,4 +367,5 @@ module.exports = {
   getMentors,
   getMentorById,
   updateAvailability,
+  getAvailability,
 };

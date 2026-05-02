@@ -1,5 +1,7 @@
 import { useMemo, useState, useEffect } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
+import { apiCreateReview, apiGetReviewsByMentor } from '../../api/guide'
 import puzzleImg from '../../assets/General-Graphics/2PersonPuzzle.png'
 import swe  from '../../assets/Tech-Graphics/Software-Engineering.png'
 import cs   from '../../assets/Tech-Graphics/Computer-Science.png'
@@ -76,10 +78,16 @@ function MentorProfile({ bookingPath = '/guide/booking' }) {
   const navigate = useNavigate()
   const { state: mentorFromState } = useLocation()
   const { id } = useParams()
+  const { currentUser } = useAuth()
 
   const [mentor, setMentor] = useState(mentorFromState || null)
   const [challenges, setChallenges] = useState([])
   const [loading, setLoading] = useState(!mentorFromState)
+
+  const [hoverRating, setHoverRating] = useState(0)
+  const [myRating, setMyRating]       = useState(0)
+  const [rated, setRated]             = useState(false)
+  const [submitting, setSubmitting]   = useState(false)
 
   // If we navigated directly (no state), fetch mentor from backend
   useEffect(() => {
@@ -101,6 +109,35 @@ function MentorProfile({ bookingPath = '/guide/booking' }) {
 
     fetchMentor()
   }, [id, mentorFromState?._id])
+
+  // Check if this explorer has already rated this mentor
+  useEffect(() => {
+    const mentorId = id || mentor?._id
+    if (!mentorId || currentUser?.role !== 'explorer') return
+    apiGetReviewsByMentor(mentorId)
+      .then(reviews => {
+        const mine = reviews.find(r =>
+          r.explorerId?._id?.toString() === currentUser._id?.toString()
+        )
+        if (mine) { setMyRating(mine.stars); setRated(true) }
+      })
+      .catch(() => {})
+  }, [id, mentor?._id, currentUser?._id])
+
+  async function handleRate(stars) {
+    if (submitting || rated) return
+    setSubmitting(true)
+    try {
+      await apiCreateReview({ mentorId: mentor._id, stars })
+      setMyRating(stars)
+      setRated(true)
+    } catch {
+      // already rated or other error — just lock the UI
+      setRated(true)
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   if (loading) return <p className="page-container">Loading...</p>
   if (!mentor)  return <p className="page-container">No mentor data found.</p>

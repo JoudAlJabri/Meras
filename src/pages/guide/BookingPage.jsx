@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import puzzleImg from '../../assets/General-Graphics/2PersonPuzzle.png'
 import swe  from '../../assets/Tech-Graphics/Software-Engineering.png'
@@ -18,19 +18,10 @@ import acc  from '../../assets/Business-Graphics/Accounting.png'
 import mkt  from '../../assets/Business-Graphics/Marketing.png'
 import mis  from '../../assets/Business-Graphics/MIS.png'
 import bus  from '../../assets/Business-Graphics/Business.png'
+import { apiGetAvailability, apiBookSession } from '../../api/guide'
 
 import './Guide.css'
 
-const SLOTS = [
-  'Sun 10:00 AM',
-  'Sun 2:00 PM',
-  'Mon 12:00 PM',
-  'Tue 4:00 PM',
-  'Wed 11:00 AM',
-  'Thu 3:00 PM',
-]
-
-//  Same maps as MentorCard / MentorProfile 
 const majorImages = {
   'computer science':              cs,
   'software engineering':          swe,
@@ -76,24 +67,87 @@ const onColor = {
   'var(--meras-gray)':   '#1A0A00',
 }
 
+// "2026-05-04" + "10:00 AM" → Date ISO string
+function slotToISO(dateStr, timeStr) {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  const [timePart, meridiem] = timeStr.split(' ')
+  let [hours, minutes] = timePart.split(':').map(Number)
+  if (meridiem === 'PM' && hours !== 12) hours += 12
+  if (meridiem === 'AM' && hours === 12) hours = 0
+  return new Date(y, m - 1, d, hours, minutes || 0).toISOString()
+}
+
+// "2026-05-04" → "Mon May 4"
+function formatDate(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  return new Date(y, m - 1, d).toLocaleDateString('en-US', {
+    weekday: 'short', month: 'short', day: 'numeric',
+  })
+}
+
 function BookingPage() {
   const navigate = useNavigate()
   const { state: mentor } = useLocation()
 
-  const [selectedSlot, setSelectedSlot] = useState(null)
-  const [topic, setTopic]               = useState('')
-  const [showModal, setShowModal]       = useState(false)
+  const [availability, setAvailability] = useState([])
+  const [loadingSlots, setLoadingSlots]   = useState(true)
+  const [selectedSlot, setSelectedSlot]   = useState(null) // { date, time }
+  const [topic, setTopic]                 = useState('')
+  const [confirming, setConfirming]       = useState(false)
+  const [booking, setBooking]             = useState(null)  // confirmed booking object
+  const [error, setError]                 = useState(null)
 
-  const majorKey   = mentor?.major?.toLowerCase()
-  const cardColor  = majorCardColors[majorKey] ?? 'var(--meras-green)'
-  const textColor  = onColor[cardColor] ?? '#ffffff'
+  const majorKey    = mentor?.major?.toLowerCase()
+  const cardColor   = majorCardColors[majorKey] ?? 'var(--meras-green)'
+  const textColor   = onColor[cardColor] ?? '#ffffff'
   const illustration = useMemo(() => majorImages[majorKey] ?? puzzleImg, [majorKey])
+
+  // Fetch guide's real availability
+  useEffect(() => {
+    if (!mentor?._id) return
+    apiGetAvailability(mentor._id)
+      .then(({ availability: raw }) => {
+        // Filter out past dates
+        const today = new Date(); today.setHours(0, 0, 0, 0)
+        const future = (raw || []).filter(({ date }) => {
+          const [y, m, d] = date.split('-').map(Number)
+          return new Date(y, m - 1, d) >= today
+        })
+        setAvailability(future)
+      })
+      .catch(() => setAvailability([]))
+      .finally(() => setLoadingSlots(false))
+  }, [mentor?._id])
 
   if (!mentor) {
     return <p className="page-container">No mentor selected.</p>
   }
 
+  // Flatten into a list of { date, time } objects for display
+  const allSlots = availability.flatMap(({ date, slots }) =>
+    slots.map(time => ({ date, time }))
+  )
+
   const isReady = selectedSlot && topic.trim()
+
+  async function handleConfirm() {
+    if (!isReady || confirming) return
+    setConfirming(true)
+    setError(null)
+    try {
+      const isoSlot = slotToISO(selectedSlot.date, selectedSlot.time)
+      const { booking: b } = await apiBookSession({
+        mentorEmail: mentor.email,
+        slot: isoSlot,
+        topic: topic.trim(),
+      })
+      setBooking(b)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setConfirming(false)
+    }
+  }
 
   return (
     <div className="bk-wrap">
@@ -115,27 +169,32 @@ function BookingPage() {
         </div>
       </div>
 
-    
-
       {/* ── TIME SLOTS ── */}
       <div className="bk-card">
         <h3 className="bk-card-title">Select a Time Slot</h3>
-        <div className="bk-slots-grid">
-          {SLOTS.map((slot) => (
-            <button
-              key={slot}
-              className="bk-slot-pill"
-              style={
-                selectedSlot === slot
-                  ? { backgroundColor: cardColor, color: textColor, borderColor: cardColor }
-                  : {}
-              }
-              onClick={() => setSelectedSlot(slot)}
-            >
-              {slot}
-            </button>
-          ))}
-        </div>
+        {loadingSlots ? (
+          <p style={{ fontSize: '14px', color: '#6B7280' }}>Loading availability…</p>
+        ) : allSlots.length === 0 ? (
+          <p style={{ fontSize: '14px', color: '#6B7280' }}>
+            This guide hasn't set any upcoming availability yet.
+          </p>
+        ) : (
+          <div className="bk-slots-grid">
+            {allSlots.map(({ date, time }) => {
+              const isActive = selectedSlot?.date === date && selectedSlot?.time === time
+              return (
+                <button
+                  key={`${date}-${time}`}
+                  className="bk-slot-pill"
+                  style={isActive ? { backgroundColor: cardColor, color: textColor, borderColor: cardColor } : {}}
+                  onClick={() => setSelectedSlot({ date, time })}
+                >
+                  {formatDate(date)} · {time}
+                </button>
+              )
+            })}
+          </div>
+        )}
       </div>
 
       {/* ── SESSION TOPIC ── */}
@@ -150,22 +209,24 @@ function BookingPage() {
         />
       </div>
 
+      {error && (
+        <p style={{ color: '#EF4444', fontSize: '14px', margin: 0 }}>{error}</p>
+      )}
+
       {/* ── CONFIRM BUTTON ── */}
       <button
         className="bk-confirm-btn"
-        disabled={!isReady}
-        style={
-          isReady
-            ? { backgroundColor: cardColor, color: textColor, opacity: 1 }
-            : {}
-        }
-        onClick={() => setShowModal(true)}
+        disabled={!isReady || confirming}
+        style={isReady && !confirming
+          ? { backgroundColor: cardColor, color: textColor, opacity: 1 }
+          : {}}
+        onClick={handleConfirm}
       >
-        Confirm Booking →
+        {confirming ? 'Booking…' : 'Confirm Booking →'}
       </button>
 
-      {/* CONFIRMATION MODAL */}
-      {showModal && (
+      {/* ── CONFIRMATION MODAL ── */}
+      {booking && (
         <div className="bk-modal-overlay">
           <div className="bk-modal">
             <div className="bk-modal-icon" style={{ backgroundColor: cardColor, color: textColor }}>
@@ -179,27 +240,37 @@ function BookingPage() {
               </div>
               <div className="bk-modal-row">
                 <span className="bk-modal-key">Time</span>
-                <span className="bk-modal-val">{selectedSlot}</span>
+                <span className="bk-modal-val">
+                  {formatDate(selectedSlot.date)} · {selectedSlot.time}
+                </span>
               </div>
               <div className="bk-modal-row">
                 <span className="bk-modal-key">Topic</span>
-                <span className="bk-modal-val">{topic}</span>
+                <span className="bk-modal-val">{booking.topic}</span>
               </div>
               <div className="bk-modal-row">
                 <span className="bk-modal-key">Meeting link</span>
-                <span className="bk-modal-val bk-modal-green">Coming soon</span>
+                <a
+                  href={booking.meetingLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bk-modal-val bk-modal-green"
+                  style={{ fontWeight: 600 }}
+                >
+                  Join on Jitsi Meet →
+                </a>
               </div>
             </div>
             <div className="bk-modal-actions">
-              <button className="bk-modal-close" onClick={() => setShowModal(false)}>
-                Close
+              <button className="bk-modal-close" onClick={() => navigate(-2)}>
+                Back to Directory
               </button>
               <button
                 className="bk-modal-home"
                 style={{ backgroundColor: cardColor, color: textColor }}
-                onClick={() => navigate(-2)}
+                onClick={() => navigate('/explorer/dashboard')}
               >
-                Back to Directory
+                Go to Dashboard
               </button>
             </div>
           </div>
