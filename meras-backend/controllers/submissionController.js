@@ -4,11 +4,13 @@ const Submission = require("../models/Submission");
 const Challenge = require("../models/Challenge");
 const User = require("../models/User");
 
-// Ensure upload directories exist at startup
-["uploads/submissions", "uploads/canvas"].forEach((dir) => {
-  const full = path.join(__dirname, "..", dir);
-  if (!fs.existsSync(full)) fs.mkdirSync(full, { recursive: true });
-});
+// Only create upload dirs in local dev (Vercel filesystem is read-only)
+if (process.env.NODE_ENV !== "production") {
+  ["uploads/submissions", "uploads/canvas"].forEach((dir) => {
+    const full = path.join(__dirname, "..", dir);
+    if (!fs.existsSync(full)) fs.mkdirSync(full, { recursive: true });
+  });
+}
 
 // POST /submissions
 // Explorer submits their work
