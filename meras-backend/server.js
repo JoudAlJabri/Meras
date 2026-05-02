@@ -16,7 +16,9 @@ if (process.env.NODE_ENV !== 'production') {
 
 // ── MIDDLEWARE ──
 
-app.use(cors()); // allows React frontend to talk to this server
+app.use(cors({
+  origin: "https://meras-frontend.vercel.app"
+})); // allows React frontend to talk to this server
 app.use(express.json()); // allows the server to read JSON from request bodies
 app.use(express.urlencoded({ extended: true }));
 

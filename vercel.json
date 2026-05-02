@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://your-backend.vercel.app/api/:path*"
+      "destination": "meras-8r7ee63xn-joudaljabris-projects.vercel.app"
     }
   ]
 }
