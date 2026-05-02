@@ -119,4 +119,8 @@ export const unsaveChallenge = async (id) => {
   return data;
 };
 
-export const apiGetChallenges = getChallenges;
+export const apiGetChallenges    = getChallenges;
+export const apiGetChallengeById = getChallengeById;
+export const apiCreateChallenge  = createChallenge;
+export const apiUpdateChallenge  = updateChallenge;
+export const apiDeleteChallenge  = deleteChallenge;
