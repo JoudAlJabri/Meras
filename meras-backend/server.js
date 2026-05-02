@@ -10,7 +10,9 @@ dotenv.config();
 const app = express();
 
 connectDB();
-startSessionReminderJob();
+if (process.env.NODE_ENV !== 'production') {
+  startSessionReminderJob();
+}
 
 // ── MIDDLEWARE ──
 
