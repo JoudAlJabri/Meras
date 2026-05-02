@@ -1,16 +1,21 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { mockChallenges } from '../../../data/mockData'
+import { apiGetChallengeById } from '../../../api/challenges'
 import TaskSubmittedCelebration from '../../../assets/General-Graphics/celebration.png'
 
 function SubmissionConfirmation() {
   const navigate = useNavigate()
-  const { index } = useParams()
-  const challenge = mockChallenges[parseInt(index)] ?? mockChallenges[0]
+  const { id } = useParams()
 
-  // Generate submission time once on mount
+  const [challenge, setChallenge] = useState(null)
+
+  useEffect(() => {
+    apiGetChallengeById(id)
+      .then(data => setChallenge(data.challenge))
+      .catch(err => console.error('Failed to load challenge:', err.message))
+  }, [id])
+
   const [submittedAt] = useState(() => {
-
     const now = new Date()
     return now.toLocaleString('en-GB', {
       day: '2-digit',
@@ -62,18 +67,15 @@ function SubmissionConfirmation() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          paddingBottom: '120px' // space for bottom buttons
+          paddingBottom: '120px'
         }}
       >
-
-       
         <img
           src={TaskSubmittedCelebration}
           alt="Celebration"
           style={{ maxHeight: '220px', marginTop: '2rem' }}
         />
 
-     
         <h4
           className="fw-bold mt-4 mb-4"
           style={{ color: 'var(--meras-text)', fontSize: '1.6rem' }}
@@ -93,8 +95,6 @@ function SubmissionConfirmation() {
             padding: '1.5rem'
           }}
         >
-
-  
           <h6
             className="fw-bold mb-3"
             style={{ color: 'var(--meras-text)', fontSize: '15px' }}
@@ -106,9 +106,7 @@ function SubmissionConfirmation() {
             className="d-flex align-items-center justify-content-between py-2"
             style={{ borderBottom: '1px solid var(--meras-border)' }}
           >
-            <span
-              style={{ fontSize: '14px', color: 'var(--meras-gray)' }}
-            >
+            <span style={{ fontSize: '14px', color: 'var(--meras-gray)' }}>
               Challenge name
             </span>
             <span
@@ -120,7 +118,7 @@ function SubmissionConfirmation() {
                 textAlign: 'right'
               }}
             >
-              {challenge?.title || 'Unknown Challenge'}
+              {challenge?.title || '—'}
             </span>
           </div>
 
@@ -128,18 +126,10 @@ function SubmissionConfirmation() {
             className="d-flex align-items-center justify-content-between py-2"
             style={{ borderBottom: '1px solid var(--meras-border)' }}
           >
-            <span
-              style={{ fontSize: '14px', color: 'var(--meras-gray)' }}
-            >
+            <span style={{ fontSize: '14px', color: 'var(--meras-gray)' }}>
               Submitted at
             </span>
-            <span
-              style={{
-                fontSize: '13px',
-                color: 'var(--meras-text)',
-                fontWeight: '500'
-              }}
-            >
+            <span style={{ fontSize: '13px', color: 'var(--meras-text)', fontWeight: '500' }}>
               {submittedAt}
             </span>
           </div>
@@ -148,9 +138,7 @@ function SubmissionConfirmation() {
             className="d-flex align-items-center justify-content-between py-2"
             style={{ borderBottom: '1px solid var(--meras-border)' }}
           >
-            <span
-              style={{ fontSize: '14px', color: 'var(--meras-gray)' }}
-            >
+            <span style={{ fontSize: '14px', color: 'var(--meras-gray)' }}>
               Status
             </span>
             <span
@@ -163,14 +151,13 @@ function SubmissionConfirmation() {
                 border: '1px solid #FDE68A'
               }}
             >
-              Pending
+              Pending Review
             </span>
           </div>
 
         </div>
       </div>
 
-    
       <div
         style={{
           position: 'fixed',
@@ -181,7 +168,6 @@ function SubmissionConfirmation() {
           zIndex: 50
         }}
       >
-        {/* back to Dashboard */}
         <button
           onClick={() => navigate('/explorer/dashboard')}
           className="btn fw-semibold px-4 py-2 text-white"
@@ -195,7 +181,6 @@ function SubmissionConfirmation() {
           Back to Dashboard →
         </button>
 
-        {/* browse More Challenges */}
         <button
           onClick={() => navigate('/explorer/challengeCatalog')}
           className="btn fw-semibold px-4 py-2 text-white"

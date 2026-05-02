@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const Submission = require("../models/Submission");
 const Challenge = require("../models/Challenge");
+const User = require("../models/User");
 
 // Ensure upload directories exist at startup
 ["uploads/submissions", "uploads/canvas"].forEach((dir) => {
@@ -55,6 +56,11 @@ const createSubmission = async (req, res) => {
       fileUrl,
       textAnswer:     textAnswer || "",
       canvasUrl,
+    });
+
+    await User.findByIdAndUpdate(req.user.id, {
+      $addToSet: { completedChallenges: challengeId },
+      $pull:     { challengesInProgress: challengeId },
     });
 
     res.status(201).json({ submission });

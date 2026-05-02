@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ReactSketchCanvas } from 'react-sketch-canvas'
+import { apiCreateSubmission } from '../../../api/submissions'
 
 
 
@@ -13,8 +14,9 @@ const MODES = {
 
 function TaskWorkspace() {
   const navigate = useNavigate()
-const { id } = useParams()  // change index → id
+const { id } = useParams()
 const [challenge, setChallenge] = useState(null)
+const [loading, setLoading] = useState(true)
 
 useEffect(() => {
   const fetchChallenge = async () => {
@@ -24,6 +26,8 @@ useEffect(() => {
       setChallenge(data.challenge)
     } catch (error) {
       console.error("Error fetching challenge:", error)
+    } finally {
+      setLoading(false)
     }
   }
   fetchChallenge()
@@ -174,8 +178,7 @@ useEffect(() => {
   }
 
   // submit
-  const handleSubmit = () => {
-    // Basic validation
+  const handleSubmit = async () => {
     if (mode === MODES.FILE && !uploadedFile) {
       alert('Please upload a file first')
       return
@@ -186,11 +189,25 @@ useEffect(() => {
     }
 
     setSubmitting(true)
-    // Simulate API call. <------------- here edit later
-    setTimeout(() => {
+    try {
+      let canvasBase64 = null
+      if (mode === MODES.CANVAS) {
+        canvasBase64 = await canvasRef.current?.exportImage('png')
+      }
+
+      await apiCreateSubmission({
+        challengeId: id,
+        mode,
+        file: uploadedFile,
+        textAnswer,
+        canvasBase64,
+      })
+
+      navigate(`/explorer/submission-confirmation/${id}`)
+    } catch (err) {
+      alert(err.message || 'Submission failed. Please try again.')
       setSubmitting(false)
-      navigate(`/explorer/submission-confirmation/${index}`)
-    }, 1500)
+    }
   }
 
   // canvas colors ( change then if needed )
@@ -201,6 +218,14 @@ useEffect(() => {
   ]
 
 
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'var(--meras-bg)', color: 'white' }}>
+        <div className="text-center">Loading...</div>
+      </div>
+    )
+  }
 
   if (!challenge) {
     return (

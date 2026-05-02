@@ -75,12 +75,12 @@ function App() {
               <ExplorerLayout><ChallengeDetail /></ExplorerLayout>
             </ProtectedRoute>
           } />
-          <Route path="/explorer/workspace/:index" element={
+          <Route path="/explorer/workspace/:id" element={
             <ProtectedRoute allowedRoles={['explorer']}>
               <ExplorerLayout><TaskWorkspace /></ExplorerLayout>
             </ProtectedRoute>
           } />
-          <Route path="/explorer/submission-confirmation/:index" element={
+          <Route path="/explorer/submission-confirmation/:id" element={
             <ProtectedRoute allowedRoles={['explorer']}>
               <ExplorerLayout><SubmissionConfirmation /></ExplorerLayout>
             </ProtectedRoute>
