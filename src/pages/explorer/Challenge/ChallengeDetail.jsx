@@ -59,9 +59,14 @@ function ChallengeDetail() {
       try {
         const res = await fetch(`/api/challenges/${id}`)
         const data = await res.json()
+        if (!res.ok) {
+          setChallenge({ message: data.message || 'Failed to load challenge' })
+          return
+        }
         setChallenge(data.challenge)
       } catch (error) {
         console.error('Error fetching challenge:', error)
+        setChallenge({ message: 'Failed to load challenge' })
       }
     }
 

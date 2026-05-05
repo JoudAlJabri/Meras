@@ -36,6 +36,9 @@ const getChallengeById = async (req, res) => {
 
     res.status(200).json({ challenge });
   } catch (err) {
+    if (err.name === "CastError") {
+      return res.status(404).json({ message: "Challenge not found" });
+    }
     console.error("getChallengeById error:", err.message);
     res.status(500).json({ message: "Server error" });
   }
