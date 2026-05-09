@@ -1,16 +1,6 @@
-const fs = require("fs");
-const path = require("path");
 const Submission = require("../models/Submission");
 const Challenge = require("../models/Challenge");
 const User = require("../models/User");
-
-// Only create upload dirs in local dev (Vercel filesystem is read-only)
-if (process.env.NODE_ENV !== "production") {
-  ["uploads/submissions", "uploads/canvas"].forEach((dir) => {
-    const full = path.join(__dirname, "..", dir);
-    if (!fs.existsSync(full)) fs.mkdirSync(full, { recursive: true });
-  });
-}
 
 // POST /submissions
 // Explorer submits their work
@@ -28,26 +18,18 @@ const createSubmission = async (req, res) => {
     let canvasUrl = "";
 
     if (submissionType === "file") {
-      // multer already saved the file, its path is in req.file
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
       }
-      fileUrl = `/uploads/submissions/${req.file.filename}`;
+      const b64 = req.file.buffer.toString("base64");
+      fileUrl = `data:${req.file.mimetype};base64,${b64}`;
     }
 
     if (submissionType === "canvas") {
       if (!canvasBase64) {
         return res.status(400).json({ message: "canvasBase64 is required for canvas submissions" });
       }
-      const base64Data = canvasBase64.replace(/^data:image\/png;base64,/, "");
-
-      // Create a unique filename
-      const fileName = `canvas_${req.user.id}_${Date.now()}.png`;
-      const filePath = path.join(__dirname, "../uploads/canvas", fileName);
-
-      await fs.promises.writeFile(filePath, Buffer.from(base64Data, "base64"));
-
-      canvasUrl = `/uploads/canvas/${fileName}`;
+      canvasUrl = canvasBase64;
     }
 
     const submission = await Submission.create({

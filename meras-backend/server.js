@@ -19,8 +19,8 @@ if (process.env.NODE_ENV !== 'production') {
 app.use(cors({
   origin: "https://meras1-five.vercel.app"
 })); // allows React frontend to talk to this server
-app.use(express.json()); // allows the server to read JSON from request bodies
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.get("/", (req, res) => {
   res.send("Meras backend NEW TEST");
